@@ -1405,7 +1405,7 @@ script AutoCasperNBIAppDelegate
         set my netBootCreationSuccessful to false
         
         -- Reset required space
-        set requiredSpace to 30
+        set requiredSpace to 20
         
         -- Show Cog on main window
         set my mainWindowCog to true
