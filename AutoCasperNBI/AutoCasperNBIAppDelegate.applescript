@@ -312,7 +312,7 @@ script AutoCasperNBIAppDelegate
         delay 0.1
         
         --  Try & mount dropped file
-        set selectedOSdmgMountPath to do shell script "hdiutil attach " & selectedOSdmgPath & " -nobrowse -owners on | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form
+        set selectedOSdmgMountPath to do shell script "hdiutil attach " & quoted form of selectedOSdmgPath & " -nobrowse -owners on | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form
         
         -- If selectedOSdmgMountPath, then we've failed to mount as it's not a dmg.
         if selectedOSdmgMountPath is equal to "" then
