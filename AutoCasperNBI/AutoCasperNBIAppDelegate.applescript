@@ -416,8 +416,17 @@ script AutoCasperNBIAppDelegate
             -- Display exclamation icon
             set my exclamationRedOSDMG to true
             
-        else
-        
+        else if selectedOSdmgVersionMajor is less than hostMacOSVersionMajor then
+            
+            display dialog "Error: Cannot create an NetBoot from supplied OS.dmg as it's OS version (" & selectedOSdmgVersion & ") is older than this Macs OS (" & hostMacOSVersion & ")." with icon 0 buttons {"OK"}
+            
+            -- Reset OSDMG Icons & hide cog
+            doResetOSDMGIcons_(me)
+            
+            -- Display exclamation icon
+            set my exclamationRedOSDMG to true
+            else
+            
             -- Log that we're ok to proceed
             log "We can create a NetBoot from " & selectedOSdmgPath
             
@@ -2041,7 +2050,10 @@ script AutoCasperNBIAppDelegate
                             log "Deleted " & variableVariable
                             
                             -- Install rc.netboot.pkg
-                            installRCNetboot_(me)
+                            --installRCNetboot_(me)
+                            
+                            -- Install AutoCasperNBIStartup.pkg
+                            installAutoCasperNBIStartup_(me)
                     
                     else
                             
@@ -2049,8 +2061,10 @@ script AutoCasperNBIAppDelegate
                             log "Skipping extension deleting as not needed on this OS"
                             
                             -- Install rc.netboot.pkg
-                            installRCNetboot_(me)
+                            --installRCNetboot_(me)
                             
+                            -- Install AutoCasperNBIStartup.pkg
+                            installAutoCasperNBIStartup_(me)
                             
                     end if
                     
