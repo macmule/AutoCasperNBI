@@ -1368,13 +1368,13 @@ script AutoCasperNBIAppDelegate
         -- If a custom desktop is selected
         if customDesktopImagePath is not equal to missing value then
             
-            -- reload options from plist
-            retrieveDefaults_(me)
-            
             try
                 
+                -- Set customDesktopImagePath to value as text
+                set customDesktopImagePath to customDesktopImagePath as text
+                
                 -- Check for file
-                do shell script "ls " & customDesktopImagePath
+                do shell script "ls " & quoted form of customDesktopImagePath
                 
                 -- True if file exists
                 set desktopImageExists to true
@@ -1564,13 +1564,17 @@ script AutoCasperNBIAppDelegate
         if customDesktopImagePath is not equal to missing value then
             
             try
+                
+                -- Set customDesktopImagePath to value as text
+                set customDesktopImagePath to customDesktopImagePath as text
+                
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Checking that " & customDesktopImagePath & " exists"
                 
                 log "Selected Desktop Image: " & customDesktopImagePath
                 
                 -- Check for file
-                do shell script "ls " & customDesktopImagePath
+                do shell script "ls " & quoted form of customDesktopImagePath
                 
                 -- True as file exists
                 set desktopImageExists to true
@@ -2216,7 +2220,7 @@ script AutoCasperNBIAppDelegate
                 log "Trying to copy " & customDesktopImagePath & " to " & variableVariable
                 
                 -- Copy selected image
-                do shell script "cp -r " & customDesktopImagePath & " " & quoted form of variableVariable with administrator privileges
+                do shell script "cp -r " & quoted form of customDesktopImagePath & " " & quoted form of variableVariable with administrator privileges
 
                 -- Correct ownership
                 do shell script "chown root:wheel " & quoted form of variableVariable with administrator privileges
