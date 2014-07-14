@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment defaultVersion="1090" identifier="macosx"/>
+        <deployment defaultVersion="1070" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
@@ -515,7 +515,16 @@
                                     <rect key="frame" x="237" y="58" width="48" height="19"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" placeholderString="0" drawsBackground="YES" id="q2q-xA-ONJ">
-                                        <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" id="GBD-ii-qib"/>
+                                        <numberFormatter key="formatter" formatterBehavior="10_0" positiveFormat="0" negativeFormat="-0.00" localizesFormat="NO" hasThousandSeparators="NO" thousandSeparator="," id="GBD-ii-qib">
+                                            <attributedString key="attributedStringForZero">
+                                                <fragment content="0.00"/>
+                                            </attributedString>
+                                            <decimal key="minimum" value="NaN"/>
+                                            <decimal key="maximum" value="NaN"/>
+                                            <metadata>
+                                                <real key="inspectorSampleValue" value="1"/>
+                                            </metadata>
+                                        </numberFormatter>
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -817,11 +826,11 @@
                         <tabViewItems>
                             <tabViewItem label="Standard" identifier="1" id="ObJ-EC-sRC">
                                 <view key="view" ambiguous="YES" id="sgz-Bf-xLl">
-                                    <rect key="frame" x="10" y="33" width="142" height="0.0"/>
+                                    <rect key="frame" x="10" y="33" width="417" height="507"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="NetBoot Optional Settings" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="2Nc-gH-i2I">
-                                            <rect key="frame" x="6" y="-148" width="408" height="148"/>
+                                            <rect key="frame" x="6" y="359" width="408" height="148"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="406" height="132"/>
@@ -863,7 +872,7 @@
                                                         <rect key="frame" x="112" y="31" width="276" height="77"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <string key="toolTip">Tick to set a description for this NetBoot Image, once ticked a description is auto populated. This auto populated description will be set at each launch, so please replace it with your own if wanted.</string>
-                                                        <textFieldCell key="cell" controlSize="small" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" placeholderString="" drawsBackground="YES" id="Dg4-oI-p7r">
+                                                        <textFieldCell key="cell" controlSize="small" selectable="YES" editable="YES" continuous="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" placeholderString="" drawsBackground="YES" id="Dg4-oI-p7r">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -884,7 +893,7 @@
                                                         <rect key="frame" x="109" y="110" width="149" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <string key="toolTip">Tick to set a description for this NetBoot Image, once ticked a description is auto populated. This auto populated description will be set at each launch, so please replace it with your own if wanted.</string>
-                                                        <buttonCell key="cell" type="check" title="Set NetBoot Description" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="j0l-Dy-Rr5">
+                                                        <buttonCell key="cell" type="check" title="Set NetBoot Description" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" inset="2" id="j0l-Dy-Rr5">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
@@ -933,7 +942,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Screen Sharing" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="qGi-wO-ZeY">
-                                            <rect key="frame" x="6" y="-344" width="408" height="197"/>
+                                            <rect key="frame" x="6" y="163" width="408" height="197"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="406" height="181"/>
@@ -1109,7 +1118,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Desktop Picture" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="ygq-cO-tbF">
-                                            <rect key="frame" x="6" y="-452" width="408" height="109"/>
+                                            <rect key="frame" x="6" y="55" width="408" height="109"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="406" height="93"/>

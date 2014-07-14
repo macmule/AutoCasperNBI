@@ -88,6 +88,10 @@ script AutoCasperNBIAppDelegate
     property jssVersionToDelim : missing value
     property jssVersionMajor : missing value
     property jssVersionMinor : missing value
+    property myLogFile : missing value
+    property timeStamp : missing value
+    property logMe : missing value
+    property netBootSelectedLocation : missing value
     
     --- Booleans
     property selectedOSDMGTextFieldEnabled : false
@@ -133,21 +137,35 @@ script AutoCasperNBIAppDelegate
     
 --- HANDLERS ---
 
-    ----- GET REQUIRED DEFAULTS ----
     -- To be run at launch
     on getOSandUsername_(sender)
         
+        -- Log that we've launched
+        set logMe to "=========================================================================================="
+        
+        -- Log To file
+        logToFile_(me)
+
         -- Get OS of host mac to verify that we can create an .nbi from supplied OS.dmg
         set my hostMacOSVersion to (do shell script "sw_vers -productVersion")
-        log "Running on OS " & hostMacOSVersion
+        set logMe to  "Running on OS " & hostMacOSVersion
         
+        -- Log To file
+        logToFile_(me)
+
         -- Get username of user running AutoCasperNBI
         set userName to short user name of (system info)
-        log "Launched by " & userName
+        set logMe to "Launched by " & userName
+        
+        -- Log To file
+        logToFile_(me)
         
         -- Get a UUID for folder path
         set tempUUID to do shell script "uuidgen"
-        log "UUID " & tempUUID
+        set logMe to "UUID " & tempUUID
+        
+        -- Log To file
+        logToFile_(me)
         
         -- Get path to resources folder
         set pathToResources to (current application's class "NSBundle"'s mainBundle()'s resourcePath()) as string
@@ -214,6 +232,9 @@ script AutoCasperNBIAppDelegate
         -- Disable main windows buttons
         set my optionWindowEnabled to false
         
+        -- Prompt user for location to create the .nbi
+        netBootLocation_(me)
+        
         -- activate build process window
         activate
         showBuildProcessWindow's makeKeyAndOrderFront_(null)
@@ -221,16 +242,16 @@ script AutoCasperNBIAppDelegate
         -- Set NetBoot Description
         enablenetBootDescription_(me)
         
-        -- Check free space & then start build
-        checkFreeSpace_(me)
-        
     end showBuildProcess_
     
     -- Cancel & tidy up
     on cancelBuildProcess_(sender)
         
         --Log Action
-        log "Cancelling..."
+        set logMe to "Cancelling..."
+        
+        -- Log To file
+        logToFile_(me)
         
         -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
         tidyUpTimeKids_(me)
@@ -282,6 +303,11 @@ script AutoCasperNBIAppDelegate
             set selectedOSdmgPath to POSIX path of result
             
             -- Log path of selected DMG
+            set logMe to "Path: " & selectedOSdmgPath
+            
+            -- Log To file
+            logToFile_(me)
+            
             log "Path: " & selectedOSdmgPath
             
             -- Reset OSDMG Icons & hide cog
@@ -290,7 +316,8 @@ script AutoCasperNBIAppDelegate
             -- Do handler:
             doOSDMG_(me)
             
-        end
+        end try
+        
     end selectedOSDMG_
     
     -- Try & get OS version from dropped dmg, error if something is not quite right
@@ -300,7 +327,10 @@ script AutoCasperNBIAppDelegate
         set my buildProccessProgressBar to 0
         
         -- Log that we're tryin to mount selected DMG
-        log "Trying to mount: " & selectedOSdmgPath
+        set logMe to "Trying to mount: " & selectedOSdmgPath
+        
+        -- Log To file
+        logToFile_(me)
         
         -- Update label to show we're doing stuff
         set my selectedOSDMGTextField to "Examining..."
@@ -317,6 +347,7 @@ script AutoCasperNBIAppDelegate
         -- If selectedOSdmgMountPath, then we've failed to mount as it's not a dmg.
         if selectedOSdmgMountPath is equal to "" then
             
+            -- Update text field with error
             set my selectedOSDMGTextField to "Cannot mount dmg"
             
             -- Reset OSDMG Icons
@@ -368,7 +399,7 @@ script AutoCasperNBIAppDelegate
         end if
         
         -- Log mounth path
-        log "Mount Path: " & selectedOSdmgMountPath
+        set logMe to "Mount Path: " & selectedOSdmgMountPath
         
         -- Check OS Versions
         checkOSVersions_(me)
@@ -405,7 +436,10 @@ script AutoCasperNBIAppDelegate
         if hostMacOSVersionMajor is less than selectedOSdmgVersionMajor then
             
             -- Log error if selected OS.dmg's OS is greater than host
-            log "Error: Cannot create an .nbi as OS.dmg's OS version (" & selectedOSdmgVersion & ") is newer than this Macs (" & hostMacOSVersion & ")."
+            set logMe to "Error: Cannot create an .nbi as OS.dmg's OS version (" & selectedOSdmgVersion & ") is newer than this Macs (" & hostMacOSVersion & ")."
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Display error to user
             display dialog "Error: Cannot create an NetBoot from supplied OS.dmg as it's OS version (" & selectedOSdmgVersion & ") is newer than this Macs OS (" & hostMacOSVersion & ")." with icon 0 buttons {"OK"}
@@ -425,10 +459,13 @@ script AutoCasperNBIAppDelegate
             
             -- Display exclamation icon
             set my exclamationRedOSDMG to true
-            else
+        else
             
             -- Log that we're ok to proceed
-            log "We can create a NetBoot from " & selectedOSdmgPath
+            set logMe to "We can create a NetBoot from " & selectedOSdmgPath
+            
+            -- Log To file
+            logToFile_(me)
             
             -- See if pre-reqs have been met
             checkIfReadyToProceed_(me)
@@ -448,7 +485,10 @@ script AutoCasperNBIAppDelegate
             set my selectedAppPath to POSIX path of result
             
             -- Log path of the selected app
-            log "Selected App Path: " & selectedAppPath
+            set logMe to "Selected App Path: " & selectedAppPath
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Reset Selected App Icons & cog
             doResetSelectedAppIcons_(me)
@@ -469,7 +509,11 @@ script AutoCasperNBIAppDelegate
             -- Enable Options & Build
             set my disableOptionsAndBuild to false
             
-            log "Pre-Reqs met, Options & Build enabled."
+            --Log Action
+            set logMe to "Pre-Reqs met, Options & Build enabled."
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Get the NetBoot Serve option
             netBootServeOption_(me)
@@ -494,16 +538,24 @@ script AutoCasperNBIAppDelegate
         set selectedAppBundleName to do shell script "defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleName"
         
         --Log Action
-        log "Bundle Name: " & selectedAppBundleName
+        set logMe to "Bundle Name: " & selectedAppBundleName
+        
+        -- Log To file
+        logToFile_(me)
 
         -- If Bundle Name is Casper Imaging, proceed to get version
         if selectedAppBundleName is equal to "Casper Imaging" then
             
-            -- If Casper Imaging, return version
             try
+               
+                -- If Casper Imaging, return version
                 set selectedCasperImagingAppVersion to do shell script "defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleGetInfoString"
                 
-                log "Casper Imaging Version: " & selectedCasperImagingAppVersion
+                --Log Action
+                set logMe to "Casper Imaging Version: " & selectedCasperImagingAppVersion
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Set label to Casper Imaging version
                 set my selectedAppTextField to "Casper Imaging " & selectedCasperImagingAppVersion
@@ -578,13 +630,19 @@ script AutoCasperNBIAppDelegate
             try
                 
                 --Log Action
-                log "Trying to get JSS version"
+                set logMe to "Trying to get JSS version"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Try & get URL using insecure method, this way it will work with or without a valid SSL cert
                 set jssURLHtml to do shell script "curl -k " & jssURL & "/jss.html"
 
                 --Log Action
-                log "Received JSS version"
+                set logMe to "Received JSS version"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Run Handler
                 getJSSVersion_(me)
@@ -596,8 +654,15 @@ script AutoCasperNBIAppDelegate
                     doResetJSSURLIcons_(me)
                     
                     -- Error if cannot get JSS Version
-                    log "Cannot get JSS Version 2"
+                    set logMe to "Cannot get JSS Version"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                    -- Set JSS exclaimation icon to show
                     set my exclamationRedJSSURL to true
+                    
+                    -- Update text field with error
                     set my enteredJSSURLTextField to "Cannot get JSS version"
                 
             end try
@@ -621,7 +686,10 @@ script AutoCasperNBIAppDelegate
     on getJSSVersion_(sender)
         
         --Log Action
-        log "Checking JSS Version from " & jssURL
+        set logMe to "Checking JSS Version from " & jssURL
+        
+        -- Log To file
+        logToFile_(me)
         
         try
          
@@ -644,7 +712,7 @@ script AutoCasperNBIAppDelegate
             set AppleScript's text item delimiters to applescriptsDelims
             
             -- Return JSS Version
-            log "JSS is: " & jssVersion
+            set logMe to "JSS is: " & jssVersion
             
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
@@ -667,9 +735,16 @@ script AutoCasperNBIAppDelegate
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
             
-            --Error Cannot get JSS Version
-            log "Cannot get JSS Version 1"
+            -- Error if cannot get JSS Version
+            set logMe to "Cannot get JSS Version"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set JSS exclaimation icon to show
             set my exclamationRedJSSURL to true
+            
+            -- Update text field with error
             set my enteredJSSURLTextField to "Cannot get JSS version"
             
             -- Reset delimiters
@@ -714,7 +789,10 @@ script AutoCasperNBIAppDelegate
         -- If major versions do not match, bad things can happen. But we'll not stop incase this nbi is being created before uprading JSS
         if selectedCasperImagingAppVersionMajor is not equal to jssVersionMajor then
             
-            log "Major Version Difference"
+            set logMe to "Major Version Difference"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Reset Selected App Icons
             doResetSelectedAppIcons_(me)
@@ -736,13 +814,18 @@ script AutoCasperNBIAppDelegate
             if selectedCasperImagingAppVersionMinor is not equal to jssVersionMinor then
                 
                 -- Log Minor Version Diff
-                log "Minor Version Difference"
+                set logMe to "Minor Version Difference"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Reset Selected App Icons
                 doResetSelectedAppIcons_(me)
                 
                 -- Reset JSS URL icons
                 doResetJSSURLIcons_(me)
+                
+                set my disableOptionsAndBuild to FALSE
                 
                 -- Show warning labels
                 set my warningSelectedApp to true
@@ -784,12 +867,19 @@ script AutoCasperNBIAppDelegate
             -- Display error to user
             display dialog "Please select a Name for the NetBoot Image" with icon 0 buttons {"OK"}
             
-            -- Error to log
-            log "Error: Name required for NetBoot Image"
+            --Log Action
+            set logMe to "Error: Name required for NetBoot Image"
+            
+            -- Log To file
+            logToFile_(me)
             
         else
         
-            log "Name: " & netBootNameTextField
+            --Log Action
+            set logMe to "Name: " & netBootNameTextField
+            
+            -- Log To file
+            logToFile_(me)
         
         end if
         
@@ -804,8 +894,11 @@ script AutoCasperNBIAppDelegate
         -- Set options depending on checkbox
         if netBootImageIndexLoadBalanced is true then
             
-            -- If checked...
-            log "NetBoot is to be hosted on multiple servers."
+            --Log Action
+            set logMe to "NetBoot is to be hosted on multiple servers."
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Set min & max values for Index
             set netBootImageIndexMinValue to 4096 as integer
@@ -813,8 +906,11 @@ script AutoCasperNBIAppDelegate
             
         else
         
-            -- If not checked...
-            log "NetBoot is to be hosted on a single server."
+            --Log Action
+            set logMe to "NetBoot is to be hosted on a single server."
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Set min & max values for Index
             set netBootImageIndexMinValue to 1 as integer
@@ -900,10 +996,21 @@ script AutoCasperNBIAppDelegate
         
         -- Set options depending on checkbox
         if netBootImageResizeEnabled is true then
-            -- If checked...
-            log "NetBoot resize enabled"
+            
+            --Log Action
+            set logMe to "NetBoot resize enabled"
+            
+            -- Log To file
+            logToFile_(me)
+            
         else
-            log "NetBoot resize option unchecked"
+        
+            --Log Action
+            set logMe to "NetBoot resize option unchecked"
+            
+            -- Log To file
+            logToFile_(me)
+            
         end if
         
         -- Update plist with selection
@@ -935,10 +1042,20 @@ script AutoCasperNBIAppDelegate
         
         -- Set options depending on checkbox
         if netBootImageReduceEnabled is true then
-            -- If checked...
-            log "NetBoot Reduce by enabled"
+            
+           --Log Action
+            set logMe to "NetBoot Reduce by enabled"
+            
+            -- Log To file
+            logToFile_(me)
+        
         else
-            log "NetBoot Reduce option unchecked"
+            --Log Action
+            set logMe to "NetBoot Reduce option unchecked"
+            
+            -- Log To file
+            logToFile_(me)
+        
         end if
         
         -- Update plist with selection
@@ -956,12 +1073,18 @@ script AutoCasperNBIAppDelegate
                 tell defaults to setObject_forKey_(netBootDescriptionEnabled, "netBootDescriptionEnabled")
                 
                 --Log Action
-                log "NetBoot description not enabled"
+                set logMe to "NetBoot description not enabled"
+                
+                -- Log To file
+                logToFile_(me)
                 
             else
             
                 --Log Action
-                log "NetBoot description enabled"
+                set logMe to "NetBoot description enabled"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Get Build date (should return localised).
                 set buildDate to date string of (current date)
@@ -973,18 +1096,24 @@ script AutoCasperNBIAppDelegate
                 if jssURL is equal to missing value
                 
                     -- Set NetBoot Description
-                    set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & ". Created by, " & longUserName & " on: " & buildDate & "."
+                    set netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & ". Created by, " & longUserName & " on: " & buildDate & "."
                     
                     --Log Action
-                    log "NetBoot description set to " & netBootDescription
+                    set logMe to "NetBoot description set to " & quoted form of netBootDescription
+                    
+                    -- Log To file
+                    logToFile_(me)
                     
                 else
                 
                     -- Set NetBoot Description
-                    set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & " pointing to JSS " & jssURL & ". Created by, " & longUserName & " on: " & buildDate & "."
+                    set netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & " pointing to JSS " & jssURL & ". Created by, " & longUserName & " on: " & buildDate & "."
                     
                     --Log Action
-                    log "NetBoot description set to " & netBootDescription
+                    set logMe to "NetBoot description set to " & quoted form of netBootDescription
+                    
+                    -- Log To file
+                    logToFile_(me)
                     
                 end if
             
@@ -1044,6 +1173,7 @@ script AutoCasperNBIAppDelegate
             -- Delete ardUsername from plist
             tell defaults to removeObjectForKey_("ardUsername")
             
+            -- Set check to false
             set my ardDetailsCheck to false
             
         else
@@ -1051,6 +1181,7 @@ script AutoCasperNBIAppDelegate
             -- Update plist with selection
             tell defaults to setObject_forKey_(ardUsername, "ardUsername")
             
+            -- Set check to true
             set my ardDetailsCheck to true
         
         end if
@@ -1163,7 +1294,10 @@ script AutoCasperNBIAppDelegate
             if netBootImageResizeValue is equal to missing value
         
                 --Log Action
-                log "Error: NetBoot resize enabled, but no value given for expansion"
+                set logMe to "Error: NetBoot resize enabled, but no value given for expansion"
+                
+                -- Log To file
+                logToFile_(me)
         
                 -- Bound to NetBoot Image Resize value
                 netBootImageResizeEnteredValue_(me)
@@ -1349,7 +1483,8 @@ script AutoCasperNBIAppDelegate
     on selectedDesktopImage_(sender)
         
         try
-         -- Prompt user to chose an Image
+            
+            -- Prompt user to chose an Image
             choose file of type {"public.jpeg"} with prompt "Select an Desktop Image:" default location (path to pictures folder)
             
             -- Set selectedDesktopImagePath to path of OS.dmg given
@@ -1359,7 +1494,7 @@ script AutoCasperNBIAppDelegate
             set my customDesktopImageLabel to "Image Selected: " & customDesktopImagePath
             
             -- Log path of selected Image
-            log customDesktopImageLabel
+            set logMe to customDesktopImageLabel
             
             -- Update plist with selection
             tell defaults to setObject_forKey_(customDesktopImagePath, "customDesktopImagePath")
@@ -1407,6 +1542,47 @@ script AutoCasperNBIAppDelegate
 
 ----- BUILD PRE-CHECK -----
 
+    -- Prompt user for location to create the .nbi
+    on netBootLocation_(sender)
+
+        try
+            
+            --If /Library/NetBoot/NetBootSPO exists
+            choose folder with prompt "Choose a location to create the .nbi in:" default location "/Library/NetBoot/"
+            
+            -- Set netBootSelectedLocation to path of location given
+            set netBootSelectedLocation to POSIX path of the result
+            
+            --Log Action
+            set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Check that we have enough space available to proceed
+            checkFreeSpace_(me)
+            
+        on error
+            
+            --Else open pointing to the desktop folder
+            choose folder with prompt "Choose a location to create the .nbi in:" default location (path to desktop folder)
+            
+            -- Set netBootSelectedLocation to path of location given
+            set netBootSelectedLocation to POSIX path of the result
+            
+            --Log Action
+            set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Check that we have enough space available to proceed
+            checkFreeSpace_(me)
+            
+        end try
+
+    end netBootLocation
+
     -- Check that we have enough space available to proceed
     on checkFreeSpace_(sender)
         
@@ -1444,18 +1620,27 @@ script AutoCasperNBIAppDelegate
         if libraryVolume is equal to usersVolume then
             
             --Log Action
-            log "AutoCasperNBI & this users Home folder reside on the same volume. Getting available space on: " & libraryVolume
+            set logMe to "AutoCasperNBI & this users Home folder reside on the same volume. Getting available space on: " & libraryVolume
+            
+            -- Log To file
+            logToFile_(me)
             
         else
         
             --Log Action
-            log "AutoCasperNBI & this users Home folder reside on the different volumes. Getting available space on both " & libraryVolume & " & " & usersVolume
+            set logMe to "AutoCasperNBI & this users Home folder reside on the different volumes. Getting available space on both " & libraryVolume & " & " & usersVolume
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Guesstimate, as we write to both the Home folder & OS HD, half required space to make sure we're ok to proceed.
             set requiredSpace to requiredSpace / 2
             
             --Log Action
-            log "There is " & requiredSpace & "GB space required on both " & libraryVolume & " & " & usersVolume
+            set logMe to "There is " & requiredSpace & "GB space required on both " & libraryVolume & " & " & usersVolume
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Checking that we have enough free space"
@@ -1488,7 +1673,10 @@ script AutoCasperNBIAppDelegate
         -- Make sure we have enough space on the App Volume to proceed
         if freeSpacelibraryVolume is less than requiredSpace then
             
-            log "There is " & requiredSpace & "GB of space is needed, only " & freeSpacelibraryVolume & "GB free. Cannot proceed."
+            set logMe to "There is " & requiredSpace & "GB of space is needed, only " & freeSpacelibraryVolume & "GB free. Cannot proceed."
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Display error to user
             display dialog "Error: " & requiredSpace & "GB of space is needed, only " & freeSpacelibraryVolume & "GB free. Cannot proceed." with icon 0 buttons {"OK"}
@@ -1505,7 +1693,10 @@ script AutoCasperNBIAppDelegate
         else
         
             --Log Action
-            log "There is " & libraryVolume & " has " & freeSpacelibraryVolume & "GB free. " & requiredSpace & "GB is needed, so we're ok to proceed."
+            set logMe to "There is " & libraryVolume & " has " & freeSpacelibraryVolume & "GB free. " & requiredSpace & "GB is needed, so we're ok to proceed."
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Set requiredSpaceCheckPassed based on if we're ok to proceed
             set my requiredSpaceCheckPassed to true
@@ -1523,7 +1714,10 @@ script AutoCasperNBIAppDelegate
             if freeSpaceUsersVolume is less than requiredSpace then
                 
                 --Log Action
-                log "There is " & requiredSpace & "GB of space is needed, only " & freeSpaceUsersVolume & "GB free. Cannot proceed."
+                set logMe to "There is " & requiredSpace & "GB of space is needed, only " & freeSpaceUsersVolume & "GB free. Cannot proceed."
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Display error to user
                 display dialog "Error: " & requiredSpace & "GB of space is needed, only " & freeSpaceUsersVolume & "GB free. Cannot proceed." with icon 0 buttons {"OK"}
@@ -1540,7 +1734,10 @@ script AutoCasperNBIAppDelegate
             else
             
                 --Log Action
-                log "The volume " & usersVolume & " has " & freeSpaceUsersVolume & "GB free. " & requiredSpace & "GB is needed, so we're ok to proceed."
+                set logMe to "The volume " & usersVolume & " has " & freeSpaceUsersVolume & "GB free. " & requiredSpace & "GB is needed, so we're ok to proceed."
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Set requiredSpaceCheckPassed based on if we're ok to proceed
                 set my requiredSpaceCheckPassed to true
@@ -1580,7 +1777,10 @@ script AutoCasperNBIAppDelegate
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Checking that " & customDesktopImagePath & " exists"
                 
-                log "Selected Desktop Image: " & customDesktopImagePath
+                set logMe to "Selected Desktop Image: " & customDesktopImagePath
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Check for file
                 do shell script "ls " & quoted form of customDesktopImagePath
@@ -1605,7 +1805,10 @@ script AutoCasperNBIAppDelegate
                 if button returned of the result is "No" then
                     
                     --Log Action
-                    log "User chose not to proceed as missing Desktop Image"
+                    set logMe to "User chose not to proceed as missing Desktop Image"
+                    
+                    -- Log To file
+                    logToFile_(me)
                     
                     -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
                     tidyUpTimeKids_(me)
@@ -1613,7 +1816,10 @@ script AutoCasperNBIAppDelegate
                 else
 
                     --Log Action
-                    log "User chose to proceed with a missing Desktop Image"
+                    set logMe to "User chose to proceed with a missing Desktop Image"
+                    
+                    -- Log To file
+                    logToFile_(me)
                     
                     -- True as file exists
                     set desktopImageExists to false
@@ -1652,16 +1858,21 @@ script AutoCasperNBIAppDelegate
         set my buildProccessProgressBar to 10
         
         --Log action
-        log "Trying to copy to /private/tmp/AutoCasperNBI" & tempUUID
+        set logMe to "Trying to copy to /private/tmp/AutoCasperNBI" & tempUUID
+        
+        -- Log To file
+        logToFile_(me)
         
         try
             
             -- Make a copy of the OS.dmg in /tmp
             do shell script "ditto -rsrc " & quoted form of selectedOSdmgPath & " /private/tmp/AutoCasperNBI/" & tempUUID with administrator privileges
 
-            
             --Log Action
-            log "Temp OS.dmg successfully copied to: /private/tmp/AutoCasperNBI/" & tempUUID
+            set logMe to "Temp OS.dmg successfully copied to: /private/tmp/AutoCasperNBI/" & tempUUID
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Mount copied OS.dmg
             mounttempOSDMG_(me)
@@ -1692,13 +1903,19 @@ script AutoCasperNBIAppDelegate
         try
 
             --Log Action
-            log "Trying to mount: /private/tmp/AutoCasperNBI/" & tempUUID
+            set logMe to "Trying to mount: /private/tmp/AutoCasperNBI/" & tempUUID
+            
+            -- Log To file
+            logToFile_(me)
             
             --  Mount temp 0S.dmg
             set selectedTempOSdmgMountPath to do shell script "hdiutil attach /private/tmp/AutoCasperNBI/" & tempUUID & " -nobrowse -owners on -shadow | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form
             
             --Log Action
-            log "Mounted to: " & selectedTempOSdmgMountPath
+            set logMe to "Mounted to: " & selectedTempOSdmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Reduce NetBoot Image if ticked
             reduceNetBootImage_(me)
@@ -1736,7 +1953,10 @@ script AutoCasperNBIAppDelegate
                 
                 ---- Applications ----
                 --Log Action
-                log "Trying to delete Applications from: " & selectedTempOSdmgMountPath & "/Applications/"
+                set logMe to "Trying to delete Applications from: " & selectedTempOSdmgMountPath & "/Applications/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Deleting unwanted Applications from: " & selectedTempOSdmgMountPath
@@ -1747,11 +1967,17 @@ script AutoCasperNBIAppDelegate
                 do shell script "find " & quoted form of selectedTempOSdmgMountPath & "/Applications/* -maxdepth 0 -not -path \"*Launchpad.app*\" -not -path \"*Safari.app*\" -not -path \"*System Preferences.app*\" -not -path \"*TextEdit.app*\"  -not -path \"*Utilities*\" -exec rm -rf {} \\;" with administrator privileges
 
                 --Log Action
-                log "Deleted Applications from: " & selectedTempOSdmgMountPath & "/Applications/"
+                set logMe to "Deleted Applications from: " & selectedTempOSdmgMountPath & "/Applications/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 ---- Utilities ----
                 --Log Action
-                log "Trying to delete Utilities from: " & selectedTempOSdmgMountPath & "/Applications/Utilities/"
+                set logMe to "Trying to delete Utilities from: " & selectedTempOSdmgMountPath & "/Applications/Utilities/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Deleting unwanted Utilities from: " & selectedTempOSdmgMountPath
@@ -1762,11 +1988,17 @@ script AutoCasperNBIAppDelegate
                 do shell script "find " & quoted form of selectedTempOSdmgMountPath & "/Applications/Utilities/* -maxdepth 0 -not -path \"*Activity Monitor.app*\" -not -path \"*Console.app*\" -not -path \"*Disk Utility.app*\" -not -path \"*Grab.app*\" -not -path \"*Keychain Access.app*\" -not -path \"*System Information.app*\" -not -path \"*Terminal.app*\" -exec rm -rf {} \\;" with administrator privileges
 
                 --Log Action
-                log "Deleted Utilities from: " & selectedTempOSdmgMountPath & "/Applications/Utilities/"
+                set logMe to "Deleted Utilities from: " & selectedTempOSdmgMountPath & "/Applications/Utilities/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 ---- PreferencePanes ----
                 --Log Action
-                log "Trying to delete Preference Panes from: " & selectedTempOSdmgMountPath & "/System/Library/PreferencePanes/"
+                set logMe to "Trying to delete Preference Panes from: " & selectedTempOSdmgMountPath & "/System/Library/PreferencePanes/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Deleting unwanted PreferencesPanes from: " & selectedTempOSdmgMountPath
@@ -1777,12 +2009,18 @@ script AutoCasperNBIAppDelegate
                 do shell script "find " & quoted form of selectedTempOSdmgMountPath & "/System/Library/PreferencePanes/* -maxdepth 0 -not -path \"*DateAndTime.prefPane*\" -not -path \"*Displays.prefPane*\" -not -path \"*Network.prefPane*\" -not -path \"*SharingPref.prefPane*\" -not -path \"*StartupDisk.prefPane*\" -exec rm -rf {} \\;" with administrator privileges
 
                 --Log Action
-                log "Deleted Preference Panes from: " & selectedTempOSdmgMountPath & "/System/Library/PreferencePanes/"
+                set logMe to "Deleted Preference Panes from: " & selectedTempOSdmgMountPath & "/System/Library/PreferencePanes/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 ---- Directories ----
                 --- /Library/ ---
                 --Log Action
-                log "Trying to empty directories in " & selectedTempOSdmgMountPath & "/Library/"
+                set logMe to "Trying to empty directories in " & selectedTempOSdmgMountPath & "/Library/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Application Support/"
@@ -1793,7 +2031,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Application\\ Support/*" with administrator privileges
                 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/Library/Application Support/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Application Support/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Audio/"
@@ -1804,7 +2045,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Audio/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/Library/Audio/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Audio/"
+                
+                -- Log To file
+                logToFile_(me)
 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Caches/"
@@ -1815,7 +2059,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Caches/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/Library/Caches/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Caches/"
+                
+                -- Log To file
+                logToFile_(me)
 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Desktop Pictures/"
@@ -1826,7 +2073,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Desktop\\ Pictures/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/Library/Desktop Pictures/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Desktop Pictures/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Dictionaries/"
@@ -1837,7 +2087,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Dictionaries/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/Library/Dictionaries/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Dictionaries/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Documentation/"
@@ -1848,18 +2101,24 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Documentation/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/Library/Documentation/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Documentation/"
+                
+                -- Log To file
+                logToFile_(me)
 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Fonts/"
+                --set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Fonts/"
 
-                delay 0.1
+                --delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Fonts/*" with administrator privileges
+                --do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Fonts/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/Library/Fonts/"
+                --set logMe to Emptied " & selectedTempOSdmgMountPath & "/Library/Fonts/"
+                
+                -- Log To file
+                --logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Modem Scripts/"
@@ -1870,7 +2129,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Modem\\ Scripts/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/Library/Modem Scripts/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Modem Scripts/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Screen Savers/"
@@ -1881,14 +2143,23 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Screen\\ Savers/*" with administrator privileges
     
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/Library/Screen Savers/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Screen Savers/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 --Log Action
-                log "Successfully emptied targeted directories in " & selectedTempOSdmgMountPath & "/Library/"
+                set logMe to "Successfully emptied targeted directories in " & selectedTempOSdmgMountPath & "/Library/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 --- /System/Library/ ---
                 --Log Action
-                log "Trying to empty targeted directories in " & selectedTempOSdmgMountPath & "/System/Library/"
+                set logMe to "Trying to empty targeted directories in " & selectedTempOSdmgMountPath & "/System/Library/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Address Book Plug-Ins/"
@@ -1899,7 +2170,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Address\\ Book\\ Plug-Ins/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Address Book Plug-Ins/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Address Book Plug-Ins/"
+                
+                -- Log To file
+                logToFile_(me)
 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Automator/"
@@ -1910,7 +2184,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Automator/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Automator/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Automator/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Caches/"
@@ -1921,7 +2198,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Caches/*" with administrator privileges
    
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Caches/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Caches/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Compositions/"
@@ -1932,7 +2212,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Compositions/*" with administrator privileges
                 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Compositions/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Compositions/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Printers/"
@@ -1943,7 +2226,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Printers/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Printers/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Printers/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Screen Savers/"
@@ -1954,7 +2240,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Screen\\ Savers/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Screen Savers/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Screen Savers/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Speech/"
@@ -1965,17 +2254,27 @@ script AutoCasperNBIAppDelegate
                 do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Speech/*" with administrator privileges
 
                 --Log Action
-                log "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Speech/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Speech/"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 --Log Action
-                log "Successfully emptied targeted directories in " & selectedTempOSdmgMountPath & "/System/Library/"
+                set logMe to "Successfully emptied targeted directories in " & selectedTempOSdmgMountPath & "/System/Library/"
+                
+                -- Log To file
+                logToFile_(me)
 
                 -- Reduce Kernel cache if we're on 10.9.0 - .3
                 reduceKernelCache_(me)
                 
             else
             
-                log "NetBoot reduction not enabled. Skipping..."
+                --Log Action
+                set logMe to "NetBoot reduction not enabled. Skipping..."
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Reduce Kernel cache if we're on 10.9.0 - .3
                 reduceKernelCache_(me)
@@ -2017,48 +2316,70 @@ script AutoCasperNBIAppDelegate
                             set variableVariable to pathToResources & "/System/Library/Extensions/AMD*"
                             
                             --Log Action
-                            log "Trying to delete " & variableVariable
+                            set logMe to "Trying to delete " & variableVariable
+                            
+                            -- Log To file
+                            logToFile_(me)
                             
                             -- Delete extensions
                             do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
                             
                             --Log Action
-                            log "Deleted " & variableVariable
+                            set logMe to "Deleted " & variableVariable
+                            
+                            -- Log To file
+                            logToFile_(me)
 
                             -- Set variableVariable to location of /System/Library/Extensions/
                             set variableVariable to pathToResources & "/System/Library/Extensions/ATI*"
                             
                             --Log Action
-                            log "Trying to delete " & variableVariable
+                            set logMe to "Trying to delete " & variableVariable
+                            
+                            -- Log To file
+                            logToFile_(me)
                             
                             -- Delete extesntions
                             do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
 
                             --Log Action
-                            log "Deleted " & variableVariable
+                            set logMe to "Deleted " & variableVariable
+                            
+                            -- Log To file
+                            logToFile_(me)
                             
                             -- Set variableVariable to location of /System/Library/Extensions/
                             set variableVariable to pathToResources & "/System/Library/Extensions/ATTO*"
                             
                             --Log Action
-                            log "Trying to delete " & variableVariable
+                            set logMe to "Trying to delete " & variableVariable
+                            
+                            -- Log To file
+                            logToFile_(me)
                             
                             -- Delete extesntions
                             do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
                             
                             --Log Action
-                            log "Deleted " & variableVariable
+                            set logMe to "Deleted " & variableVariable
+                            
+                            -- Log To file
+                            logToFile_(me)
                             
                             -- Install rc.netboot.pkg
                             --installRCNetboot_(me)
                             
                             -- Install AutoCasperNBIStartup.pkg
                             installAutoCasperNBIStartup_(me)
+
                     
                     else
                             
                             --Log Action
-                            log "Skipping extension deleting as not needed on this OS"
+                            set logMe to "Skipping extension deleting as not needed on this OS"
+                            
+                            -- Log To file
+                            logToFile_(me)
                             
                             -- Install rc.netboot.pkg
                             --installRCNetboot_(me)
@@ -2096,7 +2417,10 @@ script AutoCasperNBIAppDelegate
             set my buildProccessProgressBar to 50
             
             --Log Action
-            log "Trying to install rc.netboot.pkg"
+            set logMe to "Trying to install rc.netboot.pkg"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Set variableVariable to location of rc.netboot.pkg
             set variableVariable to pathToResources & "/rc.netboot.pkg"
@@ -2105,7 +2429,10 @@ script AutoCasperNBIAppDelegate
             do shell script "installer -pkg " & quoted form of variableVariable & " -target " & quoted form of selectedTempOSdmgMountPath with administrator privileges
 
             --Log Action
-            log "rc.netboot.pkg installed successfully"
+            set logMe to "rc.netboot.pkg installed successfully"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Install AutoCasperNBIStartup.pkg
             installAutoCasperNBIStartup_(me)
@@ -2133,7 +2460,10 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             --Log Action
-            log "Trying to install AutoCasperNBIStartup.pkg"
+            set logMe to "Trying to install AutoCasperNBIStartup.pkg"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 60
@@ -2145,7 +2475,10 @@ script AutoCasperNBIAppDelegate
             do shell script "installer -pkg " & quoted form of variableVariable & " -target " & quoted form of selectedTempOSdmgMountPath with administrator privileges
 
             --Log Action
-            log "AutoCasperNBIStartup.pkg installed successfully"
+            set logMe to "AutoCasperNBIStartup.pkg installed successfully"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Install RootUser.pkg
             installRootUserpkg_(me)
@@ -2168,7 +2501,10 @@ script AutoCasperNBIAppDelegate
         try
             
             --Log Action
-            log "Trying to install Root user via pkg"
+            set logMe to "Trying to install Root user via pkg"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Installing Root User via pkg"
@@ -2185,7 +2521,10 @@ script AutoCasperNBIAppDelegate
             do shell script "installer -pkg " & quoted form of variableVariable & " -target " & quoted form of selectedTempOSdmgMountPath with administrator privileges
 
             --Log Action
-            log "Root user installed via pkg"
+            set logMe to "Root user installed via pkg"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Set Desktop Image to selected
             copyDesktopImage_(me)
@@ -2211,7 +2550,10 @@ script AutoCasperNBIAppDelegate
             try
                 
                 --Log Action
-                log "Trying to copy Desktop Image"
+                set logMe to "Trying to copy Desktop Image"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Copying Desktop Image"
@@ -2225,13 +2567,16 @@ script AutoCasperNBIAppDelegate
                 set variableVariable to selectedTempOSdmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
                 
                 --Log Action
-                log "Removing symbolic link on " & selectedTempOSdmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                set logMe to "Removing symbolic link on " & selectedTempOSdmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Remove DefaultDesktop.jpg's symbolic link
                 do shell script "unlink " & quoted form of variableVariable with administrator privileges
                 
                 --Log Action
-                log "Trying to copy " & customDesktopImagePath & " to " & variableVariable
+                set logMe to "Trying to copy " & customDesktopImagePath & " to " & variableVariable
                 
                 -- Copy selected image
                 do shell script "cp -r " & quoted form of customDesktopImagePath & " " & quoted form of variableVariable with administrator privileges
@@ -2240,13 +2585,19 @@ script AutoCasperNBIAppDelegate
                 do shell script "chown root:wheel " & quoted form of variableVariable with administrator privileges
 
                 --Log Action
-                log "Set ownership to root:wheel on " & variableVariable
+                set logMe to "Set ownership to root:wheel on " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Correct permissions
                 do shell script "chmod 755 " & quoted form of variableVariable with administrator privileges
 
                 --Log Action
-                log "Set permissions to 755 on " & variableVariable
+                set logMe to "Set permissions to 755 on " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Copy Casper Imaging.app selected earlier
                 copyCasperImagingApp_(me)
@@ -2285,7 +2636,10 @@ script AutoCasperNBIAppDelegate
         set selectedAppPathToCopy to do shell script "echo " & quoted form of selectedAppPath & " | rev | cut -c 2- | rev"
         
         --Log Action
-        log "Casper Imaging.app to copy resides " & selectedAppPathToCopy
+        set logMe to "Casper Imaging.app to copy resides " & selectedAppPathToCopy
+        
+        -- Log To file
+        logToFile_(me)
         
         -- Copy location for Casper Imaging.app
         set variableVariable to selectedTempOSdmgMountPath & "/Applications/"
@@ -2294,7 +2648,10 @@ script AutoCasperNBIAppDelegate
         set copiedAppPath to selectedTempOSdmgMountPath & "/Applications/Casper Imaging.app"
 
         --Log Action
-        log "Casper Imaging.app to be copied to " & copiedAppPath
+        set logMe to "Casper Imaging.app to be copied to " & copiedAppPath
+        
+        -- Log To file
+        logToFile_(me)
         
         try
             
@@ -2302,19 +2659,28 @@ script AutoCasperNBIAppDelegate
             do shell script "cp -r " & quoted form of selectedAppPathToCopy & " " & quoted form of variableVariable with administrator privileges
 
             --Log action
-            log "Copied " & selectedAppPath & " to " & variableVariable
+            set logMe to "Copied " & selectedAppPath & " to " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
         
             -- Correct ownership on copied Casper Imaging.app
             do shell script "chown -R root:wheel " & quoted form of copiedAppPath with administrator privileges
    
             --Log Action
-            log "Set ownership to root:wheel on " & copiedAppPath
+            set logMe to "Set ownership to root:wheel on " & copiedAppPath
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Correct permissions on copied Casper Imaging.app
             do shell script "chmod -R 755 " & quoted form of copiedAppPath with administrator privileges
 
             --Log Action
-            log "Set permissions to 755 on " & copiedAppPath
+            set logMe to "Set permissions to 755 on " & copiedAppPath
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Try as errors if not found (i think)
             try
@@ -2323,7 +2689,10 @@ script AutoCasperNBIAppDelegate
                 do shell script "xattr -d com.apple.quarantine " & quoted form of copiedAppPath with administrator privileges
 
                 --Log Action
-                log "Quarantine flag removed from " & copiedAppPath
+                set logMe to "Quarantine flag removed from " & copiedAppPath
+                
+                -- Log To file
+                logToFile_(me)
             
             end try
         
@@ -2362,7 +2731,10 @@ script AutoCasperNBIAppDelegate
             do shell script "defaults write " & quoted form of variableVariable & " allowInvalidCertificate -bool true" with administrator privileges
             
             -- Log Action
-            log "com.jamfsoftware.jss.plist created & allow invalid certificate set"
+            set logMe to "com.jamfsoftware.jss.plist created & allow invalid certificate set"
+            
+            -- Log To file
+            logToFile_(me)
             
                 -- If a JSS URL is specified
                 if jssURL is not equal missing value
@@ -2371,7 +2743,10 @@ script AutoCasperNBIAppDelegate
                     do shell script "defaults write " & quoted form of variableVariable & " url -string " & jssURL with administrator privileges
           
                     --Log Action
-                    log "plist updated with JSS url"
+                    set logMe to "plist updated with JSS url"
+                    
+                    -- Log To file
+                    logToFile_(me)
             
             end if
 
@@ -2379,13 +2754,19 @@ script AutoCasperNBIAppDelegate
             do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
 
             --Log Action
-            log "Set ownership to root:wheel on " & variableVariable
+            set logMe to "Set ownership to root:wheel on " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
 
             -- Correct permissions
             do shell script "chmod -R 700 " & quoted form of variableVariable with administrator privileges
 
             --Log Action
-            log "Set permissions to 700 on " & variableVariable
+            set logMe to "Set permissions to 700 on " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Install CasperImagingLaunchAgent.pkg
             installCasperImagingLaunchAgent_(me)
@@ -2416,7 +2797,10 @@ script AutoCasperNBIAppDelegate
             set my buildProccessProgressBar to 110
             
             --Log Action
-            log "Trying to install Casper Imaging LaunchAgent via pkg"
+            set logMe to "Trying to install Casper Imaging LaunchAgent via pkg"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Set variableVariable to location to location of CasperImagingLaunchAgent.pkg
             set variableVariable to pathToResources & "/CasperImagingLaunchAgent.pkg"
@@ -2425,7 +2809,10 @@ script AutoCasperNBIAppDelegate
             do shell script "installer -pkg " & quoted form of variableVariable & " -target " & quoted form of selectedTempOSdmgMountPath with administrator privileges
     
             --Log Action
-            log "Casper Imaging LaunchAgent plist installed via pkg"
+            set logMe to "Casper Imaging LaunchAgent plist installed via pkg"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Get JSS CA Cert if JSS URL given
             importJSSCACert_(me)
@@ -2448,46 +2835,55 @@ script AutoCasperNBIAppDelegate
         -- If a JSS URL is specified
         if jssURL is not equal missing value
         
-        try
+            try
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Downloading JSS CA Cert"
             
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Downloading JSS CA Cert"
-        
-            delay 0.1
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 120
+                
+                -- Application Support location on TempOSdmg for installing at boot
+                set variableVariable to selectedTempOSdmgMountPath & "/Library/Application Support/AutoCasperNBI/Certificates/"
+                
+                -- Log Action
+                set logMe to "Downloading JSS CA Cert for " & jssURL
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Download CA Cert from JSS to /private/tmp/AutoCasperNBI/
+                do shell script "curl -k -o /private/tmp/AutoCasperNBI/" & tempUUID & ".cer " & jssURL & "/CA/SCEP?operation=getcacert" with administrator privileges
+         
+                -- Log Action
+                set logMe to "Copying JSS CA Cert to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Copy to Temp OS dmg for import at startup
+                do shell script "cp -r /private/tmp/AutoCasperNBI/" & tempUUID & ".cer " & quoted form of variableVariable with administrator privileges
+               
+                -- Log Action
+                set logMe to "JSS CA Cert downloaded to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Bypass the various setup assistants so we're logging in uninterrupted
+                bypassSetupAssistants_(me)
+                
+            on error
             
-            -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 120
-            
-            -- Application Support location on TempOSdmg for installing at boot
-            set variableVariable to selectedTempOSdmgMountPath & "/Library/Application Support/AutoCasperNBI/Certificates/"
-            
-            -- Log Action
-            log "Downloading JSS CA Cert for " & jssURL
-            
-            -- Download CA Cert from JSS to /private/tmp/AutoCasperNBI/
-            do shell script "curl -k -o /private/tmp/AutoCasperNBI/" & tempUUID & ".cer " & jssURL & "/CA/SCEP?operation=getcacert" with administrator privileges
-     
-            -- Log Action
-            log "Copying JSS CA Cert to " & variableVariable
-            
-            -- Copy to Temp OS dmg for import at startup
-            do shell script "cp -r /private/tmp/AutoCasperNBI/" & tempUUID & ".cer " & quoted form of variableVariable with administrator privileges
-           
-            -- Log Action
-            log "JSS CA Cert downloaded to " & variableVariable
-            
-            -- Bypass the various setup assistants so we're logging in uninterrupted
-            bypassSetupAssistants_(me)
-            
-        on error
-        
-            -- Display error to user
-            display dialog "Error: Importing JSS CA Cert" with icon 0 buttons {"OK"}
-            
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-            tidyUpTimeKids_(me)
-            
-        end try
+                -- Display error to user
+                display dialog "Error: Importing JSS CA Cert" with icon 0 buttons {"OK"}
+                
+                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                tidyUpTimeKids_(me)
+                
+            end try
         
         else
         
@@ -2520,19 +2916,28 @@ script AutoCasperNBIAppDelegate
             do shell script "touch " & quoted form of variableVariable with administrator privileges
         
             --Log Action
-            log ".AppleSetupDone written to " & variableVariable
+            set logMe to ".AppleSetupDone written to " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
         
             -- Correct ownership
             do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
      
             --Log Action
-            log "Set ownership to root:wheel on " & variableVariable
+            set logMe to "Set ownership to root:wheel on " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Correct permissions
             do shell script "chmod -R 644 " & quoted form of variableVariable with administrator privileges
 
             --Log Action
-            log "Set permissions to 644 on " & variableVariable
+            set logMe to "Set permissions to 644 on " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
             
         ---- com.apple.SetupAssistant----
             
@@ -2549,19 +2954,28 @@ script AutoCasperNBIAppDelegate
             do shell script "defaults write " & quoted form of variableVariable & " LastSeenCloudProductVersion " & selectedOSdmgVersion  with administrator privileges
 
             --Log Action
-            log "Bypass options written to " & variableVariable
+            set logMe to "Bypass options written to " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Correct ownership
             do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
 
             --Log Action
-            log "Set ownership to root:wheel on " & variableVariable
+            set logMe to "Set ownership to root:wheel on " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
 
             -- Correct permissions
             do shell script "chmod -R 700 " & quoted form of variableVariable with administrator privileges
 
             --Log Action
-            log "Set permissions to 700 on " & variableVariable
+            set logMe to "Set permissions to 700 on " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
             
             -- com.apple.SetupAssistant Plist location on mounted volume
             set variableVariable to selectedTempOSdmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
@@ -2570,7 +2984,10 @@ script AutoCasperNBIAppDelegate
             do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
 
             --Log Action
-            log "Deleted MiniLauncher"
+            set logMe to "Deleted MiniLauncher"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Stop TimeMachine for prompting to use mounted disks for backup
             disableTimeMachinePrompt_(me)
@@ -2607,19 +3024,28 @@ script AutoCasperNBIAppDelegate
             do shell script "defaults write " & quoted form of variableVariable & " DoNotOfferNewDisksForBackup -bool YES" with administrator privileges
             
             -- Log Action
-            log "com.apple.TimeMachine.plist amended at " & variableVariable
+            set logMe to "com.apple.TimeMachine.plist amended at " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
         
             -- Correct ownership
             do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
             
             --Log Action
-            log "Set ownership to root:wheel on " & quoted form of variableVariable
+            set logMe to "Set ownership to root:wheel on " & quoted form of variableVariable
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Correct permissions
             do shell script "chmod -R 755 " & quoted form of variableVariable with administrator privileges
             
             --Log Action
-            log "Set permissions to 755 on " & quoted form of variableVariable
+            set logMe to "Set permissions to 755 on " & quoted form of variableVariable
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Delete the file delete /Library/Preferences/com.apple.dockfixup.plist
             deleteDockFixUp_(me)
@@ -2655,7 +3081,10 @@ script AutoCasperNBIAppDelegate
             do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
 
             --Log Action
-            log "Deleted " & variableVariable
+            set logMe to "Deleted " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Create the ARD user
             createARDUser_(me)
@@ -2696,37 +3125,55 @@ script AutoCasperNBIAppDelegate
                 set ardUsernameEncoded to do shell script "echo " & ardUsername & " | openssl base64 "
                 
                 --Log Action
-                log "ARD Username encoded"
+                set logMe to "ARD Username encoded"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Write encoded ARD Username to plist
                 do shell script "defaults write " & quoted form of variableVariable & " ARDUsername "  & ardUsernameEncoded  with administrator privileges
                 
                 --Log Action
-                log "Written ARD Username to " & variableVariable
+                set logMe to "Written ARD Username to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Encode ardPassword
                 set ardPasswordEncoded to do shell script "echo " & ardPassword & " | openssl base64 "
                 
                 --Log Action
-                log "ARD Password encoded"
+                set logMe to "ARD Password encoded"
+                
+                -- Log To file
+                logToFile_(me)
 
                 -- Write encoded ARD Password to plist
                 do shell script "defaults write " & quoted form of variableVariable & " ARDPassword "  & ardPasswordEncoded  with administrator privileges
 
                 --Log Action
-                log "Written ARD Password to " & variableVariable
+                set logMe to "Written ARD Password to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
 
                 -- Correct ownership
                 do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
 
                 --Log Action
-                log "Set ownership to root:wheel on " & quoted form of variableVariable
+                set logMe to "Set ownership to root:wheel on " & quoted form of variableVariable
+                
+                -- Log To file
+                logToFile_(me)
 
                 -- Correct permissions
                 do shell script "chmod -R 755 " & quoted form of variableVariable with administrator privileges
 
                 --Log Action
-                log "Set permissions to 755 on " & quoted form of variableVariable
+                set logMe to "Set permissions to 755 on " & quoted form of variableVariable
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Writes vncPassword to com.apple.VNCSettings.txt
                 enableVNC_(me)
@@ -2745,7 +3192,10 @@ script AutoCasperNBIAppDelegate
         else
         
             --Log Action
-            log "Skipping creation of ARD user as ARD not enabled"
+            set logMe to "Skipping creation of ARD user as ARD not enabled"
+            
+            -- Log To file
+            logToFile_(me)
         
             -- Writes vncPassword to com.apple.VNCSettings.txt
             enableVNC_(me)
@@ -2774,26 +3224,38 @@ script AutoCasperNBIAppDelegate
                 set variableVariable to selectedTempOSdmgMountPath & "/Library/Preferences/com.apple.VNCSettings.txt"
                 
                 --Log Action
-                log "Trying to write VNC password to " & variableVariable
+                set logMe to "Trying to write VNC password to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Write hashed vncPassword to /Library/Preferences/com.apple.VNCSettings.txt on .nbi
                 do shell script "echo " & vncPassword & " | perl -we 'BEGIN { @k = unpack \"C*\", pack \"H*\", \"1734516E8BA8C5E2FF1C39567390ADCA\"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack \"C*\", $_; foreach (@k) { printf \"%02X\", $_ ^ (shift @p || 0) }; print \"
                 \"' | sudo tee " & quoted form of variableVariable with administrator privileges
                 
                 --Log Action
-                log "VNC password written to " & variableVariable
+                set logMe to "VNC password written to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Correct Ownership
                 do shell script "chown root:wheel " & quoted form of variableVariable with administrator privileges
                 
                 --Log Action
-                log "Set ownership to root:wheel on " & variableVariable
+                set logMe to "Set ownership to root:wheel on " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Correct Permissions
                 do shell script "chmod 400 " & quoted form of variableVariable with administrator privileges
 
                 --Log Action
-                log "Set permissions to 400 on " & variableVariable
+                set logMe to "Set permissions to 400 on " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- The bit we've all been waiting for
                 createNetboot_(me)
@@ -2812,7 +3274,10 @@ script AutoCasperNBIAppDelegate
             else
                 
                 --Log Action
-                log "Skipping writing VNC password as VNC option not enabled"
+                set logMe to "Skipping writing VNC password as VNC option not enabled"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- The bit we've all been waiting for
                 createNetboot_(me)
@@ -2837,14 +3302,23 @@ script AutoCasperNBIAppDelegate
                 -- Update build Process ProgressBar
                 set my buildProccessProgressBar to 180
                 
+                -- Set netBootDestination to value of netBootSelectedLocation + netBootNameTextField
+                set netBootDestination to netBootSelectedLocation & netBootNameTextField
+                
                 --Log Action
-                log "Trying to create NBI of " & selectedTempOSdmgMountPath
+                set logMe to "Trying to create NBI of " & selectedTempOSdmgMountPath & " in " & netBootDestination
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Create NBI using imagetool
-                set netBootCreatedPath to do shell script "/System/Library/CoreServices/System\\ Image\\ Utility.app/Contents/MacOS/imagetool --netboot --destination ~/Desktop/" & quoted form of netBootNameTextField & " --source " & quoted form of selectedTempOSdmgMountPath & " --name " & quoted form of netBootNameTextField & " --index " & netBootImageIndexTextField & "| grep \"Successfully\" | awk '{print substr($0, index($0,$3))}' " with administrator privileges as quoted form
+                set netBootCreatedPath to do shell script "/System/Library/CoreServices/System\\ Image\\ Utility.app/Contents/MacOS/imagetool --netboot --destination ~/Desktop/" & quoted form of netBootNameTextField & " --source " & quoted form of selectedTempOSdmgMountPath & " --name " & quoted form of netBootNameTextField & " --index " & netBootImageIndexTextField & "| grep \"Successfully\" | awk '{print substr($0, index($0,$3))}'" with administrator privileges as quoted form
                 
                 -- Log Action
-                log "NetBoot created & can be found at " & netBootCreatedPath
+                set logMe to "NetBoot created & can be found at " & netBootCreatedPath
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Updates NBImageInfo.plist
                 setNetbootImageOptions_(me)
@@ -2879,13 +3353,19 @@ script AutoCasperNBIAppDelegate
             set variableVariable to netBootCreatedPath & "/NBImageInfo.plist"
 
             --Log Action
-            log "Trying to change permissions on " & variableVariable
+            set logMe to "Trying to change permissions on " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Making NBImageInfo.plist writable
             do shell script "chmod 777 " & variableVariable with administrator privileges
             
             --Log Action
-            log "Set permissons on " & variableVariable & " to 777"
+            set logMe to "Set permissons on " & variableVariable & " to 777"
+            
+            -- Log To file
+            logToFile_(me)
             
             ---- Description----
             -- If we're looking to set a description for this .nbi
@@ -2897,15 +3377,19 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
 
                 --Log Action
-                log "Trying to set .nbi to Description"
+                set logMe to "Trying to set .nbi description to " & netBootDescription
+                
+                -- Log To file
+                logToFile_(me)
 
-                log netBootDescription
-
-                -- Set NetBoot to Diskless
+                -- Set NetBoot to Description
                 do shell script "defaults write " & variableVariable & " Description -string " & quoted form of netBootDescription with administrator privileges
 
                 --Log Action
-                log "Set .nbi to Description"
+                set logMe to "Set .nbi Description"
+                
+                -- Log To file
+                logToFile_(me)
                 
 
            end if
@@ -2917,17 +3401,29 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             --Log Action
-            log "Trying to set .nbi to Diskless"
+            set logMe to "Trying to set .nbi to Diskless"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Set NetBoot to Diskless
             do shell script "defaults write " & variableVariable & " SupportsDiskless -bool YES" with administrator privileges
             
             --Log Action
-            log "Set .nbi to Diskless"
+            set logMe to "Set .nbi to Diskless"
+            
+            -- Log To file
+            logToFile_(me)
             
             ---- Serve Over ---
             --Log Action
-            log "Setting .nbi's serve over option"
+            set logMe to "Setting .nbi's serve over option"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set to boolean of value
+            set netBootServeOverNFSd to netBootServeOverNFS as boolean
             
             -- If NetBoot Serve Over NFS to true
             if netBootServeOverNFS is true
@@ -2938,13 +3434,19 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 --Log Action
-                log "Trying to set .nbi to being served over NFS"
+                set logMe to "Trying to set .nbi to being served over NFS"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Set NetBoot Serve over NFS
                 do shell script "defaults write " & variableVariable & " Type -string NFS" with administrator privileges
                 
                 --Log Action
-                log "Set .nbi to being served over NFS"
+                set logMe to "Set .nbi to being served over NFS"
+                
+                -- Log To file
+                logToFile_(me)
                 
             else
             
@@ -2954,13 +3456,19 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 --Log Action
-                log "Trying to set .nbi to being served over HTTP"
+                set logMe to "Trying to set .nbi to being served over HTTP"
+                
+                -- Log To file
+                logToFile_(me)
             
                 -- Set NetBoot Serve over HTTP
                 do shell script "defaults write " & variableVariable & " Type -string HTTP" with administrator privileges
 
                 --Log Action
-                log "Set .nbi to being served over NFS"
+                set logMe to "Set .nbi to being served over NFS"
+                
+                -- Log To file
+                logToFile_(me)
                 
             end if
         
@@ -2971,27 +3479,39 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             --Log Action
-            log "Trying to set .nbi to Enabled"
-            
+            set logMe to "Trying to set .nbi to Enabled"
+
+            -- Log To file
+            logToFile_(me)
+
             -- Set NetBoot to Diskless
             do shell script "defaults write " & variableVariable & " IsEnabled -bool YES" with administrator privileges
 
             --Log Action
-            log "Set .nbi to Enabled"
-            
+            set logMe to "Set .nbi to Enabled"
+
+            -- Log To file
+            logToFile_(me)
+
             ---- Fix Plist ----
             -- Correct ownership
             do shell script "chown -R root:wheel " & variableVariable with administrator privileges
 
             --Log Action
-            log "Set ownership to root:wheel on " & variableVariable
-            
+            set logMe to "Set ownership to root:wheel on " & variableVariable
+
+            -- Log To file
+            logToFile_(me)
+
             -- Correct permissions
             do shell script "chmod -R 755 " & variableVariable with administrator privileges
 
             --Log Action
-            log "Set permissions to 755 on " & variableVariable
-            
+            set logMe to "Set permissions to 755 on " & variableVariable
+
+            -- Log To file
+            logToFile_(me)
+
             ---- Revert NBImageInfo.plist permissionchanges ----
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Changing permissions on NBImageInfo.plist"
@@ -2999,13 +3519,19 @@ script AutoCasperNBIAppDelegate
             delay 0.1
 
             --Log Action
-            log "Trying to correct permissions on " & variableVariable
+            set logMe to "Trying to correct permissions on " & variableVariable
+
+            -- Log To file
+            logToFile_(me)
 
             -- Making NBImageInfo.plist writable
             do shell script "chmod 644 " & variableVariable with administrator privileges
 
             --Log Action
-            log "Set permissons on " & variableVariable & " to 644"
+            set logMe to "Set permissons on " & variableVariable & " to 644"
+
+            -- Log To file
+            logToFile_(me)
 
             -- Set netBootCreationSuccessful value, for notifying later
             set my netBootCreationSuccessful to true
@@ -3048,14 +3574,20 @@ script AutoCasperNBIAppDelegate
                 set variableVariable to netBootCreatedPath & "/NetBoot.dmg"
                 
                 --Log Action
-                log "Trying to resize " & variableVariable & " to around " & netBootImageResizeValue & "GB"
+                set logMe to "Trying to resize " & variableVariable & " to around " & netBootImageResizeValue & "GB"
                 
+                -- Log To file
+                logToFile_(me)
+
                 -- Resize NetBoot.dmg to value given
                 do shell script "hdiutil resize -size " & netBootImageResizeValue & "g " & variableVariable with administrator privileges
 
                 --Log Action
-                log "Sucessfully resized " & variableVariable
+                set logMe to "Sucessfully resized " & variableVariable
                 
+                -- Log To file
+                logToFile_(me)
+
                 -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
                 tidyUpTimeKids_(me)
                 
@@ -3075,7 +3607,10 @@ script AutoCasperNBIAppDelegate
         else
         
             --Log Action
-            log "Skipping resizing NetBoot as not selected"
+            set logMe to "Skipping resizing NetBoot as not selected"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
             tidyUpTimeKids_(me)
@@ -3100,8 +3635,11 @@ script AutoCasperNBIAppDelegate
             delay 0.1
         
             --Log Action
-            log "Trying to detach " & selectedOSdmgMountPath
+            set logMe to "Trying to detach " & selectedOSdmgMountPath
             
+            -- Log To file
+            logToFile_(me)
+
             -- Detach Volume
             do shell script "hdiutil detach " & quoted form of selectedOSdmgMountPath & " -force"
             
@@ -3116,7 +3654,10 @@ script AutoCasperNBIAppDelegate
           delay 0.1
           
           --Log Action
-          log "Trying to detach " & selectedTempOSdmgMountPath
+          set logMe to "Trying to detach " & selectedTempOSdmgMountPath
+          
+          -- Log To file
+          logToFile_(me)
           
           -- Detach Volume
           do shell script "hdiutil detach " & quoted form of selectedTempOSdmgMountPath & " -force"
@@ -3132,7 +3673,10 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             --Log Action
-            log "Trying to empty /private/tmp/AutoCasperNBI/"
+            set logMe to "Trying to empty /private/tmp/AutoCasperNBI/"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Detach Volume
             do shell script "rm -rf /private/tmp/AutoCasperNBI/*"
@@ -3142,14 +3686,14 @@ script AutoCasperNBIAppDelegate
         -- Reset Main Window Text Field & Cog
         resetMainWindowLabel_(me)
         
-        -- close build process window
-        showBuildProcessWindow's orderOut_(null)
-        
         -- Re-enable main windows buttons
         set my optionWindowEnabled to true
         
         -- Reset build Process ProgressBar
         set my buildProccessProgressBar to 0
+        
+        -- close build process window
+        showBuildProcessWindow's orderOut_(null)
         
         -- High fives all round!
         weDitIt_(me)
@@ -3162,11 +3706,14 @@ script AutoCasperNBIAppDelegate
         -- If we were successful
         if netBootCreationSuccessful is true
         
+            --Log Action
+            set logMe to "NetBoot successfully created at the following location " & netBootCreatedPath
+            
+            -- Log To file
+            logToFile_(me)
+        
             -- Notify on completion
             display dialog "NetBoot successfully created at the following location:" & return & return & netBootCreatedPath with icon 1 buttons {"OK"}
-            
-            --Log Action
-            log "NetBoot successfully created at the following location " & netBootCreatedPath
             
             -- Set netBootCreationSuccessful value, for notifying later
             set my netBootCreationSuccessful to false
@@ -3174,6 +3721,20 @@ script AutoCasperNBIAppDelegate
         end if
         
     end weDitIt_
+
+    -- Log to file
+    on logToFile_(sender)
+        
+        -- Comment out before release.. this will send log messages to Xcode's log
+        log logMe
+        
+        -- Get time & date of command execution
+        set timeStamp to do shell script "date"
+        
+        -- Write message to log file
+        do shell script "echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI.log"
+
+    end logToFile_
 
     -- Insert code here to initialize your application before any files are opened
 	on applicationWillFinishLaunching_(aNotification)
