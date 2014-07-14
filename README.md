@@ -26,6 +26,7 @@ VERSIONS
 — Commented out /Library/Fonts/*
 — Added logging to ~/Library/Log/AutoCasperNBI.log (at some point we’ll add LoginLog)
 — Added prompt to select location to created NBI
+-- Disabled NetBoot Description for now
 
 0.5 
 — Commented out rc.netboot install to fix Casper Imaging hang
