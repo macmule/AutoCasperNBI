@@ -13,7 +13,7 @@ Any options you set, should be written to a plist ~/Library/Preferences/com.macm
 
 GitHub repo is here: https://github.com/macmule/AutoCasperNBI
 
-Latest built beta can be downloaded from: 
+Latest built beta can be downloaded from: https://pentland-brands.box.com/shared/static/mppkb45edd5fxp1s8sv4.dmg
 
 ISSUES
 
@@ -49,3 +49,4 @@ should fix those pesky names with spaces.
 
 0.1
 — Initial beta
+
