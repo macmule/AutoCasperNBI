@@ -1,4 +1,3 @@
-
 The idea of this app is to take an OS.dmg either from AutoDMG or an OS.dmg captured from a never booted Mac (use case is forked builds).
 
 Once you have an OS.dmg & Casper Imaging app selected, you should be able to build an .nbi.
@@ -47,7 +46,6 @@ VERSIONS
 
 0.3
 —Added TimeMachine option to not prompt for new disks.
-
 —Changed deployment target to see if the app will run nicer.
 —Amended the netBootCreatedPath variable to use quoted form, this should fix those pesky names with spaces.
 —Removed some extra empty lines from code to tidy
