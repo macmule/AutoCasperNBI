@@ -47,6 +47,7 @@ VERSIONS
 
 0.3
 —Added TimeMachine option to not prompt for new disks.
+
 —Changed deployment target to see if the app will run nicer.
 —Amended the netBootCreatedPath variable to use quoted form, this should fix those pesky names with spaces.
 —Removed some extra empty lines from code to tidy
