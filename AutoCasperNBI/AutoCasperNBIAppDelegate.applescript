@@ -19,6 +19,7 @@ script AutoCasperNBIAppDelegate
 	-- IBOutlets
     property defaults : missing value -- for saved prefs
     property hostMacOSVersion : missing value
+    property hostMacOSBuildVersion : missing value
     property AutoCasperNBIWindow : missing value
     property optionsWindow : missing value
     property showBuildProcessWindow : missing value
@@ -92,6 +93,9 @@ script AutoCasperNBIAppDelegate
     property timeStamp : missing value
     property logMe : missing value
     property netBootSelectedLocation : missing value
+    property logDate : missing value
+    property buildProcessLogTextField : missing value
+    property versionOfAutoCasperNBI : missing value
     
     --- Booleans
     property selectedOSDMGTextFieldEnabled : false
@@ -138,17 +142,31 @@ script AutoCasperNBIAppDelegate
 --- HANDLERS ---
 
     -- To be run at launch
-    on getOSandUsername_(sender)
+    on startYourEngines_(sender)
         
         -- Log that we've launched
-        set logMe to "=========================================================================================="
+        set logMe to "\\n"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        -- Get AutoCasperNBI version
+        set versionOfAutoCasperNBI to get version of application "AutoCasperNBI"
+        
+        -- Log AutoCasperNBI version
+        set logMe to  "AutoCasperNBI " & versionOfAutoCasperNBI
         
         -- Log To file
         logToFile_(me)
 
         -- Get OS of host mac to verify that we can create an .nbi from supplied OS.dmg
         set my hostMacOSVersion to (do shell script "sw_vers -productVersion")
-        set logMe to  "Running on OS " & hostMacOSVersion
+    
+        -- Get host macs Build version for logging/debugging
+        set my hostMacOSBuildVersion to (do shell script "sw_vers -buildVersion")
+        
+        -- Log OS version & build of host mac
+        set logMe to  "Running on OS " & hostMacOSVersion & " (" & hostMacOSBuildVersion & ")"
         
         -- Log To file
         logToFile_(me)
@@ -170,7 +188,7 @@ script AutoCasperNBIAppDelegate
         -- Get path to resources folder
         set pathToResources to (current application's class "NSBundle"'s mainBundle()'s resourcePath()) as string
         
-    end getOSandUsername_
+    end startYourEngines_
 
     -- Register plist default settings
     on regDefaults_(sender)
@@ -226,24 +244,6 @@ script AutoCasperNBIAppDelegate
         
     end showOptionsWindow_
     
-    -- Start Build Process, we chain from from here for each handler passed we progress
-    on showBuildProcess_(sender)
-        
-        -- Disable main windows buttons
-        set my optionWindowEnabled to false
-        
-        -- Prompt user for location to create the .nbi
-        netBootLocation_(me)
-        
-        -- activate build process window
-        activate
-        showBuildProcessWindow's makeKeyAndOrderFront_(null)
-        
-        -- Set NetBoot Description
-        enablenetBootDescription_(me)
-        
-    end showBuildProcess_
-    
     -- Cancel & tidy up
     on cancelBuildProcess_(sender)
         
@@ -288,6 +288,36 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to missing value
         set my mainWindowCog to false
     end resetMainWindowLabel_
+    
+    ----- LOGGING -----
+    -- Log to file
+    on logToFile_(sender)
+        
+        -- Comment out before release.. this will send log messages to Xcode's log
+        --log logMe
+        
+        -- Date for log file
+        set logDate to do shell script "date +%F"
+        
+        -- Get time & date of command execution
+        set timeStamp to do shell script "date"
+        
+        try
+            
+            -- Write message to log file
+            do shell script "echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+            
+            on error
+            
+            -- Create directory if doesn't exist
+            do shell script "mkdir ~/Library/Logs/AutoCasperNBI/"
+            
+            -- Write message to log file
+            do shell script "echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+            
+        end try
+        
+    end logToFile_
 
 
 ----- MAIN WINDOW----
@@ -307,8 +337,6 @@ script AutoCasperNBIAppDelegate
             
             -- Log To file
             logToFile_(me)
-            
-            log "Path: " & selectedOSdmgPath
             
             -- Reset OSDMG Icons & hide cog
             doResetOSDMGIcons_(me)
@@ -562,6 +590,9 @@ script AutoCasperNBIAppDelegate
                 
                 -- Reset Selected App Icons
                 doResetSelectedAppIcons_(me)
+                
+                -- Set Image Index (reset index to make sure we don't create images with the same)
+                netBootImageIndex_(me)
                 
                 -- Display green tick
                 set my checkGreenSelectedApp to true
@@ -962,6 +993,12 @@ script AutoCasperNBIAppDelegate
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootServeOverNFS, "netBootServeOverNFS")
         
+        --Log Action
+        set logMe to "NetBoot is to served over HTTP"
+        
+        -- Log To file
+        logToFile_(me)
+        
     end netbootServeOverHTTPSelected_
 
     -- Bound to NetBoot Serve over NFS radio button
@@ -973,6 +1010,12 @@ script AutoCasperNBIAppDelegate
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootServeOverNFS, "netBootServeOverNFS")
         
+        --Log Action
+        set logMe to "NetBoot is to served over NFS"
+        
+        -- Log To file
+        logToFile_(me)
+        
     end netbootServeOverNFSSelected_
 
     -- Get NetBoot Serve Option, if missing value set to NFS
@@ -981,8 +1024,9 @@ script AutoCasperNBIAppDelegate
         -- Set to variable to boolean
         set netBootServeOverNFS to netBootServeOverNFS as boolean
             
-            -- Update plist with selection
-            tell defaults to setObject_forKey_(netBootServeOverNFS, "netBootServeOverNFS")
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(netBootServeOverNFS, "netBootServeOverNFS")
+            
             
     end netBootServeOption_
 
@@ -1096,7 +1140,7 @@ script AutoCasperNBIAppDelegate
                 if jssURL is equal to missing value
                 
                     -- Set NetBoot Description
-                    set netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & ". Created by, " & longUserName & " on: " & buildDate & "."
+                    set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & ". Created by, " & longUserName & " on: " & buildDate & "."
                     
                     --Log Action
                     set logMe to "NetBoot description set to " & quoted form of netBootDescription
@@ -1107,7 +1151,7 @@ script AutoCasperNBIAppDelegate
                 else
                 
                     -- Set NetBoot Description
-                    set netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & " pointing to JSS " & jssURL & ". Created by, " & longUserName & " on: " & buildDate & "."
+                    set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & " pointing to JSS " & jssURL & ". Created by, " & longUserName & " on: " & buildDate & "."
                     
                     --Log Action
                     set logMe to "NetBoot description set to " & quoted form of netBootDescription
@@ -1544,11 +1588,14 @@ script AutoCasperNBIAppDelegate
 
     -- Prompt user for location to create the .nbi
     on netBootLocation_(sender)
+        
+        -- Set NetBoot Description
+        enablenetBootDescription_(me)
 
         try
             
-            --If /Library/NetBoot/NetBootSPO exists
-            choose folder with prompt "Choose a location to create the .nbi in:" default location "/Library/NetBoot/"
+            --If /Library/NetBoot/NetBootSPO/ exists
+            choose folder with prompt "Choose a location to create the .nbi in:" default location "/Library/NetBoot/NetBootSP0/"
             
             -- Set netBootSelectedLocation to path of location given
             set netBootSelectedLocation to POSIX path of the result
@@ -1585,6 +1632,16 @@ script AutoCasperNBIAppDelegate
 
     -- Check that we have enough space available to proceed
     on checkFreeSpace_(sender)
+        
+        -- Disable main windows buttons
+        set my optionWindowEnabled to false
+
+        -- Update buildProcessLogTextField to show path to todays log
+        set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+
+        -- activate build process window
+        activate
+        showBuildProcessWindow's makeKeyAndOrderFront_(null)
         
         -- Set netBootCreationSuccessful value, for notifying later
         set my netBootCreationSuccessful to false
@@ -2107,18 +2164,18 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
 
                 -- Update Build Process Window's Text Field
-                --set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Fonts/"
+                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Fonts/"
 
-                --delay 0.1
+                delay 0.1
 
                 -- Empty the below folder
-                --do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Fonts/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Fonts/*" with administrator privileges
 
                 --Log Action
-                --set logMe to Emptied " & selectedTempOSdmgMountPath & "/Library/Fonts/"
+                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Fonts/"
                 
                 -- Log To file
-                --logToFile_(me)
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Modem Scripts/"
@@ -3100,8 +3157,7 @@ script AutoCasperNBIAppDelegate
         end try
         
     end deleteDockFixUp_
-            
-            
+
     -- Create the ARD user
     on createARDUser_(sender)
 
@@ -3306,13 +3362,13 @@ script AutoCasperNBIAppDelegate
                 set netBootDestination to netBootSelectedLocation & netBootNameTextField
                 
                 --Log Action
-                set logMe to "Trying to create NBI of " & selectedTempOSdmgMountPath & " in " & netBootDestination
+                set logMe to "Trying to create NBI of " & selectedTempOSdmgMountPath & " in " & netBootDestination & " Progress below: \\n"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Create NBI using imagetool
-                set netBootCreatedPath to do shell script "/System/Library/CoreServices/System\\ Image\\ Utility.app/Contents/MacOS/imagetool --netboot --destination ~/Desktop/" & quoted form of netBootNameTextField & " --source " & quoted form of selectedTempOSdmgMountPath & " --name " & quoted form of netBootNameTextField & " --index " & netBootImageIndexTextField & "| grep \"Successfully\" | awk '{print substr($0, index($0,$3))}'" with administrator privileges as quoted form
+                set netBootCreatedPath to do shell script "/System/Library/CoreServices/System\\ Image\\ Utility.app/Contents/MacOS/imagetool --netboot --destination " & quoted form of netBootDestination & " --source " & quoted form of selectedTempOSdmgMountPath & " --name " & quoted form of netBootNameTextField & " --index " & netBootImageIndexTextField & "| tee -a ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log | grep \"Successfully\" | awk '{print substr($0, index($0,$3))}'" with administrator privileges as quoted form
                 
                 -- Log Action
                 set logMe to "NetBoot created & can be found at " & netBootCreatedPath
@@ -3362,7 +3418,7 @@ script AutoCasperNBIAppDelegate
             do shell script "chmod 777 " & variableVariable with administrator privileges
             
             --Log Action
-            set logMe to "Set permissons on " & variableVariable & " to 777"
+            set logMe to "Set permissions on " & variableVariable & " to 777"
             
             -- Log To file
             logToFile_(me)
@@ -3372,7 +3428,7 @@ script AutoCasperNBIAppDelegate
             if netBootDescriptionEnabled is true
             
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Setting .nbi to Description"
+                set my buildProcessTextField to "Setting .nbi Description"
 
                 delay 0.1
 
@@ -3683,6 +3739,9 @@ script AutoCasperNBIAppDelegate
             
         end try
         
+        -- close build process window
+        showBuildProcessWindow's orderOut_(null)
+        
         -- Reset Main Window Text Field & Cog
         resetMainWindowLabel_(me)
         
@@ -3691,9 +3750,6 @@ script AutoCasperNBIAppDelegate
         
         -- Reset build Process ProgressBar
         set my buildProccessProgressBar to 0
-        
-        -- close build process window
-        showBuildProcessWindow's orderOut_(null)
         
         -- High fives all round!
         weDitIt_(me)
@@ -3722,25 +3778,11 @@ script AutoCasperNBIAppDelegate
         
     end weDitIt_
 
-    -- Log to file
-    on logToFile_(sender)
-        
-        -- Comment out before release.. this will send log messages to Xcode's log
-        log logMe
-        
-        -- Get time & date of command execution
-        set timeStamp to do shell script "date"
-        
-        -- Write message to log file
-        do shell script "echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI.log"
-
-    end logToFile_
-
     -- Insert code here to initialize your application before any files are opened
 	on applicationWillFinishLaunching_(aNotification)
         
         -- Get OS of host mac & user running the app
-        getOSandUsername_(me)
+        startYourEngines_(me)
         
         -- populate plist file with defaults (will not overwrite non-default settings))
         regDefaults_(me)
