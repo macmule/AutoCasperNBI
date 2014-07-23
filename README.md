@@ -4,7 +4,7 @@ Once you have an OS.dmg & Casper Imaging app selected, you should be able to bui
 <br>
 The JSS URL & options under the options tab, are optional.<br>
 <br>
-The advanced tabs functions are to come when I figure out how to tie the GUI elements in.<br>
+The addditoanl tabs functions are to come when I figure out how to tie the GUI elements in, anthing else to add to advanced tab?<br>
 <br>
 Any options you set, should be written to a plist ~/Library/Preferences/com.macmule.AutoCasperNBI.plist.<br>
 <br>
@@ -18,11 +18,7 @@ ISSUES<br>
 <br>
 Currently, AutoCasperNBI checks that 20GB of space is free.. But i’ll amend later to actually size needed.<br>
 <br>
-Please tun from /Applications (I’ll make a check for that later).<br>
-<br>
-Tracking an issue with some NFS served .nbi’s hanging on restart.<br>
-<br>
-Casper Imaging 9.3-1 should not be used due to a bug that stops OS restart<br>
+Please run from /Applications (I’ll make a check for that later).<br>
 <br>
 VERSIONS<br>
 <br>
