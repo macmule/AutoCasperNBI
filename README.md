@@ -26,17 +26,17 @@ Casper Imaging 9.3-1 should not be used due to a bug that stops OS restart<br>
 <br>
 VERSIONS<br>
 <br>
-0.8
+0.8<br>
 —Reverse engineered Apple’s createNetBoot.sh (found:
 /System/Library/CoreServices/System Image
 Utility.app/Contents/Frameworks/SIUFoundation.framework/Versions/A/XPCSe
-rvices/com.apple.SIUAgent.xpc/Contents)
-—Stopped repeated password prompt
-— Added rc.netboot as optional
-— Added custom desktop image deselect
-— Added resizing of finished DMG, (reduction & expansion)
-— Changed power management to the same plist as Apple use.
-
+rvices/com.apple.SIUAgent.xpc/Contents)<br>
+—Stopped repeated password prompt<br>
+— Added rc.netboot as optional<br>
+— Added custom desktop image deselect<br>
+— Added resizing of finished DMG, (reduction & expansion)<br>
+— Changed power management to the same plist as Apple use<br>
+<br>
 0.7<br>
 Uncommented out /Library/Fonts/*<br>
 Amended log to ~/Library/Log/AutoCasperNBI/AutoCasperNBI-date.log<br>
