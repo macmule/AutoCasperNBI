@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Architectures</key>
+	<array>
+		<string>i386</string>
+	</array>
+	<key>BackwardCompatible</key>
+	<false/>
+	<key>BootFile</key>
+	<string>booter</string>
+	<key>Description</key>
+	<string>No description</string>
+	<key>DisabledSystemIdentifiers</key>
+	<array/>
+	<key>EnabledSystemIdentifiers</key>
+	<array/>
+	<key>Index</key>
+	<integer>42000</integer>
+	<key>IsDefault</key>
+	<false/>
+	<key>IsEnabled</key>
+	<false/>
+	<key>IsInstall</key>
+	<true/>
+	<key>Kind</key>
+	<integer>1</integer>
+	<key>Language</key>
+	<string>Default</string>
+	<key>Name</key>
+	<string>My NetInstall Image</string>
+	<key>RootPath</key>
+	<string>System.dmg</string>
+	<key>SupportsDiskless</key>
+	<false/>
+	<key>Type</key>
+	<string>HTTP</string>
+</dict>
+</plist>

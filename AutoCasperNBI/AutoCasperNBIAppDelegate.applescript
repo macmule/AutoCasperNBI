@@ -20,7 +20,7 @@ script AutoCasperNBIAppDelegate
     property defaults : missing value -- for saved prefs
     property hostMacOSVersion : missing value
     property hostMacOSBuildVersion : missing value
-    property AutoCasperNBIWindow : missing value
+    property mainWindow : missing value
     property optionsWindow : missing value
     property showBuildProcessWindow : missing value
     property selectedOSdmgPath : missing value
@@ -73,7 +73,7 @@ script AutoCasperNBIAppDelegate
     property requiredSpaceCheckPassed: missing value
     property buildProcessTextField : missing value
     property tempUUID : missing value
-    property selectedTempOSdmgMountPath : missing value
+    property netBootDmgMountPath : missing value
     property selectedAppPathToCopy : missing value
     property downloadedJSSCACert : missing value
     property variableVariable : missing value
@@ -82,7 +82,7 @@ script AutoCasperNBIAppDelegate
     property ardUsernameEncoded : missing value
     property netBootCreatedPath : missing value
     property desktopImageExists : missing value
-    property netBootImageResizeValue : missing value
+    property netBootImageExpandValue : missing value
     property selectedCasperImagingAppVersionToDelim : missing value
     property selectedCasperImagingAppVersionMajor : missing value
     property selectedCasperImagingAppVersionMinor : missing value
@@ -96,6 +96,15 @@ script AutoCasperNBIAppDelegate
     property logDate : missing value
     property buildProcessLogTextField : missing value
     property versionOfAutoCasperNBI : missing value
+    property netBootDirectory : missing value
+    property adminUserName : missing value
+    property adminUsersPassword : missing value
+    property adminUserWindow : missing value
+    property netBootDmgTotalSize : missing value
+    property netBootDmgFreeSpace : missing value
+    property netBootDmgUsedSpace : missing value
+    property netBootReducedDmgMountPath : missing value
+    property netBootExpandedTotalSize : missing value
     
     --- Booleans
     property selectedOSDMGTextFieldEnabled : false
@@ -120,7 +129,7 @@ script AutoCasperNBIAppDelegate
     property disableOptionsAndBuild : true
     property netBootImageIndexLoadBalanced : false
     property optionWindowEnabled : true
-    property netBootImageResizeEnabled : false
+    property netBootImageExpandEnabled : false
     property netBootImageReduceEnabled : false
     property ardEnabled : false
     property vncEnabled : false
@@ -134,10 +143,17 @@ script AutoCasperNBIAppDelegate
     property buildProccessProgressBarAniminate : false
     property netBootCreationSuccessful : false
     property netBootServeOverNFS : true
+    property customDesktopImageEnabled : false
+    property installRCNetBootSelected : false
     
     -- Others
     property requiredSpace : 20
     property buildProccessProgressBar : 0
+    property selectedOSdmgTotalSize : 0
+    property selectedOSdmgFreeSpace : 0
+    property selectedOSdmgUsedSpace : 0
+    property netBootDmgRequiredSize : 0
+    property netBootDmgResize : 0
     
 --- HANDLERS ---
 
@@ -196,16 +212,18 @@ script AutoCasperNBIAppDelegate
         tell defaults to registerDefaults_({ardEnabled:ardEnabled, ¬
         ardUsername:ardUsername, ¬
         ardPassword:ardPassword, ¬
+        customDesktopImageEnabled:customDesktopImageEnabled, ¬
         customDesktopImagePath:customDesktopImagePath, ¬
         jssURL:jssURL, ¬
         netBootDescriptionEnabled:netBootDescriptionEnabled, ¬
         netBootImageIndexLoadBalanced:netBootImageIndexLoadBalanced, ¬
-        netBootImageResizeEnabled:netBootImageResizeEnabled, ¬
-        netBootImageResizeValue:netBootImageResizeValue, ¬
+        netBootImageExpandEnabled:netBootImageExpandEnabled, ¬
+        netBootImageExpandValue:netBootImageExpandValue, ¬
         netBootImageReduceEnabled:netBootImageReduceEnabled, ¬
         netBootServeOverNFS:netBootServeOverNFS, ¬
         vncEnabled:vncEnabled, ¬
-        vncPassword:vncPassword })
+        vncPassword:vncPassword, ¬
+        installRCNetBootSelected:installRCNetBootSelected})
     end regDefaults_
     
     -- Get values from plist
@@ -213,16 +231,18 @@ script AutoCasperNBIAppDelegate
         tell defaults to set my ardEnabled to objectForKey_("ardEnabled") as boolean
         tell defaults to set my ardUsername to objectForKey_("ardUsername")
         tell defaults to set my ardPassword to objectForKey_("ardPassword")
+        tell defaults to set my customDesktopImageEnabled to objectForKey_("customDesktopImageEnabled") as boolean
         tell defaults to set my customDesktopImagePath to objectForKey_("customDesktopImagePath")
         tell defaults to set my jssURL to objectForKey_("jssURL")
         tell defaults to set my netBootDescriptionEnabled to objectForKey_("netBootDescriptionEnabled") as boolean
         tell defaults to set my netBootImageIndexLoadBalanced to objectForKey_("netBootImageIndexLoadBalanced")
-        tell defaults to set my netBootImageResizeEnabled to objectForKey_("netBootImageResizeEnabled")
-        tell defaults to set my netBootImageResizeValue to objectForKey_("netBootImageResizeValue")
+        tell defaults to set my netBootImageExpandEnabled to objectForKey_("netBootImageExpandEnabled")
+        tell defaults to set my netBootImageExpandValue to objectForKey_("netBootImageExpandValue")
         tell defaults to set my netBootImageReduceEnabled to objectForKey_("netBootImageReduceEnabled")
         tell defaults to set my netBootServeOverNFS to objectForKey_("netBootServeOverNFS")
         tell defaults to set my vncEnabled to objectForKey_("vncEnabled") as boolean
         tell defaults to set my vncPassword to objectForKey_("vncPassword")
+        tell defaults to set my installRCNetBootSelected to objectForKey_("installRCNetBootSelected") as boolean
     end retrieveDefaults_
     
     ----- BUTTON HANDLERS ----
@@ -288,8 +308,99 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to missing value
         set my mainWindowCog to false
     end resetMainWindowLabel_
+
+----- LAUNCHING -----
+
+    -- Insert code here to initialize your application before any files are opened
+    on applicationWillFinishLaunching_(aNotification)
+        
+        -- Get OS of host mac & user running the app
+        startYourEngines_(me)
+        
+        -- populate plist file with defaults (will not overwrite non-default settings))
+        regDefaults_(me)
+        
+        -- retrieve plist values
+        retrieveDefaults_(me)
+        
+        -- check for passwords, enable check boxes if found in plist
+        checkPasswords_(me)
+        
+        -- Check that image selected for desktop exists
+        checkDesktopImage_(me)
+        
+    end applicationWillFinishLaunching_
     
-    ----- LOGGING -----
+    -- On launch as for administrative credentials & validate
+    on adminCheck_(sender)
+        
+        -- Checking variable
+        set isAdminUser to false
+        
+        -- Set to text
+        set adminUserName to adminUserName as text
+        
+        -- Check to see if supplied User is a member of the Administrator group
+        if ("80" is not in (do shell script "id " & adminUserName & " -G")) then
+            
+            --Log Action
+            set logMe to "User " & adminUserName & " is not a part of the Administrators group"
+            
+            -- Log To file
+            logToFile_(me)
+            
+        else
+            
+            --Log Action
+            set logMe to "User " & adminUserName & " is part of the Administrators group"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Checking variable
+            set isAdminUser to true
+            
+        end if
+        
+        -- If the User is an Administrator
+        if isAdminUser is true then
+            
+            -- Set to text
+            set adminUsersPassword to adminUsersPassword as text
+            
+            try
+                
+                -- Perform a check of privileges
+                do shell script "ls " user name adminUserName password adminUsersPassword with administrator privileges
+                
+                -- Open the Main Window
+                openMainWindow_(me)
+                
+            on error
+                
+                -- Display error to user
+                display dialog "Authentication failed. Please renter the Administrator credentials."with icon 2 buttons {"OK"}
+                
+            end try
+            
+        end if
+        
+    end adminCheck_
+    
+    -- Open the Main Window
+    on openMainWindow_(sender)
+        
+        -- close build process window
+        adminUserWindow's orderOut_(null)
+        
+        -- activate main window
+        activate
+        mainWindow's makeKeyAndOrderFront_(null)
+        
+    end openMainWindow_
+
+
+----- LOGGING -----
     -- Log to file
     on logToFile_(sender)
         
@@ -307,7 +418,7 @@ script AutoCasperNBIAppDelegate
             -- Write message to log file
             do shell script "echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
             
-            on error
+        on error
             
             -- Create directory if doesn't exist
             do shell script "mkdir ~/Library/Logs/AutoCasperNBI/"
@@ -318,8 +429,7 @@ script AutoCasperNBIAppDelegate
         end try
         
     end logToFile_
-
-
+    
 ----- MAIN WINDOW----
 
     -- Display a window for the user to select an DMG.
@@ -1027,19 +1137,18 @@ script AutoCasperNBIAppDelegate
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootServeOverNFS, "netBootServeOverNFS")
             
-            
     end netBootServeOption_
 
 ----- OPTIONS WINDOW  -----
 
     -- Bound to "Resize Image by"
-    on netBootImageResize_(sender)
+    on netBootImageExpand_(sender)
         
-        -- Set netBootImageResizeEnabled to boolean of value
-        set netBootImageResizeEnabled to netBootImageResizeEnabled as boolean
+        -- Set netBootImageExpandEnabled to boolean of value
+        set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
         
         -- Set options depending on checkbox
-        if netBootImageResizeEnabled is true then
+        if netBootImageExpandEnabled is true then
             
             --Log Action
             set logMe to "NetBoot resize enabled"
@@ -1058,15 +1167,15 @@ script AutoCasperNBIAppDelegate
         end if
         
         -- Update plist with selection
-        tell defaults to setObject_forKey_(netBootImageResizeEnabled, "netBootImageResizeEnabled")
+        tell defaults to setObject_forKey_(netBootImageExpandEnabled, "netBootImageExpandEnabled")
         
-    end netBootImageResize_
+    end netBootImageExpand_
 
     -- Bound to NetBoot Image Resize value
-    on netBootImageResizeEnteredValue_(sender)
+    on netBootImageExpandEnteredValue_(sender)
         
         -- If we have a value
-        if netBootImageResizeValue is equal to missing value
+        if netBootImageExpandValue is equal to missing value
         
             -- Display error to user
             display dialog "Please select a value to resize the NetBoot Image or deselect Resize by" with icon 0 buttons {"OK"}
@@ -1074,9 +1183,9 @@ script AutoCasperNBIAppDelegate
         end if
         
         -- Update plist with selection
-        tell defaults to setObject_forKey_(netBootImageResizeValue, "netBootImageResizeValue")
+        tell defaults to setObject_forKey_(netBootImageExpandValue, "netBootImageExpandValue")
         
-    end netBootImageResizeEnteredValue_
+    end netBootImageExpandEnteredValue_
 
     -- Bound to "Reduce Image Size"
     on netBootImageReduce_(sender)
@@ -1323,28 +1432,28 @@ script AutoCasperNBIAppDelegate
     end checkvncPassword_
 
     -- Check NetBoot Resize value
-    on checkNetBootResizeValue_(sender)
+    on checkNetBootExpandValue_(sender)
         
         -- reload options from plist
         retrieveDefaults_(me)
         
         -- Set to boolean of value
-        set netBootImageResizeEnabled to netBootImageResizeEnabled as boolean
+        set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
         
         -- If we're looking to Resize the NetBoot Image
-        if netBootImageResizeEnabled is true
+        if netBootImageExpandEnabled is true
         
             -- If we do not have a value to Resize the Image by
-            if netBootImageResizeValue is equal to missing value
+            if netBootImageExpandValue is equal to missing value
         
                 --Log Action
-                set logMe to "Error: NetBoot resize enabled, but no value given for expansion"
+                set logMe to "Error: NetBoot expand enabled, but no value given for expansion"
                 
                 -- Log To file
                 logToFile_(me)
         
                 -- Bound to NetBoot Image Resize value
-                netBootImageResizeEnteredValue_(me)
+                netBootImageExpandEnteredValue_(me)
                 
             else
             
@@ -1360,7 +1469,7 @@ script AutoCasperNBIAppDelegate
 
         end if
 
-    end checkNetBootResizeValue_
+    end checkNetBootExpandValue_
 
     -- Bound to the Close button on options window
     on checkScreenSharingDetails_(sender)
@@ -1482,6 +1591,7 @@ script AutoCasperNBIAppDelegate
                 end if
                 
             end if
+            
         end if
         
         -- If VNC enabled is set
@@ -1523,6 +1633,30 @@ script AutoCasperNBIAppDelegate
         
     end vncDisable_
 
+    -- Bound to "Use a custom desktop image" checkbox, sets plist
+    on customDesktopImageSelected_(sender)
+        
+        -- Set to variable to boolean
+        set customDesktopImageEnabled to customDesktopImageEnabled as boolean
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(customDesktopImageEnabled, "customDesktopImageEnabled")
+        
+        if customDesktopImageEnabled is false
+        
+            -- Delete jssURL from plist
+            tell defaults to removeObjectForKey_("customDesktopImagePath")
+        
+            -- Set lable to blank
+            set my customDesktopImageLabel to ""
+            
+            -- Update plist with selection
+            tell defaults to setObject_forKey_(customDesktopImagePath, "customDesktopImagePath")
+            
+        end if
+        
+    end customDesktopImageSelected_
+
     -- Display a window for the user to select an Desktop Image.
     on selectedDesktopImage_(sender)
         
@@ -1553,36 +1687,60 @@ script AutoCasperNBIAppDelegate
     -- If custom Desktop Image has a value, then check file exists & update error if it does not.
     on checkDesktopImage_(sender)
         
-        -- If a custom desktop is selected
-        if customDesktopImagePath is not equal to missing value then
+        -- If custom desktop image is selected
+        if customDesktopImageEnabled is true
+        
+            -- If a custom desktop is selected
+            if customDesktopImagePath is equal to missing value
+                
+                -- Set to false
+                set customDesktopImageEnabled to false
+                
+                -- Bound to "Use a custom desktop image" checkbox, sets plist
+                customDesktopImageSelected_(me)
+                
+            else
+                
+                try
+                    
+                    -- Set customDesktopImagePath to value as text
+                    set customDesktopImagePath to customDesktopImagePath as text
+                    
+                    -- Check for file
+                    do shell script "ls " & quoted form of customDesktopImagePath
+                    
+                    -- True if file exists
+                    set desktopImageExists to true
+                    
+                    -- Update label
+                    set my customDesktopImageLabel to "Image Selected: " & customDesktopImagePath
+                    
+                on error
+                    
+                    -- Update label
+                    set my customDesktopImageLabel to "Cannot Find: " & customDesktopImagePath
+                    
+                    -- True if file exists
+                    set desktopImageExists to false
+                    
+                end try
             
-            try
-                
-                -- Set customDesktopImagePath to value as text
-                set customDesktopImagePath to customDesktopImagePath as text
-                
-                -- Check for file
-                do shell script "ls " & quoted form of customDesktopImagePath
-                
-                -- True if file exists
-                set desktopImageExists to true
-                
-                -- Update label
-                set my customDesktopImageLabel to "Image Selected: " & customDesktopImagePath
-                
-            on error
-                
-                -- Update label
-                set my customDesktopImageLabel to "Cannot Find: " & customDesktopImagePath
-                
-                -- True if file exists
-                set desktopImageExists to false
-                
-            end try
-            
+            end if
+
         end if
 
     end checkDesktopImage_
+
+    -- Bound to "Install modified rc.netboot file" checkbox, sets plist
+    on installRCNetBootSelected_(sender)
+        
+        -- Set to variable to boolean
+        set installRCNetBootSelected to installRCNetBootSelected as boolean
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(installRCNetBootSelected, "installRCNetBootSelected")
+        
+    end installRCNetBootSelected_
 
 ----- BUILD PRE-CHECK -----
 
@@ -1607,7 +1765,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Check that we have enough space available to proceed
-            checkFreeSpace_(me)
+            getNetBootDmgRequiredSize_(me)
             
         on error
             
@@ -1624,274 +1782,191 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Check that we have enough space available to proceed
-            checkFreeSpace_(me)
+            getNetBootDmgRequiredSize_(me)
             
         end try
 
-    end netBootLocation
+    end netBootLocation_
 
-    -- Check that we have enough space available to proceed
-    on checkFreeSpace_(sender)
+    -- Get the space needed for the NetBoot.dmg
+    on getNetBootDmgRequiredSize_(sender)
         
-        -- Disable main windows buttons
-        set my optionWindowEnabled to false
+        try
+            
+            -- Disable main windows buttons
+            set my optionWindowEnabled to false
 
-        -- Update buildProcessLogTextField to show path to todays log
-        set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+            -- Update buildProcessLogTextField to show path to todays log
+            set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
 
-        -- activate build process window
-        activate
-        showBuildProcessWindow's makeKeyAndOrderFront_(null)
-        
-        -- Set netBootCreationSuccessful value, for notifying later
-        set my netBootCreationSuccessful to false
-        
-        -- Reset required space
-        set requiredSpace to 20
-        
-        -- Show Cog on main window
-        set my mainWindowCog to true
-  
-        -- Get path of AutoCasperNBI
-        set libraryPath to (path to library folder) as string
- 
-        -- Get path of users folder
-        set userPath to (path to home folder) as string
-        
-        -- Store delimiters for resetting later
-        set applescriptsDelims to AppleScript's text item delimiters
-        
-        -- Set delimiters to colon
-        set AppleScript's text item delimiters to ":"
-        
-        -- Get Volume Name that AutoCasperNBI resides
-        set libraryVolume to text item 1 of libraryPath
-        
-        -- Get Volume Name that Users home folder resides
-        set usersVolume to text item 1 of userPath
-        
-        -- Reset delimiters
-        set AppleScript's text item delimiters to applescriptsDelims
-
-        -- If we're using the same volume for AutoCasperNBI & home folder
-        if libraryVolume is equal to usersVolume then
+            -- activate build process window
+            activate
+            showBuildProcessWindow's makeKeyAndOrderFront_(null)
+            
+            -- Set netBootCreationSuccessful value, for notifying later
+            set my netBootCreationSuccessful to false
+            
+            -- Reset required space
+            set requiredSpace to 20
+            
+            -- Show Cog on main window
+            set my mainWindowCog to true
             
             --Log Action
-            set logMe to "AutoCasperNBI & this users Home folder reside on the same volume. Getting available space on: " & libraryVolume
+            set logMe to "Trying to get the Total size of " & quoted form of selectedOSdmgMountPath
             
             -- Log To file
             logToFile_(me)
             
-        else
-        
-            --Log Action
-            set logMe to "AutoCasperNBI & this users Home folder reside on the different volumes. Getting available space on both " & libraryVolume & " & " & usersVolume
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Guesstimate, as we write to both the Home folder & OS HD, half required space to make sure we're ok to proceed.
-            set requiredSpace to requiredSpace / 2
+            -- Get total size of selectedOSdmg
+            set selectedOSdmgTotalSize to do shell script "diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Total Size\" | awk '{ print $3 }'"
             
             --Log Action
-            set logMe to "There is " & requiredSpace & "GB space required on both " & libraryVolume & " & " & usersVolume
+            set logMe to "Total size of " & quoted form of selectedOSdmgMountPath & "is " & selectedOSdmgTotalSize & "GB"
             
             -- Log To file
             logToFile_(me)
-            
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Checking that we have enough free space"
-            
-            -- Set build Process ProgressBar to indeterminate & animated
-            set my buildProccessProgressBarIndeterminate to true
-            set my buildProccessProgressBarAniminate to true
-            
-            delay 0.1
-            
-            -- Get free space of Users volume
-            set freeSpaceUsersVolume to do shell script "diskutil info " & quoted form of usersVolume & " | grep \"Free Space\" | awk '{ print $4}'"
-            
-        end if
-        
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Checking that we have enough free space"
-        
-        -- Set build Process ProgressBar to indeterminate & animated
-        set my buildProccessProgressBarIndeterminate to true
-        set my buildProccessProgressBarAniminate to true
-        
-        delay 0.1
-        
-        -- Get free space of App Volume
-        set freeSpacelibraryVolume to do shell script "diskutil info " & quoted form of libraryVolume & " | grep \"Free Space\" | awk '{ print $4}'"
-        
-        considering numeric strings
-            
-        -- Make sure we have enough space on the App Volume to proceed
-        if freeSpacelibraryVolume is less than requiredSpace then
-            
-            set logMe to "There is " & requiredSpace & "GB of space is needed, only " & freeSpacelibraryVolume & "GB free. Cannot proceed."
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Display error to user
-            display dialog "Error: " & requiredSpace & "GB of space is needed, only " & freeSpacelibraryVolume & "GB free. Cannot proceed." with icon 0 buttons {"OK"}
-            
-            -- Set requiredSpaceCheckPassed based on if we're ok to proceed
-            set my requiredSpaceCheckPassed to false
-            
-            -- close build process window
-            showBuildProcessWindow's orderOut_(null)
-            
-            -- Re-enable main windows buttons
-            set my optionWindowEnabled to true
-            
-        else
-        
+
+            -- Get the value of the free space available on selectedOSdmg
+            set selectedOSdmgFreeSpace to do shell script "diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
+
             --Log Action
-            set logMe to "There is " & libraryVolume & " has " & freeSpacelibraryVolume & "GB free. " & requiredSpace & "GB is needed, so we're ok to proceed."
-            
+            set logMe to "There is " & selectedOSdmgFreeSpace & "GB space free on " & quoted form of selectedOSdmgMountPath
+
             -- Log To file
             logToFile_(me)
-            
-            -- Set requiredSpaceCheckPassed based on if we're ok to proceed
-            set my requiredSpaceCheckPassed to true
-            
-        end if
-        
-        end considering
-        
-        -- Check to freeSpaceUsersVolume has a value
-        if freeSpaceUsersVolume is not equal to missing value then
             
             considering numeric strings
                 
-            -- Make sure we have enough space on the User Volume to proceed
-            if freeSpaceUsersVolume is less than requiredSpace then
+                -- Get the space used on selectedOSdmg
+                set selectedOSdmgUsedSpace to (selectedOSdmgTotalSize - selectedOSdmgFreeSpace)
                 
-                --Log Action
-                set logMe to "There is " & requiredSpace & "GB of space is needed, only " & freeSpaceUsersVolume & "GB free. Cannot proceed."
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Display error to user
-                display dialog "Error: " & requiredSpace & "GB of space is needed, only " & freeSpaceUsersVolume & "GB free. Cannot proceed." with icon 0 buttons {"OK"}
-                
-                -- Set requiredSpaceCheckPassed based on if we're ok to proceed
-                set my requiredSpaceCheckPassed to false
-                
-                -- close build process window
-                showBuildProcessWindow's orderOut_(null)
-                
-                -- Re-enable main windows buttons
-                set my optionWindowEnabled to true
-                
-            else
-            
-                --Log Action
-                set logMe to "The volume " & usersVolume & " has " & freeSpaceUsersVolume & "GB free. " & requiredSpace & "GB is needed, so we're ok to proceed."
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Set requiredSpaceCheckPassed based on if we're ok to proceed
-                set my requiredSpaceCheckPassed to true
-                
-            end if
-            
             end considering
-            
-        end if
+                
+                --Log Action
+                set logMe to "Used space on  " & quoted form of selectedOSdmgMountPath & "is " & selectedOSdmgUsedSpace & "GB"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set NetBoot.dmg's size to + 1GB of what is needed
+                set netBootDmgRequiredSize to selectedOSdmgUsedSpace + 1
+                
+                --Log Action
+                set logMe to "The NetBoot.dmg will need to be around " & netBootDmgRequiredSize & "GB"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Check that selected files exist
+                checkFiles_(me)
         
-        -- If we ok to proceed
-        if requiredSpaceCheckPassed to true
-
-            -- Check that selected files exist
-            checkFiles_(me)
-    
-        else
+        on error
         
-            -- Reset Main Window Text Field & Cog
-            resetMainWindowLabel_(me)
+            -- Display error to user
+            display dialog "Error: Calculating space needed" with icon 0 buttons {"OK"}
+        
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+        
+        end try
 
-        end if
-
-    end checkFreeSpace_
+    end getNetBootDmgRequiredSize_
 
     -- Check that selected files exist
     on checkFiles_(sender)
         
-        -- If a custom desktop is selected
-        if customDesktopImagePath is not equal to missing value then
+        -- If custom desktop image is selected
+        if customDesktopImageEnabled is true
+        
+            -- Bound to "Use a custom desktop image" checkbox, sets plist
+            customDesktopImageSelected_(me)
             
-            try
+            -- If a custom desktop is selected
+            if customDesktopImagePath is equal to missing value
+            
+                -- Set to false
+                set customDesktopImageEnabled to false
                 
-                -- Set customDesktopImagePath to value as text
-                set customDesktopImagePath to customDesktopImagePath as text
+                -- Bound to "Use a custom desktop image" checkbox, sets plist
+                customDesktopImageSelected_(me)
                 
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Checking that " & customDesktopImagePath & " exists"
+                -- True if file exists
+                set desktopImageExists to false
                 
-                set logMe to "Selected Desktop Image: " & customDesktopImagePath
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Check for file
-                do shell script "ls " & quoted form of customDesktopImagePath
-                
-                -- True as file exists
-                set desktopImageExists to true
-                
-                -- Update label
-                set my customDesktopImageLabel to "Image Selected: " & customDesktopImagePath
-                
-                -- temp OS.dmg to /tmp
-                createTempOSdmgInTmp_(me)
-
-            on error
-                
-                -- Update label
-                set my customDesktopImageLabel to "Cannot Find: " & customDesktopImagePath
-                
-                display dialog "Cannot Find: " & customDesktopImagePath & ".Do you wish to proceed?" with icon 2 buttons {"No", "Yes"}
-                
-                -- If user selected no
-                if button returned of the result is "No" then
+                -- Create the .nbi folder
+                netBootLocationCreate_(me)
+            
+            else
+            
+                try
                     
-                    --Log Action
-                    set logMe to "User chose not to proceed as missing Desktop Image"
+                    -- Set customDesktopImagePath to value as text
+                    set customDesktopImagePath to customDesktopImagePath as text
+                    
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Checking that custom Desktop Image exists"
+                    
+                    set logMe to "Selected Desktop Image: " & customDesktopImagePath
                     
                     -- Log To file
                     logToFile_(me)
                     
-                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-                    tidyUpTimeKids_(me)
-                
-                else
-
-                    --Log Action
-                    set logMe to "User chose to proceed with a missing Desktop Image"
-                    
-                    -- Log To file
-                    logToFile_(me)
+                    -- Check for file
+                    do shell script "ls " & quoted form of customDesktopImagePath
                     
                     -- True as file exists
-                    set desktopImageExists to false
+                    set desktopImageExists to true
                     
-                    -- temp OS.dmg to /tmp
-                    createTempOSdmgInTmp_(me)
+                    -- Update label
+                    set my customDesktopImageLabel to "Image Selected: " & customDesktopImagePath
+                    
+                    -- Create the .nbi folder
+                    netBootLocationCreate_(me)
 
-                end if
+                on error
+                    
+                    -- Update label
+                    set my customDesktopImageLabel to "Cannot Find: " & customDesktopImagePath
+                    
+                    display dialog "Cannot Find: " & customDesktopImagePath & ".Do you wish to proceed?" with icon 2 buttons {"No", "Yes"}
+                    
+                    -- If user selected no
+                    if button returned of the result is "No" then
+                        
+                        --Log Action
+                        set logMe to "User chose not to proceed as missing Desktop Image"
+                        
+                        -- Log To file
+                        logToFile_(me)
+                        
+                        -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                        tidyUpTimeKids_(me)
+                    
+                    else
 
-            end try
+                        --Log Action
+                        set logMe to "User chose to proceed with a missing Desktop Image"
+                        
+                        -- Log To file
+                        logToFile_(me)
+                        
+                        -- True if file exists
+                        set desktopImageExists to false
+                        
+                        -- Create the .nbi folder
+                        netBootLocationCreate_(me)
+
+                    end if
+
+                end try
+                
+            end if
             
         else
         
-            -- temp OS.dmg to /tmp
-            createTempOSdmgInTmp_(me)
+            -- Create the .nbi folder
+            netBootLocationCreate_(me)
 
         end if
         
@@ -1899,95 +1974,222 @@ script AutoCasperNBIAppDelegate
 
 ----- BUILD -----
 
-    -- temp OS.dmg to /tmp
-    on createTempOSdmgInTmp_(sender)
+    -- Create the .nbi folder
+    on netBootLocationCreate_(sender)
         
         -- Set build Process ProgressBar to indeterminate & animated to false
         set my buildProccessProgressBarIndeterminate to false
         set my buildProccessProgressBarAniminate to false
         
         -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Making a copy of OS.dmg in /private/tmp/AutoCasperNBI/"
+        set my buildProcessTextField to "Creating .nbi folder"
         
         delay 0.1
         
         -- Update build Process ProgressBar
         set my buildProccessProgressBar to 10
         
+        -- Set to path of NetBoot directory
+        set netBootDirectory to netBootSelectedLocation & netBootNameTextField & ".nbi"
+        
         --Log action
-        set logMe to "Trying to copy to /private/tmp/AutoCasperNBI" & tempUUID
+        set logMe to "Trying to create .nbi folder " & netBootDirectory
         
         -- Log To file
         logToFile_(me)
-        
-        try
-            
-            -- Make a copy of the OS.dmg in /tmp
-            do shell script "ditto -rsrc " & quoted form of selectedOSdmgPath & " /private/tmp/AutoCasperNBI/" & tempUUID with administrator privileges
 
-            --Log Action
-            set logMe to "Temp OS.dmg successfully copied to: /private/tmp/AutoCasperNBI/" & tempUUID
+
+        try
+            -- Create .nbi folder
+            do shell script "mkdir " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log action
+            set logMe to "Successfully created " & quoted form of netBootDirectory
             
             -- Log To file
             logToFile_(me)
             
-            -- Mount copied OS.dmg
-            mounttempOSDMG_(me)
+            -- Create the NetBoot.dmg
+            createNetbootDmg_(me)
             
-        on error
+        on error number 1
+        
+            -- Error to user prompting for what to do next
+            display dialog "There is already afolder called: " & quoted form of netBootNameTextField & " in " & quoted form of netBootSelectedLocation & return & return & "Do you want to select another folder or delete the existing?" with icon 2 buttons {"Delete Existing", "New Folder"}
             
-            -- Display error to user
-            display dialog "Error: Cannot copy " & selectedOSdmgPath with icon 0 buttons {"OK"}
+            -- If user selected "Delete Existing"
+            if button returned of the result is "Delete Existing" then
+                
+                --Log action
+                set logMe to "Trying to delete " & quoted form of netBootDirectory
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Delete existing folder
+                do shell script "rm -rf " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+
+                --Log action
+                set logMe to "Deleted " & quoted form of netBootDirectory
+
+                -- Log To file
+                logToFile_(me)
+
+                -- Create the .nbi folder
+                netBootLocationCreate_(me)
+                
+            else
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-            tidyUpTimeKids_(me)
+                --Log action
+                set logMe to "Reselecting path to create .nbi"
+                
+                -- Log To file
+                logToFile_(me)
+            
+                -- Prompt user for location to create the .nbi
+                netBootLocation_(me)
+                
+            end if
             
         end try
         
-    end createTempOSdmgInTmp_
+    end netBootLocationCreate_
 
-    -- Mount copied OS.dmg
-    on mountTempOSDMG_(sender)
+    -- Create the NetBoot.dmg
+    on createNetbootDmg_(sender)
         
         -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Mounting temp OS.dmg"
+        set my buildProcessTextField to "Creating NetBoot.dmg"
         
         delay 0.1
         
         -- Update build Process ProgressBar
         set my buildProccessProgressBar to 20
         
+        --Log action
+        set logMe to "Trying to create NetBoot.dmg in " & netBootDirectory
+        
+        -- Log To file
+        logToFile_(me)
+        
+        -- Set to text value, to avoid an issue when name changed
+        set netBootNameTextField to netBootNameTextField as text
+                
         try
-
-            --Log Action
-            set logMe to "Trying to mount: /private/tmp/AutoCasperNBI/" & tempUUID
+            
+            -- Create a the NetBoot.dmg
+            do shell script "hdiutil create " & quoted form of netBootDirectory & "/NetBoot -size " & netBootDmgRequiredSize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log action
+            set logMe to "Successfully created NetBoot.dmg in " & quoted form of netBootDirectory
             
             -- Log To file
             logToFile_(me)
             
-            --  Mount temp 0S.dmg
-            set selectedTempOSdmgMountPath to do shell script "hdiutil attach /private/tmp/AutoCasperNBI/" & tempUUID & " -nobrowse -owners on -shadow | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form
+            -- Mount the NetBoot.dmg
+            mountNetBootDmg_(me)
             
-            --Log Action
-            set logMe to "Mounted to: " & selectedTempOSdmgMountPath
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Reduce NetBoot Image if ticked
-            reduceNetBootImage_(me)
-
         on error
         
             -- Display error to user
-            display dialog "Error: Cannot mount temp OS.dmg" with icon 0 buttons {"OK"}
+            display dialog "Error: Failed to create NetBoot.dmg" with icon 0 buttons {"OK"}
+        
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+
+        end try
+
+    end createNetbootDmg_
+
+    -- Mount the NetBoot.dmg
+    on mountNetBootDmg_(sender)
+
+        try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Mounting NetBoot.dmg"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 30
+            
+            --Log Action
+            set logMe to "Trying to mount: " & quoted form of netBootDirectory
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Mount the NetBoot.dmg & get the mount path
+            set netBootDmgMountPath to do shell script "hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Mounted to: " & netBootDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+
+            -- Copy OS.dmg's content to NetBoot.dmg
+            copyOSDmgToNetBootDmg_(me)
+
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Cannot mount NetBoot.dmg" with icon 0 buttons {"OK"}
             
             -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
             tidyUpTimeKids_(me)
             
         end try
         
-    end mountTempOSDMG_
+    end mountNetBootDmg_
+
+    -- Copy OS.dmg's content to NetBoot.dmg
+    on copyOSDmgToNetBootDmg_(sender)
+        
+        -- Set build Process ProgressBar to indeterminate & animated to false
+        set my buildProccessProgressBarIndeterminate to false
+        set my buildProccessProgressBarAniminate to false
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Copying the contents of the OS.dmg to NetBoot.dmg"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 40
+        
+        --Log action
+        set logMe to "Copying contents of " & quoted form of selectedOSdmgMountPath & " to " & quoted form of netBootDirectory & "/NetBoot.dmg"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        try
+            
+            -- Copy contents of the SelectedOSdmg to NetBootdmg
+            do shell script "ditto " & quoted form of selectedOSdmgMountPath & " " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log action
+            set logMe to "Successfully copied " & quoted form of selectedOSdmgPath & " to " & quoted form of netBootDirectory & "/NetBoot.dmg"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Reduce NetBoot Image if ticked
+            reduceNetBootImage_(me)
+                    
+        on error
+                    
+            -- Display error to user
+            display dialog "Error: Cannot copy contents of " & selectedOSdmgMountPath & " to " & quoted form of netBootDmgMountPath with icon 0 buttons {"OK"}
+                
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+                    
+        end try
+        
+    end copyOSDmgToNetBootDmg_
 
     -- Reduce NetBoot Image if ticked
     on reduceNetBootImage_(sender)
@@ -2006,67 +2208,73 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 30
+                set my buildProccessProgressBar to 50
                 
                 ---- Applications ----
                 --Log Action
-                set logMe to "Trying to delete Applications from: " & selectedTempOSdmgMountPath & "/Applications/"
+                set logMe to "Trying to delete Applications from: " & netBootDmgMountPath & "/Applications/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Deleting unwanted Applications from: " & selectedTempOSdmgMountPath
+                set my buildProcessTextField to "Reducing NetBoot size by deleting unneeded Applications"
                 
                 delay 0.1
                 
                 -- Delete all in the location except those that are given below
-                do shell script "find " & quoted form of selectedTempOSdmgMountPath & "/Applications/* -maxdepth 0 -not -path \"*Launchpad.app*\" -not -path \"*Safari.app*\" -not -path \"*System Preferences.app*\" -not -path \"*TextEdit.app*\"  -not -path \"*Utilities*\" -exec rm -rf {} \\;" with administrator privileges
+                do shell script "find " & quoted form of netBootDmgMountPath & "/Applications/* -maxdepth 0 -not -path \"*Launchpad.app*\" -not -path \"*Safari.app*\" -not -path \"*System Preferences.app*\" -not -path \"*TextEdit.app*\"  -not -path \"*Utilities*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Deleted Applications from: " & selectedTempOSdmgMountPath & "/Applications/"
+                set logMe to "Deleted Applications from: " & netBootDmgMountPath & "/Applications/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 ---- Utilities ----
                 --Log Action
-                set logMe to "Trying to delete Utilities from: " & selectedTempOSdmgMountPath & "/Applications/Utilities/"
-                
+                set logMe to  "Deleting unwanted Utilities from: " & netBootDmgMountPath
+
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Deleting unwanted Utilities from: " & selectedTempOSdmgMountPath
+                set my buildProcessTextField to "Reducing NetBoot size by deleting unneeded Utilities"
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 52
                 
                 delay 0.1
 
                 -- Delete all in the location except those that are given below
-                do shell script "find " & quoted form of selectedTempOSdmgMountPath & "/Applications/Utilities/* -maxdepth 0 -not -path \"*Activity Monitor.app*\" -not -path \"*Console.app*\" -not -path \"*Disk Utility.app*\" -not -path \"*Grab.app*\" -not -path \"*Keychain Access.app*\" -not -path \"*System Information.app*\" -not -path \"*Terminal.app*\" -exec rm -rf {} \\;" with administrator privileges
+                do shell script "find " & quoted form of netBootDmgMountPath & "/Applications/Utilities/* -maxdepth 0 -not -path \"*Activity Monitor.app*\" -not -path \"*Console.app*\" -not -path \"*Disk Utility.app*\" -not -path \"*Grab.app*\" -not -path \"*Keychain Access.app*\" -not -path \"*System Information.app*\" -not -path \"*Terminal.app*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Deleted Utilities from: " & selectedTempOSdmgMountPath & "/Applications/Utilities/"
+                set logMe to "Deleted Utilities from: " & netBootDmgMountPath & "/Applications/Utilities/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 ---- PreferencePanes ----
                 --Log Action
-                set logMe to "Trying to delete Preference Panes from: " & selectedTempOSdmgMountPath & "/System/Library/PreferencePanes/"
+                set logMe to "Deleting unwanted PreferencesPanes from: " & netBootDmgMountPath
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Deleting unwanted PreferencesPanes from: " & selectedTempOSdmgMountPath
+                set my buildProcessTextField to "Reducing NetBoot size by deleting unneeded Preference Panes"
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 54
                 
                 delay 0.1
                 
                 -- Delete all in the location except those that are given below
-                do shell script "find " & quoted form of selectedTempOSdmgMountPath & "/System/Library/PreferencePanes/* -maxdepth 0 -not -path \"*DateAndTime.prefPane*\" -not -path \"*Displays.prefPane*\" -not -path \"*Network.prefPane*\" -not -path \"*SharingPref.prefPane*\" -not -path \"*StartupDisk.prefPane*\" -exec rm -rf {} \\;" with administrator privileges
+                do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/PreferencePanes/* -maxdepth 0 -not -path \"*DateAndTime.prefPane*\" -not -path \"*Displays.prefPane*\" -not -path \"*Network.prefPane*\" -not -path \"*SharingPref.prefPane*\" -not -path \"*StartupDisk.prefPane*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Deleted Preference Panes from: " & selectedTempOSdmgMountPath & "/System/Library/PreferencePanes/"
+                set logMe to "Deleted Preference Panes from: " & netBootDmgMountPath & "/System/Library/PreferencePanes/"
                 
                 -- Log To file
                 logToFile_(me)
@@ -2074,256 +2282,393 @@ script AutoCasperNBIAppDelegate
                 ---- Directories ----
                 --- /Library/ ---
                 --Log Action
-                set logMe to "Trying to empty directories in " & selectedTempOSdmgMountPath & "/Library/"
+                set logMe to "Trying to empty directories in " & netBootDmgMountPath & "/Library/"
                 
                 -- Log To file
                 logToFile_(me)
                 
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 56
+                
+                delay 0.1
+                
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Application Support/"
+                set my buildProcessTextField to "Emptying /Library/Application Support/"
                 
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Application\\ Support/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Application\\ Support/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Application Support/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Application Support/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Audio/"
+                set my buildProcessTextField to "Emptying /Library/Audio/"
                 
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Audio/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Audio/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Audio/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Audio/"
                 
                 -- Log To file
                 logToFile_(me)
 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Caches/"
+                set my buildProcessTextField to "Emptying /Library/Caches/"
 
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Caches/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Caches/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Caches/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Caches/"
                 
                 -- Log To file
                 logToFile_(me)
 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Desktop Pictures/"
+                set my buildProcessTextField to "Emptying /Library/Desktop Pictures/"
 
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Desktop\\ Pictures/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Desktop\\ Pictures/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Desktop Pictures/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Desktop Pictures/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Dictionaries/"
+                set my buildProcessTextField to "Emptying /Library/Dictionaries/"
                 
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Dictionaries/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Dictionaries/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Dictionaries/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Dictionaries/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Documentation/"
+                set my buildProcessTextField to "Emptying /Library/Documentation/"
                 
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Documentation/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Documentation/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Documentation/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Documentation/"
                 
                 -- Log To file
                 logToFile_(me)
 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Fonts/"
+                set my buildProcessTextField to "Emptying /Library/Fonts/"
 
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Fonts/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Fonts/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Fonts/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Fonts/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Modem Scripts/"
+                set my buildProcessTextField to "Emptying /Library/Logs/"
                 
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Modem\\ Scripts/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Logs/*" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Logs/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /Library/Modem Scripts/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Modem\\ Scripts/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Modem Scripts/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Modem Scripts/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & " /Library/Screen Savers/"
+                set my buildProcessTextField to "Emptying /Library/Printers/"
                 
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/Library/Screen\\ Savers/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Printers/*" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Printers/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /Library/Receipts/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Receipts/*" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Receipts/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /Library/Screen Savers/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Screen\\ Savers/*" user name adminUserName password adminUsersPassword with administrator privileges
     
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/Library/Screen Savers/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Screen Savers/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /Library/Updates/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Updates/*" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Updates/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /Library/User Pictures/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/User\\ Pictures/*" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/User Pictures/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /Library/WebServer/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/WebServer/*" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/WebServer/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 --Log Action
-                set logMe to "Successfully emptied targeted directories in " & selectedTempOSdmgMountPath & "/Library/"
+                set logMe to "Successfully emptied targeted directories in " & netBootDmgMountPath & "/Library/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 --- /System/Library/ ---
+
                 --Log Action
-                set logMe to "Trying to empty targeted directories in " & selectedTempOSdmgMountPath & "/System/Library/"
+                set logMe to "Trying to empty targeted directories in " & netBootDmgMountPath & "/System/Library/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 58
+                
+                delay 0.1
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /System/Library/Address Book Plug-Ins/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Address\\ Book\\ Plug-Ins/*" user name adminUserName password adminUsersPassword with administrator privileges
+
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Address Book Plug-Ins/"
+                
+                -- Log To file
+                logToFile_(me)
+
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /System/Library/Automator/"
+
+                delay 0.1
+
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Automator/*" user name adminUserName password adminUsersPassword with administrator privileges
+
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Automator/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Address Book Plug-Ins/"
-                
-                delay 0.1
-                
-                -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Address\\ Book\\ Plug-Ins/*" with administrator privileges
-
-                --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Address Book Plug-Ins/"
-                
-                -- Log To file
-                logToFile_(me)
-
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Automator/"
-
-                delay 0.1
-
-                -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Automator/*" with administrator privileges
-
-                --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Automator/"
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Caches/"
+                set my buildProcessTextField to "Emptying /System/Library/Caches/"
                 
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Caches/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Caches/*" user name adminUserName password adminUsersPassword with administrator privileges
    
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Caches/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Caches/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Compositions/"
+                set my buildProcessTextField to "Emptying /System/Library/Compositions/"
                 
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Compositions/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Compositions/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Compositions/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Compositions/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Printers/"
+                set my buildProcessTextField to "Emptying /System/Library/InternetAccounts/"
                 
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Printers/*" with administrator privileges
-
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/InternetAccounts/*" user name adminUserName password adminUsersPassword with administrator privileges
+                
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Printers/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/InternetAccounts/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Screen Savers/"
+                set my buildProcessTextField to "Deleting unneeded folders from /System/Library/LinguisticData/"
                 
                 delay 0.1
-                
-                -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Screen\\ Savers/*" with administrator privileges
-
-                --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Screen Savers/"
+				
+				-- Delete all in the location except those that are given below
+                do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/LinguisticData/* -maxdepth 0 -not -path \"*en*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
+				
+				--Log Action
+                set logMe to "Deleting unneeded folders from " & netBootDmgMountPath & "/System/Library/LinguisticData/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying " & selectedTempOSdmgMountPath & "/System/Library/Speech/"
+                set my buildProcessTextField to "Emptying /System/Library/Printers/"
                 
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of selectedTempOSdmgMountPath & "/System/Library/Speech/*" with administrator privileges
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Printers/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Emptied " & selectedTempOSdmgMountPath & "/System/Library/Speech/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Printers/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /System/Library/Screen Savers/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Screen\\ Savers/*" user name adminUserName password adminUsersPassword with administrator privileges
+
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Screen Savers/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /System/Library/Speech/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Speech/*" user name adminUserName password adminUsersPassword with administrator privileges
+
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Speech/"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Emptying /System/Library/User Templates/"
+                
+                delay 0.1
+                
+                -- Empty the below folder
+                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/User\\ Templates/*" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/User Templates/"
                 
                 -- Log To file
                 logToFile_(me)
                 
                 --Log Action
-                set logMe to "Successfully emptied targeted directories in " & selectedTempOSdmgMountPath & "/System/Library/"
+                set logMe to "Successfully emptied targeted directories in " & netBootDmgMountPath & "/System/Library/"
                 
                 -- Log To file
                 logToFile_(me)
-
-                -- Reduce Kernel cache if we're on 10.9.0 - .3
-                reduceKernelCache_(me)
+                
+                -- Delete swap files from the NetBoot.dmg
+                removeSwapFiles_(me)
                 
             else
             
@@ -2333,8 +2678,8 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
                 
-                -- Reduce Kernel cache if we're on 10.9.0 - .3
-                reduceKernelCache_(me)
+                -- Delete swap files from the NetBoot.dmg
+                removeSwapFiles_(me)
                 
             end if
         
@@ -2350,143 +2695,886 @@ script AutoCasperNBIAppDelegate
         
     end reduceNetBootImage_
 
-    -- Reduce Kernel cache if we're on 10.9.0 - .3
-    on reduceKernelCache_(sender)
+    -- Delete swap files from the NetBoot.dmg
+    on removeSwapFiles_(sender)
         
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Removing swapfiles"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 60
+        
+        --Log Action
+        set logMe to "Deleting " & netBootDmgMountPath & "/private/var/vm/swapfile*"
+        
+        -- Log To file
+        logToFile_(me)
+            
+        try
+            
+            -- Delete the below, silently error if doesn't exist
+            do shell script "rm " & quoted form of netBootDmgMountPath & "/private/var/vm/swapfile*" user name adminUserName password adminUsersPassword with administrator privileges
+        
+        end try
+        
+        --Log Action
+        set logMe to "Deleted swapfiles in " & netBootDmgMountPath & "/private/var/vm/"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        -- Delete sleepimage from the NetBoot.dmg
+        removeSleepImage_(me)
+        
+    end removeSwapFiles_
+
+    -- Delete sleepimage from the NetBoot.dmg
+    on removeSleepImage_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Removing sleepimage"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 70
+        
+        --Log Action
+        set logMe to "Deleting " & netBootDmgMountPath & "/private/var/vm/sleepimage"
+        
+        -- Log To file
+        logToFile_(me)
+
+        try
+            
+            -- Delete the below file, silently error if doesn't exist
+            do shell script "rm " & quoted form of netBootDmgMountPath & "/private/var/vm/sleepimage" user name adminUserName password adminUsersPassword with administrator privileges
+        
+        end try
+        
+        --Log Action
+        set logMe to "Deleted sleepimage in " & netBootDmgMountPath & "/private/var/vm/"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        -- Empty /private/tmp from the NetBoot.dmg
+        emptyPrivateTmp_(me)
+    
+    end removeSleepImage_
+
+    -- Empty /private/tmp from the NetBoot.dmg
+    on emptyPrivateTmp_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Emptying /private/tmp"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 80
+        
+        --Log Action
+        set logMe to "Emptying " & netBootDmgMountPath & "/private/tmp/*"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        try
+
+            -- Empty the below folder
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/private/tmp/*" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Emptied " & netBootDmgMountPath & "/private/tmp/"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Empty /private/var/tmp from the NetBoot.dmg
+            emptyPrivateVarTmp_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Emptying /private/tmp" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end emptyPrivateTmp_
+
+    -- Empty /private/var/tmp from the NetBoot.dmg
+    on emptyPrivateVarTmp_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Emptying /private/var/tmp/"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 90
+        
+        --Log Action
+        set logMe to "Emptying " & netBootDmgMountPath & "/private/var/tmp/*"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        try
+            
+            -- Empty the below folder
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/private/var/tmp/*" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Emptied " & netBootDmgMountPath & "/private/var/tmp/"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Empty /Volumes/ from the NetBoot.dmg
+            emptyVolumesFolder_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Emptying /private/var/tmp" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end emptyPrivateVarTmp_
+
+    -- Empty /Volumes/ from the NetBoot.dmg
+    on emptyVolumesFolder_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Emptying /Volumes/"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 100
+        
+        --Log Action
+        set logMe to "Emptying " & netBootDmgMountPath & "/Volumes/"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        try
+            
+            -- Empty the below folder
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Volumes/*" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Emptied " & netBootDmgMountPath & "/Volumes/"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Empty /dev/ from the NetBoot.dmg
+            emptyDevFolder_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Emptying /Volumes/" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end emptyVolumesFolder_
+
+    -- Empty /dev/ from the NetBoot.dmg
+    on emptyDevFolder_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Emptying /dev/"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 110
+        
+        --Log Action
+        set logMe to "Emptying " & netBootDmgMountPath & "/dev/"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        try
+            
+            -- Empty the below folder
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/dev/*" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Emptied " & netBootDmgMountPath & "/dev/"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Empty /var/run/ from the NetBoot.dmg
+            emptyVarRunFolder_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Emptying /dev/" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end emptyDevFolder_
+
+    -- Empty /var/run/ from the NetBoot.dmg
+    on emptyVarRunFolder_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Emptying /var/run/"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 110
+        
+        --Log Action
+        set logMe to "Emptying " & netBootDmgMountPath & "/var/run/"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        try
+            
+            -- Empty the below folder
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/var/run/*" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Emptied " & netBootDmgMountPath & "/var/run/"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Disable Software Update
+            disableSoftwareUpdate_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Emptying /var/run/" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end emptyVarRunFolder_
+
+    -- Disable Software Update
+    on disableSoftwareUpdate_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Disabling Software Update"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 120
+        
+        --Log Action
+        set logMe to "Deleting " & netBootDmgMountPath & "/System/Library/CoreServices/Software Update.app"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        try
+            
+            -- Empty the below folder
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Software\\ Update.app" user name adminUserName password adminUsersPassword with administrator privileges
+
+            --Log Action
+            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/Software Update.app"
+
+            -- Log To file
+            logToFile_(me)
+            
+            --Log Action
+            set logMe to "Deleting " & netBootDmgMountPath & "/System/Library/LaunchDaemons/com.apple.softwareupdate*"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Empty the below folder
+            do shell script "rm " & quoted form of netBootDmgMountPath & "/System/Library/LaunchDaemons/com.apple.softwareupdate*" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/LaunchDaemons/com.apple.softwareupdate*"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Delete plists from SystemConfiguration to rebuild network interfaces
+            deleteSystemConfigurationPlists_(me)
+    
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Disabling Software Update" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+
+    end disableSoftwareUpdate_
+
+    -- Delete plists from SystemConfiguration to rebuild network interfaces
+    on deleteSystemConfigurationPlists_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Deleting /Library/Preferences/SystemConfiguration/preferences.plist"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 125
+        
+        --Log Action
+        set logMe to "Deleting " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/preferences.plist"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        try
+            
+            -- Delete the below folder, silently error if doesn't exist
+            do shell script "rm " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/preferences.plist" user name adminUserName password adminUsersPassword with administrator privileges
+        
+        end try
+        
+        --Log Action
+        set logMe to "Deleted " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/preferences.plist"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Deleting /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 130
+        
+        --Log Action
+        set logMe to "Deleting " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        try
+            
+            -- Delete the below folder, silently error if doesn't exist
+            do shell script "rm " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+        end try
+        
+        --Log Action
+        set logMe to "Deleted " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        -- Bypass the various setup assistants so we're logging in uninterrupted
+        bypassSetupAssistants_(me)
+            
+    end deleteSystemConfigurationPlists_
+
+    -- Bypass the various setup assistants so we're logging in uninterrupted
+    on bypassSetupAssistants_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Bypassing Apple Setup Assistant"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 133
+        
+        try
+            
+            ---- .AppleSetupDone ----
+            -- Write .AppleSetupDone file
+            do shell script "touch " & quoted form of netBootDmgMountPath & "/var/db/.AppleSetupDone" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to ".AppleSetupDone written to " & netBootDmgMountPath & "/var/db/.AppleSetupDone"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Correct ownership
+            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/var/db/.AppleSetupDone" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/var/db/.AppleSetupDone"
+            
+            -- Log To file
+            --logToFile_(me)
+            
+            -- Correct permissions
+            --do shell script "chmod 644 " & quoted form of netBootDmgMountPath & "/var/db/.AppleSetupDone" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            --set logMe to "Set permissions to 644 on " & netBootDmgMountPath & "/var/db/.AppleSetupDone"
+            
+            -- Log To file
+            --logToFile_(me)
+            
+            ---- .SetupRegComplete ----
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Bypassing Registration"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 136
+            
+            ---- .SetupRegComplete ----
+            -- Write .SetupRegComplete file
+            do shell script "touch " & quoted form of netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to ".SetupRegComplete written to " & netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Correct ownership
+            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete"
+            
+            -- Log To file
+            --logToFile_(me)
+            
+            ---- com.apple.SetupAssistant----
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Bypassing iCloud Setup Assistant"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 140
+            
+            -- Write DidSeeCloudSetup to com.apple.SetupAssistant
+            do shell script "defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist DidSeeCloudSetup -bool true" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            -- Write GestureMovieSeen to com.apple.SetupAssistant
+            do shell script "defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist GestureMovieSeen none" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            -- Write LastSeenCloudProductVersion to com.apple.SetupAssistant
+            do shell script "defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist LastSeenCloudProductVersion " & quoted form of selectedOSdmgVersion user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "iCloud Bypass options written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Correct ownership
+            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
+            
+            -- Log To file
+            --logToFile_(me)
+            
+            -- Correct permissions
+            --do shell script "chmod 700 " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist" user name adminUserName password adminUsersPassword with administrator privileges
+           
+            --Log Action
+            --set logMe to "Set permissions to 700 on " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
+            
+            -- Log To file
+            --logToFile_(me)
+            
+            --Log Action
+            set logMe to "Deleting " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            --Delete the MiniLauncher
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup\\ Assistant.app/Contents/SharedSupport/MiniLauncher" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Deleted " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
+            
+            -- Log To file
+            logToFile_(me)
+
+            -- Stop TimeMachine for prompting to use mounted disks for backup
+            disableTimeMachinePrompt_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Bypassing Setup Assistants" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end bypassSetupAssistants_
+    
+    -- Stop TimeMachine for prompting to use mounted disks for backup
+    on disableTimeMachinePrompt_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Disabling TimeMachine prompts"
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 150
+        
+        try
+            
+            -- TimeMachine Plist location on mounted volume
+            set variableVariable to netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
+            
+            -- Set TimeMachine to not prompt for new disks for backup
+            do shell script "defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist DoNotOfferNewDisksForBackup -bool YES" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            -- Log Action
+            set logMe to "com.apple.TimeMachine.plist amended at " & netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Correct ownership
+            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+           -- set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
+            
+            -- Log To file
+            --logToFile_(me)
+            
+            -- Correct permissions
+            --do shell script "chmod 755 " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            --set logMe to "Set permissions to 755 on " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
+            
+            -- Log To file
+           -- logToFile_(me)
+            
+            -- Delete the file delete /Library/Preferences/com.apple.dockfixup.plist
+            deleteDockFixUp_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Writing to /Library/Preferences/com.apple.TimeMachine.plist" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end disableTimeMachinePrompt_
+    
+    -- Delete the file delet /Library/Preferences/com.apple.dockfixup.plist
+    on deleteDockFixUp_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Deleting com.apple.dockfixup.plist"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 160
+        
+        try
+
+            --Log Action
+            set logMe to "Deleting " & netBootDmgMountPath & "/Library/Preferences/com.apple.dockfixup.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Delete com.apple.dockfixup.plist
+            do shell script "rm " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.dockfixup.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Deleted " & netBootDmgMountPath & "/Library/Preferences/com.apple.dockfixup.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Copy the com.apple.PowerManagement.plist used by SIU
+            copyPowerManagementPlist_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Deleting /Library/Preferences/com.apple.dockfixup.plist" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end deleteDockFixUp_
+
+    -- Copy the com.apple.PowerManagement.plist used by SIU
+    on copyPowerManagementPlist_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Copying com.apple.PowerManagement.plist"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 170
+        
+        try
+            
+            --Log Action
+            set logMe to "Copying com.apple.PowerManagement.plist"
+            
+            -- Log To file
+            logToFile_(me)
+        
+            -- Copy the plist
+            do shell script "ditto " & quoted form of pathToResources & "/com.apple.PowerManagement.plist " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Copied com.apple.PowerManagement.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Correct ownership
+            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist"
+            
+            -- Log To file
+            --logToFile_(me)
+            
+            -- Correct permissions
+            --do shell script "chmod 644 " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            --set logMe to "Set permissions to 644 on " &  quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist"
+            
+            -- Log To file
+            --logToFile_(me)
+            
+            -- Create the ARD user
+            createARDUser_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Copying com.apple.PowerManagement.plist" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end copyPowerManagementPlist_
+
+    -- Create the ARD user
+    on createARDUser_(sender)
+        
+        -- If ARD option has been enabled
+        if ardEnabled is equal to true then
+            
             try
                 
-                -- Set hostMacOSVersion to numeric string to compare
-                considering numeric strings
-                    
-                    -- If we're running on 10.9.0 - .3 then reduce kernel cache
-                    if hostMacOSVersion is greater than "10.8.9" and hostMacOSVersion is less than "10.9.4" then
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Creating ARD User"
                 
-                            -- Update Build Process Window's Text Field
-                            set my buildProcessTextField to "Deleting extensions to reduce kernel cache size"
-                            
-                            delay 0.1
-                            
-                            -- Update build Process ProgressBar
-                            set my buildProccessProgressBar to 40
-                            
-                            -- Set variableVariable to location of /System/Library/Extensions/
-                            set variableVariable to pathToResources & "/System/Library/Extensions/AMD*"
-                            
-                            --Log Action
-                            set logMe to "Trying to delete " & variableVariable
-                            
-                            -- Log To file
-                            logToFile_(me)
-                            
-                            -- Delete extensions
-                            do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
-                            
-                            --Log Action
-                            set logMe to "Deleted " & variableVariable
-                            
-                            -- Log To file
-                            logToFile_(me)
-
-                            -- Set variableVariable to location of /System/Library/Extensions/
-                            set variableVariable to pathToResources & "/System/Library/Extensions/ATI*"
-                            
-                            --Log Action
-                            set logMe to "Trying to delete " & variableVariable
-                            
-                            -- Log To file
-                            logToFile_(me)
-                            
-                            -- Delete extesntions
-                            do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
-
-                            --Log Action
-                            set logMe to "Deleted " & variableVariable
-                            
-                            -- Log To file
-                            logToFile_(me)
-                            
-                            -- Set variableVariable to location of /System/Library/Extensions/
-                            set variableVariable to pathToResources & "/System/Library/Extensions/ATTO*"
-                            
-                            --Log Action
-                            set logMe to "Trying to delete " & variableVariable
-                            
-                            -- Log To file
-                            logToFile_(me)
-                            
-                            -- Delete extesntions
-                            do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
-                            
-                            --Log Action
-                            set logMe to "Deleted " & variableVariable
-                            
-                            -- Log To file
-                            logToFile_(me)
-                            
-                            -- Install rc.netboot.pkg
-                            --installRCNetboot_(me)
-                            
-                            -- Install AutoCasperNBIStartup.pkg
-                            installAutoCasperNBIStartup_(me)
-
-                    
-                    else
-                            
-                            --Log Action
-                            set logMe to "Skipping extension deleting as not needed on this OS"
-                            
-                            -- Log To file
-                            logToFile_(me)
-                            
-                            -- Install rc.netboot.pkg
-                            --installRCNetboot_(me)
-                            
-                            -- Install AutoCasperNBIStartup.pkg
-                            installAutoCasperNBIStartup_(me)
-                            
-                    end if
-                    
-            end considering
-                    
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 175
+                
+                -- JSS Plist location on mounted volume
+                set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/ScreenSharing/ARDUser.plist"
+                
+                -- Encode ardUsername
+                set ardUsernameEncoded to do shell script "echo " & ardUsername & " | openssl base64 "
+                
+                --Log Action
+                set logMe to "ARD Username encoded"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Write encoded ARD Username to plist
+                do shell script "defaults write " & quoted form of variableVariable & " ARDUsername "  & ardUsernameEncoded  user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Written ARD Username to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Encode ardPassword
+                set ardPasswordEncoded to do shell script "echo " & ardPassword & " | openssl base64 "
+                
+                --Log Action
+                set logMe to "ARD Password encoded"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Write encoded ARD Password to plist
+                do shell script "defaults write " & quoted form of variableVariable & " ARDPassword "  & ardPasswordEncoded  user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Written ARD Password to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Correct ownership
+                --do shell script "chown -R root:wheel " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                --set logMe to "Set ownership to root:wheel on " & quoted form of variableVariable
+                
+                -- Log To file
+                --logToFile_(me)
+                
+                -- Correct permissions
+                --do shell script "chmod -R 755 " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                --set logMe to "Set permissions to 755 on " & quoted form of variableVariable
+                
+                -- Log To file
+                --logToFile_(me)
+                
+                -- Writes vncPassword to com.apple.VNCSettings.txt
+                enableVNC_(me)
+                
             on error
-            
+                
                 -- Display error to user
-                display dialog "Error: Deleting extensions" with icon 0 buttons {"OK"}
+                display dialog "Error: Creating ARD User" with icon 0 buttons {"OK"}
                 
                 -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
                 tidyUpTimeKids_(me)
                 
             end try
-        
-    end reduceKernelCache_
-
-    -- Install rc.netboot.pkg
-    on installRCNetboot_(sender)
-        
-        try
             
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Installing modified rc.netboot file"
-            
-            delay 0.1
-            
-            -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 50
+        -- If ARD option has not been enabled
+        else
             
             --Log Action
-            set logMe to "Trying to install rc.netboot.pkg"
+            set logMe to "Skipping creation of ARD user as ARD not enabled"
             
             -- Log To file
             logToFile_(me)
             
-            -- Set variableVariable to location of rc.netboot.pkg
-            set variableVariable to pathToResources & "/rc.netboot.pkg"
+            -- Writes vncPassword to com.apple.VNCSettings.txt
+            enableVNC_(me)
             
-            -- Install rc.netboot.pkg from rescources
-            do shell script "installer -pkg " & quoted form of variableVariable & " -target " & quoted form of selectedTempOSdmgMountPath with administrator privileges
+        end if
+        
+    end createARDUser_
 
+    -- Writes vncPassword to com.apple.VNCSettings.txt
+    on enableVNC_(sender)
+        
+        -- If VNC option has been enabled
+        if vncEnabled is equal to true then
+            
+            try
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Writing VNC password to com.apple.VNCSettings.txt"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 180
+                
+                -- Set variableVariable to location of com.apple.VNCSettings.txt
+                set variableVariable to netBootDmgMountPath & "/Library/Preferences/com.apple.VNCSettings.txt"
+                
+                --Log Action
+                set logMe to "Trying to write VNC password to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Write hashed vncPassword to /Library/Preferences/com.apple.VNCSettings.txt on .nbi
+                do shell script "echo " & vncPassword & " | perl -we 'BEGIN { @k = unpack \"C*\", pack \"H*\", \"1734516E8BA8C5E2FF1C39567390ADCA\"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack \"C*\", $_; foreach (@k) { printf \"%02X\", $_ ^ (shift @p || 0) }; print \"
+                \"' | sudo tee " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "VNC password written to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Correct Ownership
+                --do shell script "chown root:wheel " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                --set logMe to "Set ownership to root:wheel on " & variableVariable
+                
+                -- Log To file
+                --logToFile_(me)
+                
+                -- Correct Permissions
+                --do shell script "chmod 400 " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                --set logMe to "Set permissions to 400 on " & variableVariable
+                
+                -- Log To file
+                --logToFile_(me)
+                
+                -- Install AutoCasperNBIStartup.pkg
+                installAutoCasperNBIStartup_(me)
+                
+            on error
+                
+                -- Display error to user
+                display dialog "Error: Wrting VNC Settings" with icon 0 buttons {"OK"}
+                
+                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                tidyUpTimeKids_(me)
+                
+            end try
+            
+        -- If VNC option has not been enabled
+        else
+            
             --Log Action
-            set logMe to "rc.netboot.pkg installed successfully"
+            set logMe to "Skipping writing VNC password as VNC option not enabled"
             
             -- Log To file
             logToFile_(me)
@@ -2494,17 +3582,9 @@ script AutoCasperNBIAppDelegate
             -- Install AutoCasperNBIStartup.pkg
             installAutoCasperNBIStartup_(me)
             
-        on error
-            
-            -- Display error to user
-            display dialog "Error: Installing modified rc.netboot file" with icon 0 buttons {"OK"}
-            
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-            tidyUpTimeKids_(me)
-            
-        end try
+        end if
         
-    end installRCNetboot_
+    end enableVNC_
 
     -- Install AutoCasperNBIStartup.pkg
     on installAutoCasperNBIStartup_(sender)
@@ -2523,13 +3603,10 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 60
-            
-            -- Set variableVariable to location of AutoCasperNBILaunchDaemon.pkg
-            set variableVariable to pathToResources & "/AutoCasperNBIStartup.pkg"
-            
+            set my buildProccessProgressBar to 190
+        
             -- Install CasperImagingLaunchAgent.pkg from rescources
-            do shell script "installer -pkg " & quoted form of variableVariable & " -target " & quoted form of selectedTempOSdmgMountPath with administrator privileges
+            do shell script "installer -pkg " & quoted form of pathToResources & "/AutoCasperNBIStartup.pkg -target " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
             set logMe to "AutoCasperNBIStartup.pkg installed successfully"
@@ -2555,27 +3632,24 @@ script AutoCasperNBIAppDelegate
     -- Install RootUser.pkg
     on installRootUserpkg_(sender)
         
+        --Log Action
+        set logMe to "Trying to install Root user via pkg"
+        
+        -- Log To file
+        logToFile_(me)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Installing Root User via pkg"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 200
+        
         try
-            
-            --Log Action
-            set logMe to "Trying to install Root user via pkg"
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Installing Root User via pkg"
-            
-            delay 0.1
-            
-            -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 70
-            
-            -- Set variableVariable to location to location of RootUser.pkg
-            set variableVariable to pathToResources & "/RootUser.pkg"
-            
+
             -- Install RootUser.pkg from rescources
-            do shell script "installer -pkg " & quoted form of variableVariable & " -target " & quoted form of selectedTempOSdmgMountPath with administrator privileges
+            do shell script "installer -pkg " & quoted form of pathToResources & "/RootUser.pkg -target " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
             set logMe to "Root user installed via pkg"
@@ -2583,8 +3657,8 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Set Desktop Image to selected
-            copyDesktopImage_(me)
+            -- Install rc.netboot.pkg
+            installRCNetboot_(me)
             
         on error
             
@@ -2598,6 +3672,56 @@ script AutoCasperNBIAppDelegate
         
     end installRootUserpkg_
 
+    -- Install rc.netboot.pkg
+    on installRCNetboot_(sender)
+        
+        --Set to boolean
+        set installRCNetBootSelected to installRCNetBootSelected as boolean
+        
+        -- if we're installing rc.netboot.pkg
+        if installRCNetBootSelected is true
+
+            try
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Installing modified rc.netboot file"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 210
+                
+                --Log Action
+                log "Trying to install rc.netboot.pkg"
+                
+                -- Install rc.netboot.pkg from rescources
+                do shell script "installer -pkg " & quoted form of pathToResources & "/rc.netboot.pkg -target " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                log "rc.netboot.pkg installed successfully"
+                
+                -- Set Desktop Image to selected
+                copyDesktopImage_(me)
+                
+            on error
+                
+                -- Display error to user
+                display dialog "Error: Installing modified rc.netboot file" with icon 0 buttons {"OK"}
+                
+                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                tidyUpTimeKids_(me)
+                
+            end try
+            
+        else
+        
+            -- Set Desktop Image to selected
+            copyDesktopImage_(me)
+        
+        end if
+        
+    end installRCNetboot_
+
     -- Set Desktop Image to selected
     on copyDesktopImage_(sender)
         
@@ -2606,55 +3730,65 @@ script AutoCasperNBIAppDelegate
         
             try
                 
-                --Log Action
-                set logMe to "Trying to copy Desktop Image"
-                
-                -- Log To file
-                logToFile_(me)
-                
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Copying Desktop Image"
                 
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 80
+                set my buildProccessProgressBar to 220
                 
                 -- Set variableVariable to path of DefaultDesktop.jpg
-                set variableVariable to selectedTempOSdmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                set variableVariable to netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
                 
                 --Log Action
-                set logMe to "Removing symbolic link on " & selectedTempOSdmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                set logMe to "Removing symbolic link on " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
                 
                 -- Log To file
                 logToFile_(me)
                 
-                -- Remove DefaultDesktop.jpg's symbolic link
-                do shell script "unlink " & quoted form of variableVariable with administrator privileges
+                try
+                
+                    -- Remove DefaultDesktop.jpg's symbolic link, silently error is doesn't exist
+                    do shell script "unlink " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                end try
+                
+                -- Set to text
+                set customDesktopImagePath to customDesktopImagePath as text
                 
                 --Log Action
-                set logMe to "Trying to copy " & customDesktopImagePath & " to " & variableVariable
+                set logMe to "Trying to copy " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                
+                -- Log To file
+                logToFile_(me)
                 
                 -- Copy selected image
-                do shell script "cp -r " & quoted form of customDesktopImagePath & " " & quoted form of variableVariable with administrator privileges
+                do shell script "cp -r " & quoted form of customDesktopImagePath & " " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Copied " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                
+                -- Log To file
+                logToFile_(me)
 
                 -- Correct ownership
-                do shell script "chown root:wheel " & quoted form of variableVariable with administrator privileges
+                --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Set ownership to root:wheel on " & variableVariable
+                --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
                 
                 -- Log To file
-                logToFile_(me)
+                --logToFile_(me)
                 
                 -- Correct permissions
-                do shell script "chmod 755 " & quoted form of variableVariable with administrator privileges
+                --do shell script "chmod 755 " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Set permissions to 755 on " & variableVariable
+                --set logMe to "Set permissions to 755 on " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
                 
                 -- Log To file
-                logToFile_(me)
+                --logToFile_(me)
                 
                 -- Copy Casper Imaging.app selected earlier
                 copyCasperImagingApp_(me)
@@ -2681,39 +3815,38 @@ script AutoCasperNBIAppDelegate
     -- Copy Casper Imaging.app selected earlier
     on copyCasperImagingApp_(sender)
         
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Copying Casper Imaging.app"
-        
-        delay 0.1
-        
-        -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 90
-        
-        -- Cut the trailing /
-        set selectedAppPathToCopy to do shell script "echo " & quoted form of selectedAppPath & " | rev | cut -c 2- | rev"
-        
-        --Log Action
-        set logMe to "Casper Imaging.app to copy resides " & selectedAppPathToCopy
-        
-        -- Log To file
-        logToFile_(me)
-        
-        -- Copy location for Casper Imaging.app
-        set variableVariable to selectedTempOSdmgMountPath & "/Applications/"
-        
-        -- Copy path of Casper Imaging.app
-        set copiedAppPath to selectedTempOSdmgMountPath & "/Applications/Casper Imaging.app"
-
-        --Log Action
-        set logMe to "Casper Imaging.app to be copied to " & copiedAppPath
-        
-        -- Log To file
-        logToFile_(me)
-        
         try
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Copying Casper Imaging.app"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 230
+            
+            -- Cut the trailing /
+            set selectedAppPathToCopy to do shell script "echo " & quoted form of selectedAppPath & " | rev | cut -c 2- | rev"
+            
+            --Log Action
+            set logMe to "Casper Imaging.app to copy resides " & selectedAppPathToCopy
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Copy location for Casper Imaging.app
+            set variableVariable to netBootDmgMountPath & "/Applications/"
+            
+            -- Copy path of Casper Imaging.app
+            set copiedAppPath to netBootDmgMountPath & "/Applications/Casper Imaging.app"
+            
+            --Log Action
+            set logMe to "Casper Imaging.app to be copied to " & copiedAppPath
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Copy Casper Imaging.app & log
-            do shell script "cp -r " & quoted form of selectedAppPathToCopy & " " & quoted form of variableVariable with administrator privileges
+            do shell script "cp -r " & quoted form of selectedAppPathToCopy & " " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log action
             set logMe to "Copied " & selectedAppPath & " to " & variableVariable
@@ -2722,28 +3855,28 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
         
             -- Correct ownership on copied Casper Imaging.app
-            do shell script "chown -R root:wheel " & quoted form of copiedAppPath with administrator privileges
+            --do shell script "chown -R root:wheel " & quoted form of copiedAppPath user name adminUserName password adminUsersPassword with administrator privileges
    
             --Log Action
-            set logMe to "Set ownership to root:wheel on " & copiedAppPath
+            --set logMe to "Set ownership to root:wheel on " & copiedAppPath
             
             -- Log To file
-            logToFile_(me)
+            --logToFile_(me)
             
             -- Correct permissions on copied Casper Imaging.app
-            do shell script "chmod -R 755 " & quoted form of copiedAppPath with administrator privileges
+            --do shell script "chmod -R 755 " & quoted form of copiedAppPath user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
-            set logMe to "Set permissions to 755 on " & copiedAppPath
+            --set logMe to "Set permissions to 755 on " & copiedAppPath
             
             -- Log To file
-            logToFile_(me)
+            --logToFile_(me)
             
             -- Try as errors if not found (i think)
             try
                 
                 -- Delete Quaratine flag
-                do shell script "xattr -d com.apple.quarantine " & quoted form of copiedAppPath with administrator privileges
+                do shell script "xattr -d com.apple.quarantine " & quoted form of copiedAppPath user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Quarantine flag removed from " & copiedAppPath
@@ -2771,21 +3904,21 @@ script AutoCasperNBIAppDelegate
     -- Write the Casper Imaging plist
     on writeCasperImagingPlist_(sender)
         
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Writing Casper Imaging plist"
-        
-        delay 0.1
-        
-        -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 100
-        
         try
             
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Writing Casper Imaging plist"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 240
+            
             -- JSS Plist location on mounted volume
-            set variableVariable to selectedTempOSdmgMountPath & "/private/var/root/Library/Preferences/com.jamfsoftware.jss.plist"
+            set variableVariable to netBootDmgMountPath & "/private/var/root/Library/Preferences/com.jamfsoftware.jss.plist"
             
             -- Write Casper Imaging plist to allow invalid cert,
-            do shell script "defaults write " & quoted form of variableVariable & " allowInvalidCertificate -bool true" with administrator privileges
+            do shell script "defaults write " & quoted form of variableVariable & " allowInvalidCertificate -bool true" user name adminUserName password adminUsersPassword with administrator privileges
             
             -- Log Action
             set logMe to "com.jamfsoftware.jss.plist created & allow invalid certificate set"
@@ -2793,37 +3926,37 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-                -- If a JSS URL is specified
-                if jssURL is not equal missing value
+            -- If a JSS URL is specified
+            if jssURL is not equal missing value
+            
+                -- Write JSS URL to plist,
+                do shell script "defaults write " & quoted form of variableVariable & " url -string " & jssURL user name adminUserName password adminUsersPassword with administrator privileges
+      
+                --Log Action
+                set logMe to "plist updated with JSS url"
                 
-                    -- Write JSS URL to plist,
-                    do shell script "defaults write " & quoted form of variableVariable & " url -string " & jssURL with administrator privileges
-          
-                    --Log Action
-                    set logMe to "plist updated with JSS url"
-                    
-                    -- Log To file
-                    logToFile_(me)
+                -- Log To file
+                logToFile_(me)
             
             end if
 
             -- Correct ownership
-            do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
+            --do shell script "chown root:wheel " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
-            set logMe to "Set ownership to root:wheel on " & variableVariable
+            --set logMe to "Set ownership to root:wheel on " & variableVariable
             
             -- Log To file
-            logToFile_(me)
+            --logToFile_(me)
 
             -- Correct permissions
-            do shell script "chmod -R 700 " & quoted form of variableVariable with administrator privileges
+            --do shell script "chmod 700 " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
-            set logMe to "Set permissions to 700 on " & variableVariable
+            --set logMe to "Set permissions to 700 on " & variableVariable
             
             -- Log To file
-            logToFile_(me)
+            --logToFile_(me)
             
             -- Install CasperImagingLaunchAgent.pkg
             installCasperImagingLaunchAgent_(me)
@@ -2851,7 +3984,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 110
+            set my buildProccessProgressBar to 250
             
             --Log Action
             set logMe to "Trying to install Casper Imaging LaunchAgent via pkg"
@@ -2859,11 +3992,8 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Set variableVariable to location to location of CasperImagingLaunchAgent.pkg
-            set variableVariable to pathToResources & "/CasperImagingLaunchAgent.pkg"
-            
             -- Install CasperImagingLaunchAgent.pkg from rescources
-            do shell script "installer -pkg " & quoted form of variableVariable & " -target " & quoted form of selectedTempOSdmgMountPath with administrator privileges
+            do shell script "installer -pkg " & quoted form of pathToResources & "/CasperImagingLaunchAgent.pkg -target " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
     
             --Log Action
             set logMe to "Casper Imaging LaunchAgent plist installed via pkg"
@@ -2900,10 +4030,10 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 120
+                set my buildProccessProgressBar to 260
                 
                 -- Application Support location on TempOSdmg for installing at boot
-                set variableVariable to selectedTempOSdmgMountPath & "/Library/Application Support/AutoCasperNBI/Certificates/"
+                set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Certificates/"
                 
                 -- Log Action
                 set logMe to "Downloading JSS CA Cert for " & jssURL
@@ -2911,26 +4041,17 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
                 
-                -- Download CA Cert from JSS to /private/tmp/AutoCasperNBI/
-                do shell script "curl -k -o /private/tmp/AutoCasperNBI/" & tempUUID & ".cer " & jssURL & "/CA/SCEP?operation=getcacert" with administrator privileges
+                -- Download CA Cert from JSS to /Library/Application Support/AutoCasperNBI/Certificates/UUID
+                do shell script "curl -k -o " & quoted form of variableVariable & tempUUID & ".cer " & jssURL & "/CA/SCEP?operation=getcacert" user name adminUserName password adminUsersPassword with administrator privileges
          
-                -- Log Action
-                set logMe to "Copying JSS CA Cert to " & variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Copy to Temp OS dmg for import at startup
-                do shell script "cp -r /private/tmp/AutoCasperNBI/" & tempUUID & ".cer " & quoted form of variableVariable with administrator privileges
-               
-                -- Log Action
-                set logMe to "JSS CA Cert downloaded to " & variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Bypass the various setup assistants so we're logging in uninterrupted
-                bypassSetupAssistants_(me)
+                 -- Log Action
+                 set logMe to "Downloaded JSS CA Cert to " & quoted form of variableVariable
+                 
+                 -- Log To file
+                 logToFile_(me)
+         
+                -- Create dlyd shared cache files
+                createDlydCaches_(me)
                 
             on error
             
@@ -2944,596 +4065,728 @@ script AutoCasperNBIAppDelegate
         
         else
         
-            -- Bypass the various setup assistants so we're logging in uninterrupted
-            bypassSetupAssistants_(me)
+            -- Create dlyd shared cache files
+            createDlydCaches_(me)
         
         end if
 
     end importJSSCACert_
 
-    -- Bypass the various setup assistants so we're logging in uninterrupted
-    on bypassSetupAssistants_(sender)
-        
-        try
-            
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Bypassing Setup Assistants"
-            
-            delay 0.1
-            
-            -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 130
-            
-            -- Set variableVariable to location to write .AppleSetupDone
-            set variableVariable to selectedTempOSdmgMountPath & "/var/db/.AppleSetupDone"
-            
-        ---- .AppleSetupDone ----
-            
-            -- Write .AppleSetupDone file
-            do shell script "touch " & quoted form of variableVariable with administrator privileges
-        
-            --Log Action
-            set logMe to ".AppleSetupDone written to " & variableVariable
-            
-            -- Log To file
-            logToFile_(me)
-        
-            -- Correct ownership
-            do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
-     
-            --Log Action
-            set logMe to "Set ownership to root:wheel on " & variableVariable
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Correct permissions
-            do shell script "chmod -R 644 " & quoted form of variableVariable with administrator privileges
-
-            --Log Action
-            set logMe to "Set permissions to 644 on " & variableVariable
-            
-            -- Log To file
-            logToFile_(me)
-            
-        ---- com.apple.SetupAssistant----
-            
-            -- com.apple.SetupAssistant Plist location on mounted volume
-            set variableVariable to selectedTempOSdmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
-            
-            -- Write DidSeeCloudSetup to com.apple.SetupAssistant
-            do shell script "defaults write " & quoted form of variableVariable & " DidSeeCloudSetup -bool TRUE" with administrator privileges
-
-            -- Write GestureMovieSeen to com.apple.SetupAssistant
-            do shell script "defaults write " & quoted form of variableVariable & " GestureMovieSeen none" with administrator privileges
-
-            -- Write LastSeenCloudProductVersion to com.apple.SetupAssistant
-            do shell script "defaults write " & quoted form of variableVariable & " LastSeenCloudProductVersion " & selectedOSdmgVersion  with administrator privileges
-
-            --Log Action
-            set logMe to "Bypass options written to " & variableVariable
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Correct ownership
-            do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
-
-            --Log Action
-            set logMe to "Set ownership to root:wheel on " & variableVariable
-            
-            -- Log To file
-            logToFile_(me)
-
-            -- Correct permissions
-            do shell script "chmod -R 700 " & quoted form of variableVariable with administrator privileges
-
-            --Log Action
-            set logMe to "Set permissions to 700 on " & variableVariable
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- com.apple.SetupAssistant Plist location on mounted volume
-            set variableVariable to selectedTempOSdmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
-            
-            -- Delete the MiniLauncher
-            do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
-
-            --Log Action
-            set logMe to "Deleted MiniLauncher"
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Stop TimeMachine for prompting to use mounted disks for backup
-            disableTimeMachinePrompt_(me)
-
-        on error
-        
-            -- Display error to user
-            display dialog "Error: Bypassing Setup Assistants" with icon 0 buttons {"OK"}
-            
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-            tidyUpTimeKids_(me)
-            
-        end try
-        
-    end bypassSetupAssistants_
-
-    -- Stop TimeMachine for prompting to use mounted disks for backup
-    on disableTimeMachinePrompt_(sender)
+    -- Create dlyd shared cache files
+    on createDlydCaches_(sender)
         
         -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Amending TimeMachine plist on " & selectedTempOSdmgMountPath
+        set my buildProcessTextField to "Creating dyld shared cache files"
         
         delay 0.1
         
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 140
-        
+        set my buildProccessProgressBar to 270
+
         try
             
-            -- TimeMachine Plist location on mounted volume
-            set variableVariable to selectedTempOSdmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
-            
-            -- Set TimeMachine to not prompt for new disks for backup
-            do shell script "defaults write " & quoted form of variableVariable & " DoNotOfferNewDisksForBackup -bool YES" with administrator privileges
-            
-            -- Log Action
-            set logMe to "com.apple.TimeMachine.plist amended at " & variableVariable
+            --Log Action
+            set logMe to "Creating dyld shared cache files on: " & netBootDmgMountPath
             
             -- Log To file
             logToFile_(me)
-        
-            -- Correct ownership
-            do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
+            
+            do shell script "update_dyld_shared_cache -root " & quoted form of netBootDmgMountPath & " -universal_boot -force" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
-            set logMe to "Set ownership to root:wheel on " & quoted form of variableVariable
+            set logMe to "Successfully created dyld caches"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
+            manualKernelCacheReductionCheck_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Creating dyld shared cache files" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end createDlydCaches
+
+    -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
+    on manualKernelCacheReductionCheck_(sender)
+        
+        -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
+        --manualKernelCacheReductionCheck_(me)
+        considering numeric strings
+            
+            -- If we're running on 10.9.0 - .3 then reduce kernel cache
+            if hostMacOSVersion is greater than "10.8.9" and hostMacOSVersion is less than "10.9.4" then
+                
+                --Log Action
+                set logMe to "We're on not on 10.9.+ so need to manually reduce kernel cache"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Reduce Kernel cache if we're on 10.9.0 - .3
+                reduceKernelCache_(me)
+                
+            else
+                
+                --Log Action
+                set logMe to "Skipping extension deletion as not needed on this OS"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Generate the Kernel cache
+                generateKernelCache_(me)
+                
+                
+            end if
+            
+        end considering
+        
+    end manualKernelCacheReductionCheck_
+
+    -- Reduce Kernel cache if we're on 10.9.0 - .3
+    on reduceKernelCache_(sender)
+        
+        try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Deleting extensions to reduce kernel cache size"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 280
+            
+            --Log Action
+            set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Delete extensions
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/AMD*"  user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            --Log Action
+            set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/ATI*"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Delete extesntions
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATI*" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATI*"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            --Log Action
+            set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Delete extesntions
+            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATTO*" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Generate the Kernel cache
+            generateKernelCache_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Deleting extensions" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end reduceKernelCache_
+
+    -- Generate the Kernel cache
+    on generateKernelCache_(sender)
+        
+        try
+            
+            ---- MAKE x86_64 FOLDER ----
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Creating x84_64 folder"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 290
+            
+            --Log Action
+            set logMe to "Trying to create folder " & netBootDirectory & "/i386/x86_64"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Create the x86_64 folder
+            do shell script "mkdir -p " & quoted form of netBootDirectory & "/i386/x86_64" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Created folder " & netBootDirectory & "/i386/x86_64"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            ---- UPDATE KERNEL CACHE ----
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Updating kernel cache"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 294
+            
+            --Log Action
+            set logMe to "Updating kernel cache on: " & netBootDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Update
+            do shell script "kextcache -update-volume  " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Updated kernel cache on: " & netBootDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            ---- GENERATE KERNEL CACHE ----
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Generating kernel cache"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 298
+            
+            --Log Action
+            set logMe to "Generating kernel cache"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            try
+
+                -- Generate kernel cache, silently error as this will error when on 10.9.4 when skipping extensions
+                do shell script "kextcache -arch x86_64 -l -n -K " & quoted form of netBootDmgMountPath & "/mach_kernel -c " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
+
+            end try
+            
+            --Log Action
+            set logMe to "Updated kernel cache on: " & netBootDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Copy the boot.efi to the booter shell
+            copyBootEfi_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Generating kernel cache" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end generateKernelCache_
+
+    -- Copy the boot.efi to the booter shell
+    on copyBootEfi_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Copying boot.efi"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 300
+        
+        try
+            
+            --Log Action
+            set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Copy the plist
+            do shell script "ditto " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Copied " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            --Log Action
+            set logMe to "Unlocking " & quoted form of netBootDirectory & "/i386/booter"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Unlock booter
+            do shell script "chflags nouchg " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Unlocked " & quoted form of netBootDirectory & "/i386/booter"
+            
+            -- Correct ownership
+            do shell script "chown -R root:admin " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Set ownership to root:admin on " & netBootDirectory & "/i386/booter"
             
             -- Log To file
             logToFile_(me)
             
             -- Correct permissions
-            do shell script "chmod -R 755 " & quoted form of variableVariable with administrator privileges
+            do shell script "chmod -R 775 " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
-            set logMe to "Set permissions to 755 on " & quoted form of variableVariable
+            set logMe to "Set permissions to 775 on " & netBootDirectory & "/i386/booter"
             
             -- Log To file
             logToFile_(me)
             
-            -- Delete the file delete /Library/Preferences/com.apple.dockfixup.plist
-            deleteDockFixUp_(me)
+            -- Copy PlatformSupport.plist
+            copyPlatformSupportPlist_(me)
             
         on error
             
             -- Display error to user
-            display dialog "Error: Writing to /Library/Preferences/com.apple.TimeMachine.plist" with icon 0 buttons {"OK"}
+            display dialog "Error: Copying booter.efi" with icon 0 buttons {"OK"}
             
             -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
             tidyUpTimeKids_(me)
             
         end try
         
-    end disableTimeMachinePrompt_
+    end copyBootEfi_
 
-    -- Delete the file delet /Library/Preferences/com.apple.dockfixup.plist
-    on deleteDockFixUp_(sender)
+    -- Copy PlatformSupport.plist
+    on copyPlatformSupportPlist_(sender)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Copying PlaformSupport.plist"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 310
         
         try
             
-            -- Set variableVariable to location to write .AppleSetupDone
-            set variableVariable to selectedTempOSdmgMountPath & "/Library/Preferences/com.apple.dockfixup.plist"
-            
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Deleting com.apple.dockfixup.plist"
-            
-            delay 0.1
-            
-            -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 150
-            
-            do shell script "rm -rf " & quoted form of variableVariable with administrator privileges
-
             --Log Action
-            set logMe to "Deleted " & variableVariable
+            set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
             
             -- Log To file
             logToFile_(me)
             
-            -- Create the ARD user
-            createARDUser_(me)
+            -- Copy the plist
+            do shell script "ditto " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Copied " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Copy NBImageInfo.plist
+            copyNBImageInfoPlist_(me)
             
         on error
             
             -- Display error to user
-            display dialog "Error: Deleting /Library/Preferences/com.apple.dockfixup.plist" with icon 0 buttons {"OK"}
+            display dialog "Error: Copying PlatformSupport.plist" with icon 0 buttons {"OK"}
             
             -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
             tidyUpTimeKids_(me)
             
         end try
         
-    end deleteDockFixUp_
+    end copyPlatformSupportPlist_
 
-    -- Create the ARD user
-    on createARDUser_(sender)
-
-        -- If ARD option has been enabled
-        if ardEnabled is equal to true then
-                
-            try
-                    
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Creating ARD User"
-                
-                delay 0.1
-                
-                -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 160
-                
-                -- JSS Plist location on mounted volume
-                set variableVariable to selectedTempOSdmgMountPath & "/Library/Application Support/AutoCasperNBI/ScreenSharing/ARDUser.plist"
-                
-                -- Encode ardUsername
-                set ardUsernameEncoded to do shell script "echo " & ardUsername & " | openssl base64 "
-                
-                --Log Action
-                set logMe to "ARD Username encoded"
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Write encoded ARD Username to plist
-                do shell script "defaults write " & quoted form of variableVariable & " ARDUsername "  & ardUsernameEncoded  with administrator privileges
-                
-                --Log Action
-                set logMe to "Written ARD Username to " & variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Encode ardPassword
-                set ardPasswordEncoded to do shell script "echo " & ardPassword & " | openssl base64 "
-                
-                --Log Action
-                set logMe to "ARD Password encoded"
-                
-                -- Log To file
-                logToFile_(me)
-
-                -- Write encoded ARD Password to plist
-                do shell script "defaults write " & quoted form of variableVariable & " ARDPassword "  & ardPasswordEncoded  with administrator privileges
-
-                --Log Action
-                set logMe to "Written ARD Password to " & variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-
-                -- Correct ownership
-                do shell script "chown -R root:wheel " & quoted form of variableVariable with administrator privileges
-
-                --Log Action
-                set logMe to "Set ownership to root:wheel on " & quoted form of variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-
-                -- Correct permissions
-                do shell script "chmod -R 755 " & quoted form of variableVariable with administrator privileges
-
-                --Log Action
-                set logMe to "Set permissions to 755 on " & quoted form of variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Writes vncPassword to com.apple.VNCSettings.txt
-                enableVNC_(me)
-             
-            on error
-             
-                 -- Display error to user
-                 display dialog "Error: Creating ARD User" with icon 0 buttons {"OK"}
-                 
-                 -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-                 tidyUpTimeKids_(me)
-             
-            end try
+    -- Copy NBImageInfo.plist
+    on copyNBImageInfoPlist_(sender)
         
-        -- If ARD option has not been enabled
-        else
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Copying NBImageInfo.plist"
         
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 320
+        
+        try
+            
             --Log Action
-            set logMe to "Skipping creation of ARD user as ARD not enabled"
+            set logMe to "Copying NBImageInfo.plist"
             
             -- Log To file
             logToFile_(me)
+            
+            -- Copy the plist
+            do shell script "ditto " & quoted form of pathToResources & "/NBImageInfo.plist " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Copied NBImageInfo.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Updates NBImageInfo.plist
+            updateNBImageInfoPlist_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Copying  NBImageInfo.plist" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
         
-            -- Writes vncPassword to com.apple.VNCSettings.txt
-            enableVNC_(me)
-            
-        end if
-     
-    end createARDUser_
-            
-    -- Writes vncPassword to com.apple.VNCSettings.txt
-    on enableVNC_(sender)
-
-            -- If VNC option has been enabled
-            if vncEnabled is equal to true then
-                
-                try
-                    
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Writing VNC password to " & variableVariable
-                
-                delay 0.1
-                
-                -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 170
-                
-                -- Set variableVariable to location of com.apple.VNCSettings.txt
-                set variableVariable to selectedTempOSdmgMountPath & "/Library/Preferences/com.apple.VNCSettings.txt"
-                
-                --Log Action
-                set logMe to "Trying to write VNC password to " & variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Write hashed vncPassword to /Library/Preferences/com.apple.VNCSettings.txt on .nbi
-                do shell script "echo " & vncPassword & " | perl -we 'BEGIN { @k = unpack \"C*\", pack \"H*\", \"1734516E8BA8C5E2FF1C39567390ADCA\"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack \"C*\", $_; foreach (@k) { printf \"%02X\", $_ ^ (shift @p || 0) }; print \"
-                \"' | sudo tee " & quoted form of variableVariable with administrator privileges
-                
-                --Log Action
-                set logMe to "VNC password written to " & variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Correct Ownership
-                do shell script "chown root:wheel " & quoted form of variableVariable with administrator privileges
-                
-                --Log Action
-                set logMe to "Set ownership to root:wheel on " & variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Correct Permissions
-                do shell script "chmod 400 " & quoted form of variableVariable with administrator privileges
-
-                --Log Action
-                set logMe to "Set permissions to 400 on " & variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- The bit we've all been waiting for
-                createNetboot_(me)
-                
-                on error
-                
-                    -- Display error to user
-                    display dialog "Error: Wrting VNC Settings" with icon 0 buttons {"OK"}
-                
-                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-                    tidyUpTimeKids_(me)
-                
-                end try
-                
-            -- If VNC option has not been enabled
-            else
-                
-                --Log Action
-                set logMe to "Skipping writing VNC password as VNC option not enabled"
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- The bit we've all been waiting for
-                createNetboot_(me)
-                
-            end if
-            
-    end enableVNC_
-
-    -- The bit we've all been waiting for
-    on createNetboot_(sender)
-        
-        -- Set netBootNameTextField's variable to text
-        set my netBootNameTextField to my netBootNameTextField as text
-            
-            try
-                
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Creating NetBoot (during this process we may show as not responding)"
-                
-                delay 0.1
-                
-                -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 180
-                
-                -- Set netBootDestination to value of netBootSelectedLocation + netBootNameTextField
-                set netBootDestination to netBootSelectedLocation & netBootNameTextField
-                
-                --Log Action
-                set logMe to "Trying to create NBI of " & selectedTempOSdmgMountPath & " in " & netBootDestination & " Progress below: \\n"
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Create NBI using imagetool
-                set netBootCreatedPath to do shell script "/System/Library/CoreServices/System\\ Image\\ Utility.app/Contents/MacOS/imagetool --netboot --destination " & quoted form of netBootDestination & " --source " & quoted form of selectedTempOSdmgMountPath & " --name " & quoted form of netBootNameTextField & " --index " & netBootImageIndexTextField & "| tee -a ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log | grep \"Successfully\" | awk '{print substr($0, index($0,$3))}'" with administrator privileges as quoted form
-                
-                -- Log Action
-                set logMe to "NetBoot created & can be found at " & netBootCreatedPath
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Updates NBImageInfo.plist
-                setNetbootImageOptions_(me)
-                
-            on error
-            
-                -- Display error to user
-                display dialog "Error: Creating NetBoot" with icon 0 buttons {"OK"}
-                
-                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-                tidyUpTimeKids_(me)
-            
-            end try
-        
-    end createNetboot_
+    end copyNBImageInfoPlist_
 
     -- Updates NBImageInfo.plist
-    on setNetbootImageOptions_(sender)
+    on updateNBImageInfoPlist_(sender)
         
-        try
-            
-            ---- Make NBImageInfo.plist writable ----
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Changing permissions on NBImageInfo.plist"
-            
-            delay 0.1
-            
-            -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 190
-            
-            -- Set variableVariable to location to write NetBoot Values
-            set variableVariable to netBootCreatedPath & "/NBImageInfo.plist"
-
-            --Log Action
-            set logMe to "Trying to change permissions on " & variableVariable
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Making NBImageInfo.plist writable
-            do shell script "chmod 777 " & variableVariable with administrator privileges
-            
-            --Log Action
-            set logMe to "Set permissions on " & variableVariable & " to 777"
-            
-            -- Log To file
-            logToFile_(me)
-            
-            ---- Description----
-            -- If we're looking to set a description for this .nbi
-            if netBootDescriptionEnabled is true
-            
+            try
+                
+                ---- Make NBImageInfo.plist writable ----
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Setting .nbi Description"
-
-                delay 0.1
-
-                --Log Action
-                set logMe to "Trying to set .nbi description to " & netBootDescription
+                set my buildProcessTextField to "Amending NBImageInfo.plist"
                 
-                -- Log To file
-                logToFile_(me)
-
-                -- Set NetBoot to Description
-                do shell script "defaults write " & variableVariable & " Description -string " & quoted form of netBootDescription with administrator privileges
-
-                --Log Action
-                set logMe to "Set .nbi Description"
-                
-                -- Log To file
-                logToFile_(me)
-                
-
-           end if
-        
-            ---- Diskless ----
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Setting .nbi to Diskless"
-            
-            delay 0.1
-            
-            --Log Action
-            set logMe to "Trying to set .nbi to Diskless"
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Set NetBoot to Diskless
-            do shell script "defaults write " & variableVariable & " SupportsDiskless -bool YES" with administrator privileges
-            
-            --Log Action
-            set logMe to "Set .nbi to Diskless"
-            
-            -- Log To file
-            logToFile_(me)
-            
-            ---- Serve Over ---
-            --Log Action
-            set logMe to "Setting .nbi's serve over option"
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Set to boolean of value
-            set netBootServeOverNFSd to netBootServeOverNFS as boolean
-            
-            -- If NetBoot Serve Over NFS to true
-            if netBootServeOverNFS is true
-            
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Setting .nbi to being served over NFS"
-            
                 delay 0.1
                 
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 330
+                
                 --Log Action
-                set logMe to "Trying to set .nbi to being served over NFS"
+                set logMe to "Trying to change permissions on " & netBootDirectory & "/NBImageInfo.plist"
                 
                 -- Log To file
                 logToFile_(me)
                 
-                -- Set NetBoot Serve over NFS
-                do shell script "defaults write " & variableVariable & " Type -string NFS" with administrator privileges
+                -- Making NBImageInfo.plist writable
+                do shell script "chmod 777 "  & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
-                set logMe to "Set .nbi to being served over NFS"
+                set logMe to "Set permissions on " & netBootDirectory & "/NBImageInfo.plist to 777"
                 
                 -- Log To file
                 logToFile_(me)
                 
-            else
+                ---- Description----
+                -- If we're looking to set a description for this .nbi
+                if netBootDescriptionEnabled is true
+                    
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Setting NBImageInfo.plist Description"
+                    
+                    delay 0.1
+                    
+                    -- Update build Process ProgressBar
+                    set my buildProccessProgressBar to 334
+                    
+                    --Log Action
+                    set logMe to "Trying to set .nbi description to " & netBootDescription
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                    -- Set NetBoot to Description
+                    do shell script "defaults write "& quoted form of netBootDirectory & "/NBImageInfo.plist Description -string " & quoted form of netBootDescription user name adminUserName password adminUsersPassword with administrator privileges
+                    
+                    --Log Action
+                    set logMe to "Set .nbi Description"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                end if
             
+                ---- Index ----
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Setting .nbi to being served over HTTP"
-            
+                set my buildProcessTextField to "Setting NBImageInfo.plist Index"
+                
                 delay 0.1
                 
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 336
+                
                 --Log Action
-                set logMe to "Trying to set .nbi to being served over HTTP"
+                set logMe to "Trying to set .nbi Index"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set NetBoot to Diskless
+                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Index -int " & netBootImageIndexTextField user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Set .nbi Index"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                ---- IsInstall ----
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Setting NBImageInfo.plist IsInstall value"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 338
+                
+                --Log Action
+                set logMe to "Trying to set .nbi IsInstall value"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set IsInstall value
+                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist IsInstall -bool NO" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Set .nbi IsInstall value"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                ---- Name ----
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Setting NBImageInfo.plist Name"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 340
+                
+                --Log Action
+                set logMe to "Trying to set .nbi Name to " & netBootNameTextField
+
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set NetBoot to Diskless
+                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Name -string " & quoted form of netBootNameTextField user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Set .nbi Name to " & netBootNameTextField
                 
                 -- Log To file
                 logToFile_(me)
             
-                -- Set NetBoot Serve over HTTP
-                do shell script "defaults write " & variableVariable & " Type -string HTTP" with administrator privileges
+                ---- Diskless ----
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Setting NBImageInfo.plist to Diskless"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 342
 
                 --Log Action
-                set logMe to "Set .nbi to being served over NFS"
+                set logMe to "Trying to set .nbi to Diskless"
                 
                 -- Log To file
                 logToFile_(me)
                 
-            end if
-        
+                -- Set NetBoot to Diskless
+                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist  SupportsDiskless -bool YES" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Set .nbi to Diskless"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                ---- RootPath ----
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Setting NBImageInfo.plist RootPath"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 344
+                
+                --Log Action
+                set logMe to "Trying to set .nbi to RootPath"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set NetBoot to Diskless
+                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Set .nbi to RootPath"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                ---- Serve Over ---
+                --Log Action
+                set logMe to "Setting NBImageInfo.plist's serve over option"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                ---- ImageType ----
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Setting NBImageInfo.plist ImageType"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 346
+                
+                --Log Action
+                set logMe to "Trying to set .nbi to ImageType"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set NetBoot to Diskless
+                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist ImageType -string netboot" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Set .nbi to ImageType"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                ---- osVersion ----
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Setting NBImageInfo.plist osVersion"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 348
+                
+                --Log Action
+                set logMe to "Trying to set .nbi to osVersion"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set NetBoot to Diskless
+                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist osVersion -string 10.9" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Set .nbi to osVersion"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                ---- Serve Over ---
+                --Log Action
+                set logMe to "Setting NBImageInfo.plist's serve over option"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set to boolean of value
+                set netBootServeOverNFSd to netBootServeOverNFS as boolean
+                
+                -- If NetBoot Serve Over NFS to true
+                if netBootServeOverNFS is true
+                
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Setting NBImageInfo.plist to being served over NFS"
+                    
+                    delay 0.1
+                    
+                    -- Update build Process ProgressBar
+                    set my buildProccessProgressBar to 351
+
+
+                    --Log Action
+                    set logMe to "Trying to set .nbi to being served over NFS"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                    -- Set NetBoot Serve over NFS
+                    do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Type -string NFS" user name adminUserName password adminUsersPassword with administrator privileges
+                    
+                    --Log Action
+                    set logMe to "Set .nbi to being served over NFS"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                
+                else
+                
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Setting NBImageInfo.plist to being served over HTTP"
+                    
+                    delay 0.1
+                    
+                    -- Update build Process ProgressBar
+                    set my buildProccessProgressBar to 351
+
+
+                    --Log Action
+                    set logMe to "Trying to set .nbi to being served over HTTP"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                    -- Set NetBoot Serve over HTTP
+                    do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Type -string HTTP" user name adminUserName password adminUsersPassword with administrator privileges
+                    
+                    --Log Action
+                    set logMe to "Set .nbi to being served over NFS"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                end if
+
             ---- Enabled ----
             -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Setting .nbi to Enabled"
-            
+            set my buildProcessTextField to "Setting NBImageInfo.plist to Enabled"
+
             delay 0.1
-            
+
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 354
+
             --Log Action
             set logMe to "Trying to set .nbi to Enabled"
 
@@ -3541,7 +4794,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
 
             -- Set NetBoot to Diskless
-            do shell script "defaults write " & variableVariable & " IsEnabled -bool YES" with administrator privileges
+            do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist IsEnabled -bool YES" user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
             set logMe to "Set .nbi to Enabled"
@@ -3551,19 +4804,19 @@ script AutoCasperNBIAppDelegate
 
             ---- Fix Plist ----
             -- Correct ownership
-            do shell script "chown -R root:wheel " & variableVariable with administrator privileges
+            do shell script "chown -R root:wheel " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
-            set logMe to "Set ownership to root:wheel on " & variableVariable
+            set logMe to "Set ownership to root:wheel on " & netBootDirectory & "/NBImageInfo.plist"
 
             -- Log To file
             logToFile_(me)
 
             -- Correct permissions
-            do shell script "chmod -R 755 " & variableVariable with administrator privileges
+            do shell script "chmod -R 755 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
-            set logMe to "Set permissions to 755 on " & variableVariable
+            set logMe to "Set permissions to 755 on " & netBootDirectory & "/NBImageInfo.plist"
 
             -- Log To file
             logToFile_(me)
@@ -3574,170 +4827,636 @@ script AutoCasperNBIAppDelegate
 
             delay 0.1
 
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 357
+
             --Log Action
-            set logMe to "Trying to correct permissions on " & variableVariable
+            set logMe to "Trying to correct permissions on " & netBootDirectory & "/NBImageInfo.plist"
 
             -- Log To file
             logToFile_(me)
 
             -- Making NBImageInfo.plist writable
-            do shell script "chmod 644 " & variableVariable with administrator privileges
+            do shell script "chmod 644 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
-            set logMe to "Set permissons on " & variableVariable & " to 644"
+            set logMe to "Set permissons on " & netBootDirectory & "/NBImageInfo.plist to 644"
 
             -- Log To file
             logToFile_(me)
 
-            -- Set netBootCreationSuccessful value, for notifying later
-            set my netBootCreationSuccessful to true
-
-            -- Resize NetBoot Image
-           resizeNetBootImage_(me)
+            -- Disable Spotlight Indexing on NetBoot.dmg
+            disableSpotlight_(me)
 
         on error
             
             -- Display error to user
-            display dialog "Error: Writing NetBoot Options" with icon 0 buttons {"OK"}
+            display dialog "Error: Writing NBImageInfo.plist" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+
+    end supdateNBImageInfoPlist_
+
+    -- Disable Spotlight Indexing on NetBoot.dmg
+    on disableSpotlight_(sender)
+        
+        try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Disabling Spotlight Indexing"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 365
+            
+            --Log Action
+            set logMe to "Trying to disable Spotlight Indexing on " & netBootDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Disable Spotlight Indexing
+            do shell script "mdutil -i off " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+
+            --Log Action
+            set logMe to "Disabled Spotlight Indexing on " & netBootDmgMountPath
+
+            -- Log To file
+            logToFile_(me)
+            
+            -- Get size of NetBoot.dmg
+            getNetBootDmgSize_(me)
+            
+        on error
+        
+            -- Display error to user
+            display dialog "Error: Disabling Spolight Indexing" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+        
+        end try
+        
+    end disableSpotlight_
+
+    -- Get size of NetBoot.dmg
+    on getNetBootDmgSize_(sender)
+        
+        try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Getting NetBoot.dmg size"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 370
+            
+            --Log Action
+            set logMe to "Trying to get the Total size of " & quoted form of netBootDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Get total size of NetBoot.dmg
+            set netBootDmgTotalSize to do shell script "diskutil info " & quoted form of netBootDmgMountPath & " | grep \"Total Size\" | awk '{ print $3 }'"
+            
+            --Log Action
+            set logMe to "Total size of " & quoted form of netBootDmgMountPath & "is " & netBootDmgTotalSize & "GB"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Get the value of the free space available on NetBoot.dmg
+            set netBootDmgFreeSpace to do shell script "diskutil info " & quoted form of netBootDmgMountPath & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
+            
+            --Log Action
+            set logMe to "There is " & netBootDmgFreeSpace & "GB space free on " & quoted form of netBootDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            considering numeric strings
+                
+                -- Get the space used on NetBoot.dmg
+                set netBootDmgUsedSpace to (netBootDmgTotalSize - netBootDmgFreeSpace)
+                
+            end considering
+            
+            --Log Action
+            set logMe to "Used space on  " & quoted form of netBootDmgMountPath & "is " & netBootDmgUsedSpace & "GB"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            considering numeric strings
+                
+                -- Set NetBoot.dmg's size to + 1GB of what is needed
+                set netBootDmgResize to netBootDmgUsedSpace + 1
+                
+            end considering
+            
+            --Log Action
+            set logMe to "NetBoot.reduced.dmg will need to be around " & netBootDmgResize & "GB"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set to boolean of value
+            set netBootImageReduceEnabled to netBootImageReduceEnabled as boolean
+            set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
+            
+            -- If we're resizing the NetBoot Image
+            if netBootImageReduceEnabled is true
+                
+                ---- Reduce NetBoot Image
+                createReducedNetBootImage_(me)
+                
+            else if netBootImageExpandEnabled is true
+                
+                -- Expands the NetBoot.dmg
+                expandNetBootDMG_(me)
+            
+            else
+            
+                -- Set netBootCreationSuccessful value, for notifying later
+                set my netBootCreationSuccessful to true
+                
+                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                tidyUpTimeKids_(me)
+            
+            end if
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Calculating space needed" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+
+    end getNetBootDmgSize_
+
+    ---- Reduce NetBoot Image
+    on createReducedNetBootImage_(sedner)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Creating a smaller NetBoot.dmg"
+        
+        delay 0.1
+        
+        -- Update build Process ProgressBar
+        set my buildProccessProgressBar to 380
+        
+        --Log action
+        set logMe to "Trying to create NetBoot.reduced.dmg in " & netBootDirectory
+        
+        -- Log To file
+        logToFile_(me)
+        
+        -- Set to text value, to avoid an issue when name changed
+        set netBootNameTextField to netBootNameTextField as text
+        
+        try
+            
+            -- Create a the NetBoot.dmg
+            do shell script "hdiutil create " & quoted form of netBootDirectory & "/NetBoot.reduced -size " & netBootDmgResize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log action
+            set logMe to "Successfully created NetBoot.reduced.dmg in " & quoted form of netBootDirectory
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Mount the NetBoot.dmg
+            mountReducedNetBootDmg_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Failed to create NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
             
             -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
             tidyUpTimeKids_(me)
             
         end try
         
-    end setNetbootImageOptions_
+    end createReducedNetBootImage_
 
-    -- Resize NetBoot Image
-    on resizeNetBootImage_(sedner)
+    -- Mount the NetBoot.reduced.dmg
+    on mountReducedNetBootDmg_(sender)
         
-        -- Set to boolean of value
-        set netBootImageResizeEnabled to netBootImageResizeEnabled as boolean
-        
-        -- If we're resizing the NetBoot Image
-        if netBootImageResizeEnabled is true then
+        try
             
-            try
-
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Resizing NetBoot Image by " & netBootImageResizeValue & "GB"
-                
-                delay 0.1
-                
-                -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 200
-                
-                -- Set variableVariable to location to write NetBoot Values
-                set variableVariable to netBootCreatedPath & "/NetBoot.dmg"
-                
-                --Log Action
-                set logMe to "Trying to resize " & variableVariable & " to around " & netBootImageResizeValue & "GB"
-                
-                -- Log To file
-                logToFile_(me)
-
-                -- Resize NetBoot.dmg to value given
-                do shell script "hdiutil resize -size " & netBootImageResizeValue & "g " & variableVariable with administrator privileges
-
-                --Log Action
-                set logMe to "Sucessfully resized " & variableVariable
-                
-                -- Log To file
-                logToFile_(me)
-
-                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-                tidyUpTimeKids_(me)
-                
-            on error
-                
-                -- Display error to user
-                display dialog "Error: Resizing NetBoot.dmg" with icon 0 buttons {"OK"}
-                
-                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-                tidyUpTimeKids_(me)
-                
-                -- Set netBootCreationSuccessful value, for notifying later
-                set my netBootCreationSuccessful to false
-                
-            end try
-        
-        else
-        
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Mounting NetBoot.reduced.dmg"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 390
+            
             --Log Action
-            set logMe to "Skipping resizing NetBoot as not selected"
+            set logMe to "Trying to mount: " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg"
             
             -- Log To file
             logToFile_(me)
+            
+            -- Mount the NetBoot.dmg & get the mount path
+            set netBootReducedDmgMountPath to do shell script "hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Mounted to: " & netBootReducedDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Copy NetBoot.dmg's content to NetBoot.reduced.dmg
+            copyNetBootDmgToNetBootReducedDmg_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Cannot mount NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+
+    end mountReducedNetBootDmg_
+
+    -- Copy NetBoot.dmg's content to NetBoot.reduced.dmg
+    on copyNetBootDmgToNetBootReducedDmg_(sender)
+        
+        try
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Copying the contents of the NetBoot.dmg to NetBoot.reduced.dmg"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 400
+            
+            --Log action
+            set logMe to "Copying contents of " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Copy contents of the SelectedOSdmg to NetBootdmg
+            do shell script "ditto " & quoted form of netBootDmgMountPath & " " & quoted form of netBootReducedDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log action
+            set logMe to "Successfully copied " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Updates NBImageInfo.plist post reduction
+            postReduceupdateNBImageInfoPlist_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Cannot copy contents of " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end copyNetBootDmgToNetBootReducedDmg_
+
+    -- Updates NBImageInfo.plist post reduction
+    on postReduceupdateNBImageInfoPlist_(sender)
+        
+        try
+            
+            ---- Make NBImageInfo.plist writable ----
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Amending NBImageInfo.plist"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 410
+            
+            --Log Action
+            set logMe to "Trying to change permissions on " & netBootDirectory & "/NBImageInfo.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Making NBImageInfo.plist writable
+            do shell script "chmod 777 "  & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Set permissions on " & netBootDirectory & "/NBImageInfo.plist to 777"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            ---- RootPath ----
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Updating NBImageInfo.plist RootPath"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 413
+            
+            --Log Action
+            set logMe to "Trying to set .nbi to RootPath"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set NetBoot to Diskless
+            do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.reduced.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Set .nbi to RootPath"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            ---- Fix Plist ----
+            -- Correct ownership
+            do shell script "chown -R root:wheel " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Set ownership to root:wheel on " & netBootDirectory & "/NBImageInfo.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Correct permissions
+            do shell script "chmod -R 755 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Set permissions to 755 on " & netBootDirectory & "/NBImageInfo.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            ---- Revert NBImageInfo.plist permissionchanges ----
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Changing permissions on NBImageInfo.plist"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 416
+            
+            --Log Action
+            set logMe to "Trying to correct permissions on " & netBootDirectory & "/NBImageInfo.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Making NBImageInfo.plist writable
+            do shell script "chmod 644 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Set permissons on " & netBootDirectory & "/NBImageInfo.plist to 644"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            --Delete NetBoot.dmg
+            deleteNetBootDmg_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Updating RootPath in NBImageInfo.plist" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+        
+    end postReduceupdateNBImageInfoPlist_
+
+    --Delete NetBoot.dmg
+    on deleteNetBootDmg_(sender)
+
+        try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Unmounting NetBoot.dmg"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 420
+            
+            ---- Unmount NetBoot.dmg ----
+            try
+                
+                --Log Action
+                set logMe to "Trying to detach " & netBootDmgMountPath
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Detach Volume
+                do shell script "hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+                
+            end try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Deleting NetBoot.dmg"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 425
+            
+            --Log action
+            set logMe to "Deleting " & quoted form of netBootDirectory & "/NetBoot.dmg"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Create a the NetBoot.dmg
+            do shell script "rm -f " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log action
+            set logMe to "Deleted " & quoted form of netBootDirectory & "/NetBoot.dmg"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Expands the NetBoot.dmg
+            expandNetBootDMG_(me)
+            
+        on error
+            
+            -- Display error to user
+            display dialog "Error: Failed to create NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
+            
+            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            tidyUpTimeKids_(me)
+            
+        end try
+
+    end deleteNetBootDmg_
+
+    -- Expands the NetBoot.dmg
+    on expandNetBootDMG_(sender)
+        
+        -- If we're expanding the NetBoot.dmg
+        if netBootImageExpandEnabled is true
+        
+            -- If we resized the NetBoot Image
+            if netBootImageReduceEnabled is true then
+                
+                try
+            
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Expanding NetBoot.reduced.dmg"
+                
+                    delay 0.1
+                
+                    -- Update build Process ProgressBar
+                    set my buildProccessProgressBar to 430
+                    
+                    considering numeric strings
+                        
+                        -- Set Netboot.reduced.dmg to required space + selected expansion value
+                        set netBootExpandedTotalSize to netBootDmgUsedSpace + netBootImageExpandValue
+                    
+                    end considering
+                    
+                    ---- Unmount NetBoot.reduced.dmg ----
+                    try
+                        
+                        --Log Action
+                        set logMe to "Trying to detach " & netBootReducedDmgMountPath
+                        
+                        -- Log To file
+                        logToFile_(me)
+                        
+                        -- Detach Volume
+                        do shell script "hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
+                        
+                    end try
+                    
+                    -- Set to text
+                    set netBootExpandedTotalSize to netBootExpandedTotalSize as text
+                    set netBootDirectory to netBootDirectory as text
+                    
+                    --Log Action
+                    set logMe to "Trying to expand " & netBootDirectory & "/NetBoot.reduced.dmg to " & netBootExpandedTotalSize & "GB"
+                    
+                    -- Log To file
+                    logToFile_(me)
+
+                    -- Expand NetBoot.reduced.dmg by the value given before
+                    do shell script "hdiutil resize -size " & netBootExpandedTotalSize & "g " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                    
+                    -- Set netBootCreationSuccessful value, for notifying later
+                    set my netBootCreationSuccessful to true
+                    
+                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                    tidyUpTimeKids_(me)
+                
+                on error
+                
+                    -- Display error to user
+                    display dialog "Error: Expanding NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
+                    
+                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                    tidyUpTimeKids_(me)
+                
+                end try
+                
+            else
+        
+                try
+                    
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Expanding NetBoot.dmg"
+                    
+                    delay 0.1
+                    
+                    -- Update build Process ProgressBar
+                    set my buildProccessProgressBar to 430
+                    
+                    considering numeric strings
+                        
+                        -- Set NetBoot.dmg to required space + selected expansion value
+                        set netBootExpandedTotalSize to netBootDmgUsedSpace + netBootImageExpandValue
+                        
+                    end considering
+                    
+                    ---- Unmount NetBoot.dmg ----
+                    try
+                        
+                        --Log Action
+                        set logMe to "Trying to detach " & netBootDmgMountPath
+                        
+                        -- Log To file
+                        logToFile_(me)
+                        
+                        -- Detach Volume
+                        do shell script "hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+                        
+                    end try
+                    
+                    -- Set to text
+                    set netBootExpandedTotalSize to netBootExpandedTotalSize as text
+                    set netBootDirectory to netBootDirectory as text
+                    
+                    --Log Action
+                    set logMe to "Trying to expand " & netBootDirectory & "/NetBoot.dmg to " & netBootExpandedTotalSize & "GB"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                    -- Expand NetBoot.dmg by the value given before
+                    do shell script "hdiutil resize -size " & netBootExpandedTotalSize & "g " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                    
+                    -- Set netBootCreationSuccessful value, for notifying later
+                    set my netBootCreationSuccessful to true
+                    
+                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                    tidyUpTimeKids_(me)
+                    
+                on error
+                    
+                    -- Display error to user
+                    display dialog "Error: Expanding NetBoot.dmg" with icon 0 buttons {"OK"}
+                    
+                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                    tidyUpTimeKids_(me)
+                    
+                end try
+                
+            end if
+        
+        else
+        
+            -- Set netBootCreationSuccessful value, for notifying later
+            set my netBootCreationSuccessful to true
             
             -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
             tidyUpTimeKids_(me)
 
         end if
-
-    end resizeNetBootImage_
+            
+    end expandNetBootDMG_
 
     -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
     on tidyUpTimeKids_(sender)
-      
-      ---- Unmount OS.dmg ----
-        try
-              
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Detaching " & selectedOSdmgMountPath
-            
-            -- Set build Process ProgressBar to indeterminate & animated
-            set my buildProccessProgressBarIndeterminate to true
-            set my buildProccessProgressBarAniminate to true
-            
-            delay 0.1
-        
-            --Log Action
-            set logMe to "Trying to detach " & selectedOSdmgMountPath
-            
-            -- Log To file
-            logToFile_(me)
-
-            -- Detach Volume
-            do shell script "hdiutil detach " & quoted form of selectedOSdmgMountPath & " -force"
-            
-        end try
-      
-      ---- Unmount Temp OS.dmg ----
-        try
-          
-          -- Update Build Process Window's Text Field
-          set my buildProcessTextField to "Detaching " & selectedTempOSdmgMountPath
-          
-          delay 0.1
-          
-          --Log Action
-          set logMe to "Trying to detach " & selectedTempOSdmgMountPath
-          
-          -- Log To file
-          logToFile_(me)
-          
-          -- Detach Volume
-          do shell script "hdiutil detach " & quoted form of selectedTempOSdmgMountPath & " -force"
-          
-        end try
-
-      ---- Empty /private/tmp/AutoCasperNBI/ ----
-        try
-            
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Emptying /private/tmp/AutoCasperNBI/"
-            
-            delay 0.1
-            
-            --Log Action
-            set logMe to "Trying to empty /private/tmp/AutoCasperNBI/"
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Detach Volume
-            do shell script "rm -rf /private/tmp/AutoCasperNBI/*"
-            
-        end try
         
         -- close build process window
         showBuildProcessWindow's orderOut_(null)
@@ -3756,6 +5475,7 @@ script AutoCasperNBIAppDelegate
             
     end tidyUpTimeKids_
 
+
     -- High fives all round!
     on weDitIt_(sender)
         
@@ -3763,13 +5483,13 @@ script AutoCasperNBIAppDelegate
         if netBootCreationSuccessful is true
         
             --Log Action
-            set logMe to "NetBoot successfully created at the following location " & netBootCreatedPath
+            set logMe to "NetBoot successfully created at the following location " & netBootDirectory
             
             -- Log To file
             logToFile_(me)
         
             -- Notify on completion
-            display dialog "NetBoot successfully created at the following location:" & return & return & netBootCreatedPath with icon 1 buttons {"OK"}
+            display dialog "NetBoot successfully created at the following location:" & return & return & netBootDirectory with icon 1 buttons {"OK"}
             
             -- Set netBootCreationSuccessful value, for notifying later
             set my netBootCreationSuccessful to false
@@ -3777,32 +5497,73 @@ script AutoCasperNBIAppDelegate
         end if
         
     end weDitIt_
-
-    -- Insert code here to initialize your application before any files are opened
-	on applicationWillFinishLaunching_(aNotification)
-        
-        -- Get OS of host mac & user running the app
-        startYourEngines_(me)
-        
-        -- populate plist file with defaults (will not overwrite non-default settings))
-        regDefaults_(me)
-        
-        -- retrieve plist values
-        retrieveDefaults_(me)
-        
-        -- check for passwords, enable check boxes if found in plist
-        checkPasswords_(me)
-        
-        -- Check that image selected for desktop exists
-        checkDesktopImage_(me)
-        
-	end applicationWillFinishLaunching_
 	
     -- Insert code here to do any housekeeping before your application quits
 	on applicationShouldTerminate_(sender)
         
-        -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-        tidyUpTimeKids_(me)
+        -- Disable main windows buttons
+        set my optionWindowEnabled to false
+        
+        -- Update buildProcessLogTextField to show path to todays log
+        set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+        
+        -- activate build process window
+        activate
+        showBuildProcessWindow's makeKeyAndOrderFront_(null)
+        
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Detaching any Volumes we mounted"
+        
+        -- Set build Process ProgressBar to indeterminate & animated
+        set my buildProccessProgressBarIndeterminate to true
+        set my buildProccessProgressBarAniminate to true
+        
+        delay 0.1
+        
+        ---- Unmount NetBoot.dmg ----
+        try
+            
+            --Log Action
+            set logMe to "Trying to detach " & netBootDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Detach Volume
+            do shell script "hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+            
+        end try
+        
+        ---- Unmount NetBoot.reduced.dmg ----
+        try
+            
+            --Log Action
+            set logMe to "Trying to detach " & netBootReducedDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Detach Volume
+            do shell script "hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
+            
+        end try
+        
+        ---- Unmount OS.dmg ----
+        try
+            
+            --Log Action
+            set logMe to "Trying to detach " & selectedOSdmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Detach Volume
+            do shell script "hdiutil detach " & quoted form of selectedOSdmgMountPath & " -force"
+            
+        end try
+        
+        -- close build process window
+        showBuildProcessWindow's orderOut_(null)
         
         -- Terminate App
 		return current application's NSTerminateNow

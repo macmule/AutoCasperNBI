@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ActivePowerProfiles</key>
+	<dict>
+		<key>AC Power</key>
+		<integer>-1</integer>
+		<key>Battery Power</key>
+		<integer>-1</integer>
+		<key>UPS Power</key>
+		<integer>-1</integer>
+	</dict>
+	<key>Custom Profile</key>
+	<dict>
+		<key>AC Power</key>
+		<dict>
+			<key>Automatic Restart On Power Loss</key>
+			<integer>0</integer>
+			<key>Disk Sleep Timer</key>
+			<integer>10</integer>
+			<key>Display Sleep Timer</key>
+			<integer>10</integer>
+			<key>Dynamic Power Step</key>
+			<integer>1</integer>
+			<key>Reduce Processor Speed</key>
+			<integer>0</integer>
+			<key>Sleep On Power Button</key>
+			<integer>1</integer>
+			<key>System Sleep Timer</key>
+			<integer>0</integer>
+			<key>Wake On AC Change</key>
+			<integer>0</integer>
+			<key>Wake On LAN</key>
+			<integer>1</integer>
+			<key>Wake On Modem Ring</key>
+			<integer>1</integer>
+		</dict>
+		<key>Battery Power</key>
+		<dict>
+			<key>Automatic Restart On Power Loss</key>
+			<integer>0</integer>
+			<key>Disk Sleep Timer</key>
+			<integer>10</integer>
+			<key>Display Sleep Timer</key>
+			<integer>10</integer>
+			<key>Dynamic Power Step</key>
+			<integer>1</integer>
+			<key>Reduce Processor Speed</key>
+			<integer>0</integer>
+			<key>Sleep On Power Button</key>
+			<integer>1</integer>
+			<key>System Sleep Timer</key>
+			<integer>0</integer>
+			<key>Wake On AC Change</key>
+			<integer>0</integer>
+			<key>Wake On LAN</key>
+			<integer>1</integer>
+			<key>Wake On Modem Ring</key>
+			<integer>1</integer>
+		</dict>
+		<key>UPS Power</key>
+		<dict>
+			<key>Automatic Restart On Power Loss</key>
+			<integer>0</integer>
+			<key>Disk Sleep Timer</key>
+			<integer>10</integer>
+			<key>Display Sleep Timer</key>
+			<integer>10</integer>
+			<key>Dynamic Power Step</key>
+			<integer>1</integer>
+			<key>Reduce Processor Speed</key>
+			<integer>0</integer>
+			<key>Sleep On Power Button</key>
+			<integer>1</integer>
+			<key>System Sleep Timer</key>
+			<integer>0</integer>
+			<key>Wake On AC Change</key>
+			<integer>0</integer>
+			<key>Wake On LAN</key>
+			<integer>1</integer>
+			<key>Wake On Modem Ring</key>
+			<integer>1</integer>
+		</dict>
+	</dict>
+</dict>
+</plist>
