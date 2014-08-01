@@ -16,9 +16,7 @@ If you wish to contact me direct, please use: http://macmule.com/contact/<br>
 <br>
 ISSUES<br>
 <br>
-Currently, AutoCasperNBI checks that 20GB of space is free.. But i’ll amend later to actually size needed.<br>
-<br>
-Please run from /Applications (I’ll make a check for that later).<br>
+There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
