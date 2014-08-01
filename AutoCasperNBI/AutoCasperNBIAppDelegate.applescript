@@ -14,7 +14,6 @@ script AutoCasperNBIAppDelegate
 	property parent : class "NSObject"
     
 --- Objects
---property AutoCasperNBIWindow : missing value
 
 	-- IBOutlets
     property defaults : missing value -- for saved prefs
@@ -145,7 +144,9 @@ script AutoCasperNBIAppDelegate
     property netBootServeOverNFS : true
     property customDesktopImageEnabled : false
     property installRCNetBootSelected : false
-    
+    property timeServerOptionsEnabled : false
+    property createReadOnlyDMG : false
+
     -- Others
     property requiredSpace : 20
     property buildProccessProgressBar : 0
@@ -154,11 +155,16 @@ script AutoCasperNBIAppDelegate
     property selectedOSdmgUsedSpace : 0
     property netBootDmgRequiredSize : 0
     property netBootDmgResize : 0
+    property timeServerSelected : "time.apple.com"
+    property timeZoneSelected : "Americas/Los_Angeles"
     
 --- HANDLERS ---
 
     -- To be run at launch
     on startYourEngines_(sender)
+        
+        -- Date for log file
+        set logDate to do shell script "date +%F"
         
         -- Log that we've launched
         set logMe to "\\n"
@@ -223,7 +229,11 @@ script AutoCasperNBIAppDelegate
         netBootServeOverNFS:netBootServeOverNFS, ¬
         vncEnabled:vncEnabled, ¬
         vncPassword:vncPassword, ¬
-        installRCNetBootSelected:installRCNetBootSelected})
+        timeServerOptionsEnabled:timeServerOptionsEnabled, ¬
+        timeServerSelected:timeServerSelected, ¬
+        timeZoneSelected:timeZoneSelected,  ¬
+        installRCNetBootSelected:installRCNetBootSelected, ¬
+        createReadOnlyDMG:createReadOnlyDMG})
     end regDefaults_
     
     -- Get values from plist
@@ -242,7 +252,11 @@ script AutoCasperNBIAppDelegate
         tell defaults to set my netBootServeOverNFS to objectForKey_("netBootServeOverNFS")
         tell defaults to set my vncEnabled to objectForKey_("vncEnabled") as boolean
         tell defaults to set my vncPassword to objectForKey_("vncPassword")
+        tell defaults to set my timeServerOptionsEnabled to objectForKey_("timeServerOptionsEnabled") as boolean
+        tell defaults to set my timeServerSelected to objectForKey_("timeServerSelected")
+        tell defaults to set my timeZoneSelected to objectForKey_("timeZoneSelected")
         tell defaults to set my installRCNetBootSelected to objectForKey_("installRCNetBootSelected") as boolean
+        tell defaults to set my createReadOnlyDMG to objectForKey_("createReadOnlyDMG") as boolean
     end retrieveDefaults_
     
     ----- BUTTON HANDLERS ----
@@ -273,7 +287,7 @@ script AutoCasperNBIAppDelegate
         -- Log To file
         logToFile_(me)
         
-        -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+        -- Detach mounted volumes
         tidyUpTimeKids_(me)
         
     end cancelBuildProcess_
@@ -407,9 +421,6 @@ script AutoCasperNBIAppDelegate
         -- Comment out before release.. this will send log messages to Xcode's log
         --log logMe
         
-        -- Date for log file
-        set logDate to do shell script "date +%F"
-        
         -- Get time & date of command execution
         set timeStamp to do shell script "date"
         
@@ -523,8 +534,14 @@ script AutoCasperNBIAppDelegate
             -- If a dmg but cannot read /System/Library/CoreServices/SystemVersion.plist
             on error
             
+                --Log Action
+                set logMe to "Cannot read OS Version from " & quoted form of selectedOSdmgMountPath
+                
+                -- Log To file
+                logToFile_(me)
+            
                 -- Error advising we cannot get the OS version from dmg
-                set my selectedOSDMGTextField to "Cannot read OS Version"
+                set my selectedOSDMGTextField to "Cannot read OS Version from " & selectedOSdmgMountPath
                 
                 -- Reset OSDMG Icons & hide cog
                 doResetOSDMGIcons_(me)
@@ -570,45 +587,8 @@ script AutoCasperNBIAppDelegate
         -- Reset delimiters
         set AppleScript's text item delimiters to applescriptsDelims
         
-        -- If major versions do not match, bad things can happen. But we'll not stop incase this nbi is being created before uprading JSS
-        if hostMacOSVersionMajor is less than selectedOSdmgVersionMajor then
-            
-            -- Log error if selected OS.dmg's OS is greater than host
-            set logMe to "Error: Cannot create an .nbi as OS.dmg's OS version (" & selectedOSdmgVersion & ") is newer than this Macs (" & hostMacOSVersion & ")."
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Display error to user
-            display dialog "Error: Cannot create an NetBoot from supplied OS.dmg as it's OS version (" & selectedOSdmgVersion & ") is newer than this Macs OS (" & hostMacOSVersion & ")." with icon 0 buttons {"OK"}
-            
-            -- Reset OSDMG Icons & hide cog
-            doResetOSDMGIcons_(me)
-            
-            -- Display exclamation icon
-            set my exclamationRedOSDMG to true
-            
-        else if selectedOSdmgVersionMajor is less than hostMacOSVersionMajor then
-            
-            display dialog "Error: Cannot create an NetBoot from supplied OS.dmg as it's OS version (" & selectedOSdmgVersion & ") is older than this Macs OS (" & hostMacOSVersion & ")." with icon 0 buttons {"OK"}
-            
-            -- Reset OSDMG Icons & hide cog
-            doResetOSDMGIcons_(me)
-            
-            -- Display exclamation icon
-            set my exclamationRedOSDMG to true
-        else
-            
-            -- Log that we're ok to proceed
-            set logMe to "We can create a NetBoot from " & selectedOSdmgPath
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- See if pre-reqs have been met
-            checkIfReadyToProceed_(me)
-            
-        end if
+        -- See if pre-reqs have been met
+        checkIfReadyToProceed_(me)
         
     end checkOSVersions_
 
@@ -733,6 +713,12 @@ script AutoCasperNBIAppDelegate
         -- If selected app is not Casper Imaging.
         else
         
+            --Log Action
+            set logMe to "Select Casper Imaging.app"
+            
+            -- Log To file
+            logToFile_(me)
+        
             -- Reset Selected App Icons
             doResetSelectedAppIcons_(me)
         
@@ -790,6 +776,12 @@ script AutoCasperNBIAppDelegate
                 
             -- Error if we cannot get the JSS version
             on error
+            
+                    --Log Action
+                    set logMe to "Cannot get JSS Version"
+                    
+                    -- Log To file
+                    logToFile_(me)
             
                     -- Reset JSS URL icons
                     doResetJSSURLIcons_(me)
@@ -872,7 +864,13 @@ script AutoCasperNBIAppDelegate
             
         -- Error if there is an issue
         on error
-            
+        
+            --Log Action
+            set logMe to "Cannot get JSS Version"
+        
+            -- Log To file
+            logToFile_(me)
+        
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
             
@@ -1731,6 +1729,61 @@ script AutoCasperNBIAppDelegate
 
     end checkDesktopImage_
 
+    -- Bound to "Set time server & zone" checkbox, sets plist
+    on timeServerOptionsEnabled_(sender)
+        
+        -- Set to variable to boolean
+        set timeServerOptionsEnabled to timeServerOptionsEnabled as boolean
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(timeServerOptionsEnabled, "timeServerOptionsEnabled")
+        
+    end timeServerOptionsEnabled_
+
+    -- Bound to Time Server Text field
+    on timeServerCheck_(sender)
+        
+        -- If textfield is empty
+        if timeServerSelected is missing value then
+            
+            -- Set netBoot Name
+            set my timeServerSelected to "time.apple.com"
+            
+            -- Display error to user
+            display dialog "Please enter a Time Server" with icon 0 buttons {"OK"}
+            
+            --Log Action
+            set logMe to "Error: Please enter a Time Server"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Update plist with selection
+            tell defaults to setObject_forKey_(timeServerSelected, "timeServerSelected")
+            
+            else
+            
+            --Log Action
+            set logMe to "Time Server: " & timeServerSelected
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Update plist with selection
+            tell defaults to setObject_forKey_(timeServerSelected, "timeServerSelected")
+            
+        end if
+        
+    end timeServerCheck_
+
+    -- Bound to Time Zone drop down
+    on timeZoneTest_(sender)
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(timeZoneSelected, "timeZoneSelected")
+        
+    end timeZoneTest_
+
     -- Bound to "Install modified rc.netboot file" checkbox, sets plist
     on installRCNetBootSelected_(sender)
         
@@ -1741,6 +1794,17 @@ script AutoCasperNBIAppDelegate
         tell defaults to setObject_forKey_(installRCNetBootSelected, "installRCNetBootSelected")
         
     end installRCNetBootSelected_
+
+    -- Bound to "Create Read-Only DMG" checkbox, sets plist
+    on createReadOnlyDMGSelected_(sender)
+        
+        -- Set to variable to boolean
+        set createReadOnlyDMG to createReadOnlyDMG as boolean
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_( createReadOnlyDMG, "createReadOnlyDMG")
+        
+    end createReadOnlyDMGSelected_
 
 ----- BUILD PRE-CHECK -----
 
@@ -1863,10 +1927,16 @@ script AutoCasperNBIAppDelegate
         
         on error
         
+            --Log Action
+            set logMe to "Error: Calculating space needed"
+            
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Calculating space needed" with icon 0 buttons {"OK"}
         
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
         
         end try
@@ -1940,7 +2010,7 @@ script AutoCasperNBIAppDelegate
                         -- Log To file
                         logToFile_(me)
                         
-                        -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                        -- Detach mounted volumes
                         tidyUpTimeKids_(me)
                     
                     else
@@ -1976,30 +2046,30 @@ script AutoCasperNBIAppDelegate
 
     -- Create the .nbi folder
     on netBootLocationCreate_(sender)
-        
-        -- Set build Process ProgressBar to indeterminate & animated to false
-        set my buildProccessProgressBarIndeterminate to false
-        set my buildProccessProgressBarAniminate to false
-        
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Creating .nbi folder"
-        
-        delay 0.1
-        
-        -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 10
-        
-        -- Set to path of NetBoot directory
-        set netBootDirectory to netBootSelectedLocation & netBootNameTextField & ".nbi"
-        
-        --Log action
-        set logMe to "Trying to create .nbi folder " & netBootDirectory
-        
-        -- Log To file
-        logToFile_(me)
-
 
         try
+            
+            -- Set build Process ProgressBar to indeterminate & animated to false
+            set my buildProccessProgressBarIndeterminate to false
+            set my buildProccessProgressBarAniminate to false
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Creating .nbi folder"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 10
+            
+            -- Set to path of NetBoot directory
+            set netBootDirectory to netBootSelectedLocation & netBootNameTextField & ".nbi"
+            
+            --Log action
+            set logMe to "Trying to create .nbi folder " & netBootDirectory
+            
+            -- Log To file
+            logToFile_(me)
+            
             -- Create .nbi folder
             do shell script "mkdir " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
             
@@ -2057,25 +2127,25 @@ script AutoCasperNBIAppDelegate
 
     -- Create the NetBoot.dmg
     on createNetbootDmg_(sender)
-        
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Creating NetBoot.dmg"
-        
-        delay 0.1
-        
-        -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 20
-        
-        --Log action
-        set logMe to "Trying to create NetBoot.dmg in " & netBootDirectory
-        
-        -- Log To file
-        logToFile_(me)
-        
-        -- Set to text value, to avoid an issue when name changed
-        set netBootNameTextField to netBootNameTextField as text
                 
         try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Creating NetBoot.dmg"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 20
+            
+            --Log action
+            set logMe to "Trying to create NetBoot.dmg in " & netBootDirectory
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set to text value, to avoid an issue when name changed
+            set netBootNameTextField to netBootNameTextField as text
             
             -- Create a the NetBoot.dmg
             do shell script "hdiutil create " & quoted form of netBootDirectory & "/NetBoot -size " & netBootDmgRequiredSize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
@@ -2091,10 +2161,16 @@ script AutoCasperNBIAppDelegate
             
         on error
         
+            --Log Action
+            set logMe to "Error: Failed to create NetBoot.dmg"
+            
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Failed to create NetBoot.dmg" with icon 0 buttons {"OK"}
         
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
 
         end try
@@ -2133,11 +2209,17 @@ script AutoCasperNBIAppDelegate
             copyOSDmgToNetBootDmg_(me)
 
         on error
+        
+            --Log Action
+            set logMe to "Error: Cannot mount NetBoot.dmg"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Cannot mount NetBoot.dmg" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -2147,25 +2229,25 @@ script AutoCasperNBIAppDelegate
     -- Copy OS.dmg's content to NetBoot.dmg
     on copyOSDmgToNetBootDmg_(sender)
         
-        -- Set build Process ProgressBar to indeterminate & animated to false
-        set my buildProccessProgressBarIndeterminate to false
-        set my buildProccessProgressBarAniminate to false
-        
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Copying the contents of the OS.dmg to NetBoot.dmg"
-        
-        delay 0.1
-        
-        -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 40
-        
-        --Log action
-        set logMe to "Copying contents of " & quoted form of selectedOSdmgMountPath & " to " & quoted form of netBootDirectory & "/NetBoot.dmg"
-        
-        -- Log To file
-        logToFile_(me)
-        
         try
+            
+            -- Set build Process ProgressBar to indeterminate & animated to false
+            set my buildProccessProgressBarIndeterminate to false
+            set my buildProccessProgressBarAniminate to false
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Copying the contents of the OS.dmg to NetBoot.dmg"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 40
+            
+            --Log action
+            set logMe to "Copying contents of " & quoted form of selectedOSdmgMountPath & " to " & quoted form of netBootDirectory & "/NetBoot.dmg"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Copy contents of the SelectedOSdmg to NetBootdmg
             do shell script "ditto " & quoted form of selectedOSdmgMountPath & " " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
@@ -2180,11 +2262,17 @@ script AutoCasperNBIAppDelegate
             reduceNetBootImage_(me)
                     
         on error
-                    
+        
+            --Log Action
+            set logMe to "Error: Cannot copy contents of " & selectedOSdmgMountPath & " to " & quoted form of netBootDmgMountPath
+            
+            -- Log To file
+            logToFile_(me)
+
             -- Display error to user
             display dialog "Error: Cannot copy contents of " & selectedOSdmgMountPath & " to " & quoted form of netBootDmgMountPath with icon 0 buttons {"OK"}
                 
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
                     
         end try
@@ -2685,10 +2773,16 @@ script AutoCasperNBIAppDelegate
         
         on error
         
+            --Log Action
+            set logMe to "Error: Deleting files"
+            
+            -- Log To file
+            logToFile_(me)
+            
             -- Display error to user
             display dialog "Error: Deleting files" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -2797,11 +2891,17 @@ script AutoCasperNBIAppDelegate
             emptyPrivateVarTmp_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Emptying /private/tmp"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Emptying /private/tmp" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -2840,11 +2940,17 @@ script AutoCasperNBIAppDelegate
             emptyVolumesFolder_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Emptying /private/var/tmp/"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
-            display dialog "Error: Emptying /private/var/tmp" with icon 0 buttons {"OK"}
+            display dialog "Error: Emptying /private/var/tmp/" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -2883,11 +2989,17 @@ script AutoCasperNBIAppDelegate
             emptyDevFolder_(me)
             
         on error
-            
+
+            --Log Action
+            set logMe to "Error: Emptying /Volumes/"
+
+            -- Log To file
+            logToFile_(me)
+
             -- Display error to user
             display dialog "Error: Emptying /Volumes/" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -2926,11 +3038,17 @@ script AutoCasperNBIAppDelegate
             emptyVarRunFolder_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Emptying /dev/"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Emptying /dev/" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -2969,11 +3087,17 @@ script AutoCasperNBIAppDelegate
             disableSoftwareUpdate_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Emptying /var/run/"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Emptying /var/run/" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -3027,11 +3151,17 @@ script AutoCasperNBIAppDelegate
             deleteSystemConfigurationPlists_(me)
     
         on error
+        
+            --Log Action
+            set logMe to "Error: Disabling Software Update"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Display error to user
             display dialog "Error: Disabling Software Update" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -3123,24 +3253,6 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Correct ownership
-            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/var/db/.AppleSetupDone" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/var/db/.AppleSetupDone"
-            
-            -- Log To file
-            --logToFile_(me)
-            
-            -- Correct permissions
-            --do shell script "chmod 644 " & quoted form of netBootDmgMountPath & "/var/db/.AppleSetupDone" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            --set logMe to "Set permissions to 644 on " & netBootDmgMountPath & "/var/db/.AppleSetupDone"
-            
-            -- Log To file
-            --logToFile_(me)
-            
             ---- .SetupRegComplete ----
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Bypassing Registration"
@@ -3159,15 +3271,6 @@ script AutoCasperNBIAppDelegate
             
             -- Log To file
             logToFile_(me)
-            
-            -- Correct ownership
-            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete"
-            
-            -- Log To file
-            --logToFile_(me)
             
             ---- com.apple.SetupAssistant----
             -- Update Build Process Window's Text Field
@@ -3192,25 +3295,7 @@ script AutoCasperNBIAppDelegate
             
             -- Log To file
             logToFile_(me)
-            
-            -- Correct ownership
-            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
-            
-            -- Log To file
-            --logToFile_(me)
-            
-            -- Correct permissions
-            --do shell script "chmod 700 " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist" user name adminUserName password adminUsersPassword with administrator privileges
-           
-            --Log Action
-            --set logMe to "Set permissions to 700 on " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
-            
-            -- Log To file
-            --logToFile_(me)
-            
+
             --Log Action
             set logMe to "Deleting " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
             
@@ -3230,11 +3315,17 @@ script AutoCasperNBIAppDelegate
             disableTimeMachinePrompt_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Bypassing Setup Assistants"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Bypassing Setup Assistants" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -3265,33 +3356,21 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Correct ownership
-            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-           -- set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
-            
-            -- Log To file
-            --logToFile_(me)
-            
-            -- Correct permissions
-            --do shell script "chmod 755 " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            --set logMe to "Set permissions to 755 on " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
-            
-            -- Log To file
-           -- logToFile_(me)
-            
             -- Delete the file delete /Library/Preferences/com.apple.dockfixup.plist
             deleteDockFixUp_(me)
             
         on error
-            
+
+            --Log Action
+            set logMe to "Error: Writing to /Library/Preferences/com.apple.TimeMachine.plist"
+
+            -- Log To file
+            logToFile_(me)
+
             -- Display error to user
             display dialog "Error: Writing to /Library/Preferences/com.apple.TimeMachine.plist" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -3331,10 +3410,16 @@ script AutoCasperNBIAppDelegate
             
         on error
             
+            --Log Action
+            set logMe to "Error: Deleting /Library/Preferences/com.apple.dockfixup.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
             -- Display error to user
             display dialog "Error: Deleting /Library/Preferences/com.apple.dockfixup.plist" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -3369,33 +3454,21 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Correct ownership
-            --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist"
-            
-            -- Log To file
-            --logToFile_(me)
-            
-            -- Correct permissions
-            --do shell script "chmod 644 " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            --set logMe to "Set permissions to 644 on " &  quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist"
-            
-            -- Log To file
-            --logToFile_(me)
-            
             -- Create the ARD user
             createARDUser_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Copying com.apple.PowerManagement.plist"
+            
+            -- Log To file
+            logToFile_(me)
             
             -- Display error to user
             display dialog "Error: Copying com.apple.PowerManagement.plist" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -3419,7 +3492,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProccessProgressBar to 175
                 
                 -- JSS Plist location on mounted volume
-                set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/ScreenSharing/ARDUser.plist"
+                set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Settings/ARDUser.plist"
                 
                 -- Encode ardUsername
                 set ardUsernameEncoded to do shell script "echo " & ardUsername & " | openssl base64 "
@@ -3456,34 +3529,22 @@ script AutoCasperNBIAppDelegate
                 
                 -- Log To file
                 logToFile_(me)
-                
-                -- Correct ownership
-                --do shell script "chown -R root:wheel " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
-                
-                --Log Action
-                --set logMe to "Set ownership to root:wheel on " & quoted form of variableVariable
-                
-                -- Log To file
-                --logToFile_(me)
-                
-                -- Correct permissions
-                --do shell script "chmod -R 755 " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
-                
-                --Log Action
-                --set logMe to "Set permissions to 755 on " & quoted form of variableVariable
-                
-                -- Log To file
-                --logToFile_(me)
-                
+
                 -- Writes vncPassword to com.apple.VNCSettings.txt
                 enableVNC_(me)
                 
             on error
+            
+                --Log Action
+                set logMe to "Error: Creating ARD User"
                 
+                -- Log To file
+                logToFile_(me)
+            
                 -- Display error to user
                 display dialog "Error: Creating ARD User" with icon 0 buttons {"OK"}
                 
-                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                -- Detach mounted volumes
                 tidyUpTimeKids_(me)
                 
             end try
@@ -3539,33 +3600,21 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
                 
-                -- Correct Ownership
-                --do shell script "chown root:wheel " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
-                
-                --Log Action
-                --set logMe to "Set ownership to root:wheel on " & variableVariable
-                
-                -- Log To file
-                --logToFile_(me)
-                
-                -- Correct Permissions
-                --do shell script "chmod 400 " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
-                
-                --Log Action
-                --set logMe to "Set permissions to 400 on " & variableVariable
-                
-                -- Log To file
-                --logToFile_(me)
-                
-                -- Install AutoCasperNBIStartup.pkg
-                installAutoCasperNBIStartup_(me)
+                -- Set Time Server & Zone if enabled
+                setTimeServerAndZone_(me)
                 
             on error
+            
+                --Log Action
+                set logMe to "Error: Wrting VNC Settings"
                 
+                -- Log To file
+                logToFile_(me)
+            
                 -- Display error to user
                 display dialog "Error: Wrting VNC Settings" with icon 0 buttons {"OK"}
                 
-                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                -- Detach mounted volumes
                 tidyUpTimeKids_(me)
                 
             end try
@@ -3579,16 +3628,81 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Install AutoCasperNBIStartup.pkg
-            installAutoCasperNBIStartup_(me)
+            -- Set Time Server & Zone if enabled
+            setTimeServerAndZone_(me)
             
         end if
         
     end enableVNC_
 
+    -- Set Time Server & Zone if enabled
+    on setTimeServerAndZone_(sender)
+        
+        -- If VNC option has been enabled
+        if timeServerOptionsEnabled is equal to true then
+        
+            try
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Writing Time Server & Zone Settings"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 185
+                
+                -- JSS Plist location on mounted volume
+                set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Settings/TimeSettings.plist"
+                
+                -- Write Time Server to plist
+                do shell script "defaults write " & quoted form of variableVariable & " timeServer "  & timeServerSelected  user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Written Time Server " & timeServerSelected & " to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Write encoded Time Zone to plist
+                do shell script "defaults write " & quoted form of variableVariable & " timeZone "  & timeZoneSelected  user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Written Time Zone " & timeZoneSelected & " to " & variableVariable
+                
+                -- Log To file
+                logToFile_(me)
+
+                -- Install AutoCasperNBIStartup.pkg
+                installAutoCasperNBIStartup_(me)
+
+            on error
+            
+                --Log Action
+                set logMe to "Error: Writing Time Server & Zone Settings"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Display error to user
+                display dialog "Error: Writing Time Server & Zone Settings" with icon 0 buttons {"OK"}
+                
+                -- Detach mounted volumes
+                tidyUpTimeKids_(me)
+            
+            end try
+        
+        else
+        
+            -- Install AutoCasperNBIStartup.pkg
+            installAutoCasperNBIStartup_(me)
+        
+        end if
+        
+    end setTimeServerAndZone_
+
     -- Install AutoCasperNBIStartup.pkg
     on installAutoCasperNBIStartup_(sender)
-        
+    
         try
             
             -- Update Build Process Window's Text Field
@@ -3618,11 +3732,17 @@ script AutoCasperNBIAppDelegate
             installRootUserpkg_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Installing AutoCasperNBI LaunchDaemon & required files"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Installing AutoCasperNBI LaunchDaemon & required files" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -3661,11 +3781,17 @@ script AutoCasperNBIAppDelegate
             installRCNetboot_(me)
             
         on error
-            
+
+            --Log Action
+            set logMe to "Error: Installing Root User"
+
+            -- Log To file
+            logToFile_(me)
+
             -- Display error to user
             display dialog "Error: Installing Root User" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -3704,11 +3830,17 @@ script AutoCasperNBIAppDelegate
                 copyDesktopImage_(me)
                 
             on error
+            
+                --Log Action
+                set logMe to "Error: Installing modified rc.netboot file"
                 
+                -- Log To file
+                logToFile_(me)
+            
                 -- Display error to user
                 display dialog "Error: Installing modified rc.netboot file" with icon 0 buttons {"OK"}
                 
-                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                -- Detach mounted volumes
                 tidyUpTimeKids_(me)
                 
             end try
@@ -3771,34 +3903,22 @@ script AutoCasperNBIAppDelegate
                 
                 -- Log To file
                 logToFile_(me)
-
-                -- Correct ownership
-                --do shell script "chown root:wheel " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
-
-                --Log Action
-                --set logMe to "Set ownership to root:wheel on " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                
-                -- Log To file
-                --logToFile_(me)
-                
-                -- Correct permissions
-                --do shell script "chmod 755 " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
-
-                --Log Action
-                --set logMe to "Set permissions to 755 on " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                
-                -- Log To file
-                --logToFile_(me)
                 
                 -- Copy Casper Imaging.app selected earlier
                 copyCasperImagingApp_(me)
                 
             on error
+            
+                --Log Action
+                set logMe to "Error: Copying Desktop Image"
                 
+                -- Log To file
+                logToFile_(me)
+            
                 -- Display error to user
                 display dialog "Error: Copying Desktop Image" with icon 0 buttons {"OK"}
                 
-                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                -- Detach mounted volumes
                 tidyUpTimeKids_(me)
                 
             end try
@@ -3853,24 +3973,6 @@ script AutoCasperNBIAppDelegate
             
             -- Log To file
             logToFile_(me)
-        
-            -- Correct ownership on copied Casper Imaging.app
-            --do shell script "chown -R root:wheel " & quoted form of copiedAppPath user name adminUserName password adminUsersPassword with administrator privileges
-   
-            --Log Action
-            --set logMe to "Set ownership to root:wheel on " & copiedAppPath
-            
-            -- Log To file
-            --logToFile_(me)
-            
-            -- Correct permissions on copied Casper Imaging.app
-            --do shell script "chmod -R 755 " & quoted form of copiedAppPath user name adminUserName password adminUsersPassword with administrator privileges
-
-            --Log Action
-            --set logMe to "Set permissions to 755 on " & copiedAppPath
-            
-            -- Log To file
-            --logToFile_(me)
             
             -- Try as errors if not found (i think)
             try
@@ -3891,10 +3993,16 @@ script AutoCasperNBIAppDelegate
             
         on error
         
+            --Log Action
+            set logMe to "Error: There was an issue copying  " & selectedAppPath & " to " & variableVariable
+            
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: There was an issue copying  " & selectedAppPath & " to " & variableVariable  with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -3939,34 +4047,22 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
             
             end if
-
-            -- Correct ownership
-            --do shell script "chown root:wheel " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
-
-            --Log Action
-            --set logMe to "Set ownership to root:wheel on " & variableVariable
-            
-            -- Log To file
-            --logToFile_(me)
-
-            -- Correct permissions
-            --do shell script "chmod 700 " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
-
-            --Log Action
-            --set logMe to "Set permissions to 700 on " & variableVariable
-            
-            -- Log To file
-            --logToFile_(me)
             
             -- Install CasperImagingLaunchAgent.pkg
             installCasperImagingLaunchAgent_(me)
                 
         on error
             
+            --Log Action
+            set logMe to "Error: Installing the Casper Imaging plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
             -- Display error to user
             display dialog "Error: Installing the Casper Imaging plist" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -4005,11 +4101,17 @@ script AutoCasperNBIAppDelegate
             importJSSCACert_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Installing Casper Imaging LaunchAgent"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Installing Casper Imaging LaunchAgent" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -4055,10 +4157,16 @@ script AutoCasperNBIAppDelegate
                 
             on error
             
+                --Log Action
+                set logMe to "Error: Importing JSS CA Cert"
+                
+                -- Log To file
+                logToFile_(me)
+            
                 -- Display error to user
                 display dialog "Error: Importing JSS CA Cert" with icon 0 buttons {"OK"}
                 
-                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                -- Detach mounted volumes
                 tidyUpTimeKids_(me)
                 
             end try
@@ -4103,11 +4211,17 @@ script AutoCasperNBIAppDelegate
             manualKernelCacheReductionCheck_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Creating dyld shared cache files"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Creating dyld shared cache files" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -4213,11 +4327,17 @@ script AutoCasperNBIAppDelegate
             generateKernelCache_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Deleting extensions"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Deleting extensions" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -4309,11 +4429,17 @@ script AutoCasperNBIAppDelegate
             copyBootEfi_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Generating kernel cache"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Generating kernel cache" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -4323,15 +4449,15 @@ script AutoCasperNBIAppDelegate
     -- Copy the boot.efi to the booter shell
     on copyBootEfi_(sender)
         
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Copying boot.efi"
-        
-        delay 0.1
-        
-        -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 300
-        
         try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Copying boot.efi"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 300
             
             --Log Action
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
@@ -4369,24 +4495,21 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Correct permissions
-            do shell script "chmod -R 775 " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            set logMe to "Set permissions to 775 on " & netBootDirectory & "/i386/booter"
-            
-            -- Log To file
-            logToFile_(me)
-            
             -- Copy PlatformSupport.plist
             copyPlatformSupportPlist_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Copying booter.efi"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Copying booter.efi" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -4396,15 +4519,15 @@ script AutoCasperNBIAppDelegate
     -- Copy PlatformSupport.plist
     on copyPlatformSupportPlist_(sender)
         
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Copying PlaformSupport.plist"
-        
-        delay 0.1
-        
-        -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 310
-        
         try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Copying PlaformSupport.plist"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 310
             
             --Log Action
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
@@ -4425,11 +4548,17 @@ script AutoCasperNBIAppDelegate
             copyNBImageInfoPlist_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Copying PlatformSupport.plist"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Copying PlatformSupport.plist" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -4468,11 +4597,17 @@ script AutoCasperNBIAppDelegate
             updateNBImageInfoPlist_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Copying NBImageInfo.plist"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
-            display dialog "Error: Copying  NBImageInfo.plist" with icon 0 buttons {"OK"}
+            display dialog "Error: Copying NBImageInfo.plist" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -4597,7 +4732,6 @@ script AutoCasperNBIAppDelegate
                 --Log Action
                 set logMe to "Trying to set .nbi Name to " & netBootNameTextField
 
-                
                 -- Log To file
                 logToFile_(me)
                 
@@ -4705,7 +4839,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
-                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist osVersion -string 10.9" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist osVersion -string 10." & selectedOSdmgVersionMajor user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Set .nbi to osVersion"
@@ -4721,7 +4855,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Set to boolean of value
-                set netBootServeOverNFSd to netBootServeOverNFS as boolean
+                set netBootServeOverNFS to netBootServeOverNFS as boolean
                 
                 -- If NetBoot Serve Over NFS to true
                 if netBootServeOverNFS is true
@@ -4850,10 +4984,16 @@ script AutoCasperNBIAppDelegate
 
         on error
             
+            --Log Action
+            set logMe to "Error: Writing NBImageInfo.plist"
+            
+            -- Log To file
+            logToFile_(me)
+            
             -- Display error to user
             display dialog "Error: Writing NBImageInfo.plist" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -4893,10 +5033,16 @@ script AutoCasperNBIAppDelegate
             
         on error
         
+            --Log Action
+            set logMe to "Error: Disabling Spolight Indexing"
+            
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Disabling Spolight Indexing" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
         
         end try
@@ -4983,20 +5129,23 @@ script AutoCasperNBIAppDelegate
             
             else
             
-                -- Set netBootCreationSuccessful value, for notifying later
-                set my netBootCreationSuccessful to true
-                
-                -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-                tidyUpTimeKids_(me)
+                -- Create Read Only DMG
+                createReadOnlyDMG_(me)
             
             end if
             
         on error
             
+            --Log Action
+            set logMe to "Error: Calculating space needed"
+            
+            -- Log To file
+            logToFile_(me)
+            
             -- Display error to user
             display dialog "Error: Calculating space needed" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -5038,11 +5187,17 @@ script AutoCasperNBIAppDelegate
             mountReducedNetBootDmg_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Failed to create NetBoot.reduced.dmg"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Failed to create NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -5081,11 +5236,17 @@ script AutoCasperNBIAppDelegate
             copyNetBootDmgToNetBootReducedDmg_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Cannot mount NetBoot.reduced.dmg"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Cannot mount NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -5123,11 +5284,17 @@ script AutoCasperNBIAppDelegate
             postReduceupdateNBImageInfoPlist_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Cannot copy contents of " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Cannot copy contents of " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -5197,15 +5364,6 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Correct permissions
-            do shell script "chmod -R 755 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            set logMe to "Set permissions to 755 on " & netBootDirectory & "/NBImageInfo.plist"
-            
-            -- Log To file
-            logToFile_(me)
-            
             ---- Revert NBImageInfo.plist permissionchanges ----
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Changing permissions on NBImageInfo.plist"
@@ -5234,11 +5392,17 @@ script AutoCasperNBIAppDelegate
             deleteNetBootDmg_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Updating RootPath in NBImageInfo.plist"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
             display dialog "Error: Updating RootPath in NBImageInfo.plist" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -5299,11 +5463,17 @@ script AutoCasperNBIAppDelegate
             expandNetBootDMG_(me)
             
         on error
+        
+            --Log Action
+            set logMe to "Error: Failed to delete NetBoot.dmg"
             
+            -- Log To file
+            logToFile_(me)
+        
             -- Display error to user
-            display dialog "Error: Failed to create NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
+            display dialog "Error: Failed to delete NetBoot.dmg" with icon 0 buttons {"OK"}
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
             
         end try
@@ -5366,15 +5536,21 @@ script AutoCasperNBIAppDelegate
                     -- Set netBootCreationSuccessful value, for notifying later
                     set my netBootCreationSuccessful to true
                     
-                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                    -- Detach mounted volumes
                     tidyUpTimeKids_(me)
                 
                 on error
                 
+                    --Log Action
+                    set logMe to "Error: Expanding NetBoot.reduced.dmg"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                
                     -- Display error to user
                     display dialog "Error: Expanding NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
                     
-                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                    -- Detach mounted volumes
                     tidyUpTimeKids_(me)
                 
                 end try
@@ -5425,18 +5601,21 @@ script AutoCasperNBIAppDelegate
                     -- Expand NetBoot.dmg by the value given before
                     do shell script "hdiutil resize -size " & netBootExpandedTotalSize & "g " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                     
-                    -- Set netBootCreationSuccessful value, for notifying later
-                    set my netBootCreationSuccessful to true
-                    
-                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
-                    tidyUpTimeKids_(me)
+                    -- Create Read Only DMG
+                    createReadOnlyDMG_(me)
                     
                 on error
+                
+                    --Log Action
+                    set logMe to "Error: Expanding NetBoot.dmg"
+                    
+                    -- Log To file
+                    logToFile_(me)
                     
                     -- Display error to user
                     display dialog "Error: Expanding NetBoot.dmg" with icon 0 buttons {"OK"}
                     
-                    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+                    -- Detach mounted volumes
                     tidyUpTimeKids_(me)
                     
                 end try
@@ -5445,17 +5624,152 @@ script AutoCasperNBIAppDelegate
         
         else
         
+            -- Create Read Only DMG
+            createReadOnlyDMG_(me)
+
+        end if
+
+    end expandNetBootDMG_
+
+    -- Create Read Only DMG
+    on createReadOnlyDMG_(sender)
+        
+        -- If we're creating a Read-Only DMG
+        if createReadOnlyDMG is true
+        
+            try
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Creating Read-Only DMG"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 440
+                
+                -- If we resized the NetBoot Image
+                if netBootImageReduceEnabled is true then
+                    
+                    ---- Unmount NetBoot.reduced.dmg ----
+                    try
+                        
+                        --Log Action
+                        set logMe to "Trying to detach " & netBootReducedDmgMountPath
+                        
+                        -- Log To file
+                        logToFile_(me)
+                        
+                        -- Detach Volume
+                        do shell script "hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
+                        
+                    end try
+                    
+                    --Log Action
+                    set logMe to "Trying create Read-Only DMG of " & netBootDirectory & "/NetBoot.reduced.dmg"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                    -- Make a Read-Only copy of NetBoot.reduced.dmg
+                    do shell script "hdiutil convert -format UDZO -o " & quoted form of netBootDirectory & "/NetBoot.readonly.dmg " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                    
+                    --Log Action
+                    set logMe to "Created " & netBootDirectory & "/NetBoot.readonly.dmg"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                else
+                
+                ---- Unmount NetBoot.dmg ----
+                try
+                    
+                    --Log Action
+                    set logMe to "Trying to detach " & netBootDmgMountPath
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                    -- Detach Volume
+                    do shell script "hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+                    
+                end try
+                
+                    --Log Action
+                    set logMe to "Trying create Read-Only DMG of " & netBootDirectory & "/NetBoot.dmg"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                
+                    -- Make a Read-Only copy of NetBoot.dmg
+                    do shell script "hdiutil convert -format UDZO -o " & quoted form of netBootDirectory & "/NetBoot.readonly.dmg " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                    
+                    --Log Action
+                    set logMe to "Created " & netBootDirectory & "/NetBoot.readonly.dmg"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                
+                end if
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Scanning Read-Only DMG"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 445
+                
+                --Log Action
+                set logMe to "ASR scanning " & netBootDirectory & "/NetBoot.readonly.dmg"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- ASR scan NetBoot.readonly.dmg
+                do shell script "asr -imagescan " & quoted form of netBootDirectory & "/NetBoot.readonly.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "ASR scanned " & netBootDirectory & "/NetBoot.readonly.dmg"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set netBootCreationSuccessful value, for notifying later
+                set my netBootCreationSuccessful to true
+                
+                -- Detach mounted volumes
+                tidyUpTimeKids_(me)
+                
+            on error
+            
+                --Log Action
+                set logMe to "Error: Creating Read-Only DMG"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Display error to user
+                display dialog "Error: Creating Read-Only DMG" with icon 0 buttons {"OK"}
+                
+                -- Detach mounted volumes
+                tidyUpTimeKids_(me)
+            
+            end try
+        
+        else
+        
             -- Set netBootCreationSuccessful value, for notifying later
             set my netBootCreationSuccessful to true
             
-            -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+            -- Detach mounted volumes
             tidyUpTimeKids_(me)
-
-        end if
             
-    end expandNetBootDMG_
+        end if
+        
+    end createReadOnlyDMG_
 
-    -- Detach mounted volumes & empty /private/tmp/AutoCasperNBI/
+    -- Detach mounted volumes
     on tidyUpTimeKids_(sender)
         
         -- close build process window
@@ -5471,13 +5785,12 @@ script AutoCasperNBIAppDelegate
         set my buildProccessProgressBar to 0
         
         -- High fives all round!
-        weDitIt_(me)
+        weDidIt_(me)
             
     end tidyUpTimeKids_
 
-
     -- High fives all round!
-    on weDitIt_(sender)
+    on weDidIt_(sender)
         
         -- If we were successful
         if netBootCreationSuccessful is true
@@ -5496,7 +5809,7 @@ script AutoCasperNBIAppDelegate
         
         end if
         
-    end weDitIt_
+    end weDidIt_
 	
     -- Insert code here to do any housekeeping before your application quits
 	on applicationShouldTerminate_(sender)

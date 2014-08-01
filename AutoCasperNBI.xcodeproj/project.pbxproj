@@ -26,9 +26,9 @@
 		7C39447E1960C57D00BF371B /* Package.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447D1960C57D00BF371B /* Package.icns */; };
 		7C3944801960C7DA00BF371B /* CertStackLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */; };
 		7C47FE0C196C8B1D00E1DAD9 /* rc.netboot.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C47FE0B196C8B1D00E1DAD9 /* rc.netboot.pkg */; };
-		7C50193619742343004F395E /* AutoCasperNBIStartup.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C50193519742343004F395E /* AutoCasperNBIStartup.pkg */; };
 		7C6D0A011969F27F006D7759 /* CasperImagingLaunchAgent.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C6D0A001969F27F006D7759 /* CasperImagingLaunchAgent.pkg */; };
 		7C801962196EA9AE0079952B /* AutoCasperNBI.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C801961196EA9AE0079952B /* AutoCasperNBI.png */; };
+		7C878911198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C878910198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg */; };
 		7CBBEC33197CFEB000250F49 /* com.apple.PowerManagement.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */; };
 		7CBE0400194F14020068CA84 /* Error.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CBE03FC194F14020068CA84 /* Error.png */; };
 		7CBE0401194F14020068CA84 /* Major Warning.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CBE03FD194F14020068CA84 /* Major Warning.png */; };
@@ -36,6 +36,7 @@
 		7CBE0403194F14020068CA84 /* Warning.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CBE03FF194F14020068CA84 /* Warning.png */; };
 		7CC636E6197D444E008473CE /* NBImageInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CC636E5197D444E008473CE /* NBImageInfo.plist */; };
 		7CDC96EE196AEDBA00C359A1 /* RootUser.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7CDC96ED196AEDBA00C359A1 /* RootUser.pkg */; };
+		7CDCE26C1985A2B8005CE10C /* Clock.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CDCE26B1985A2B8005CE10C /* Clock.png */; };
 		7CEDD051195B8243009DA982 /* Installer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CEDD050195B8243009DA982 /* Installer.icns */; };
 /* End PBXBuildFile section */
 
@@ -65,9 +66,9 @@
 		7C39447D1960C57D00BF371B /* Package.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Package.icns; sourceTree = "<group>"; };
 		7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CertStackLarge@2x.png"; sourceTree = "<group>"; };
 		7C47FE0B196C8B1D00E1DAD9 /* rc.netboot.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = rc.netboot.pkg; sourceTree = "<group>"; };
-		7C50193519742343004F395E /* AutoCasperNBIStartup.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = AutoCasperNBIStartup.pkg; sourceTree = "<group>"; };
 		7C6D0A001969F27F006D7759 /* CasperImagingLaunchAgent.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = CasperImagingLaunchAgent.pkg; sourceTree = "<group>"; };
 		7C801961196EA9AE0079952B /* AutoCasperNBI.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AutoCasperNBI.png; sourceTree = "<group>"; };
+		7C878910198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = AutoCasperNBIStartup.pkg; sourceTree = "<group>"; };
 		7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.apple.PowerManagement.plist; sourceTree = "<group>"; };
 		7CBE03FC194F14020068CA84 /* Error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Error.png; sourceTree = "<group>"; };
 		7CBE03FD194F14020068CA84 /* Major Warning.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Major Warning.png"; sourceTree = "<group>"; };
@@ -75,6 +76,7 @@
 		7CBE03FF194F14020068CA84 /* Warning.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Warning.png; sourceTree = "<group>"; };
 		7CC636E5197D444E008473CE /* NBImageInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NBImageInfo.plist; sourceTree = "<group>"; };
 		7CDC96ED196AEDBA00C359A1 /* RootUser.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = RootUser.pkg; sourceTree = "<group>"; };
+		7CDCE26B1985A2B8005CE10C /* Clock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Clock.png; sourceTree = "<group>"; };
 		7CEDD050195B8243009DA982 /* Installer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Installer.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -131,8 +133,8 @@
 		7C130586193FC0B60060F343 /* AutoCasperNBI */ = {
 			isa = PBXGroup;
 			children = (
+				7C878910198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg */,
 				7CC636E5197D444E008473CE /* NBImageInfo.plist */,
-				7C50193519742343004F395E /* AutoCasperNBIStartup.pkg */,
 				7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */,
 				7CDC96ED196AEDBA00C359A1 /* RootUser.pkg */,
 				7C47FE0B196C8B1D00E1DAD9 /* rc.netboot.pkg */,
@@ -161,6 +163,7 @@
 		7C1305A0193FC0F70060F343 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				7CDCE26B1985A2B8005CE10C /* Clock.png */,
 				7C197009198058F00092062D /* Scripts.icns */,
 				7C801961196EA9AE0079952B /* AutoCasperNBI.png */,
 				7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */,
@@ -234,7 +237,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7CBBEC33197CFEB000250F49 /* com.apple.PowerManagement.plist in Resources */,
-				7C50193619742343004F395E /* AutoCasperNBIStartup.pkg in Resources */,
 				7C1305AB193FC10A0060F343 /* NetBootVolume.icns in Resources */,
 				7C1305AC193FC10A0060F343 /* osx-jss-login.png in Resources */,
 				7CBE0401194F14020068CA84 /* Major Warning.png in Resources */,
@@ -249,11 +251,13 @@
 				7CC636E6197D444E008473CE /* NBImageInfo.plist in Resources */,
 				7CBE0400194F14020068CA84 /* Error.png in Resources */,
 				7C6D0A011969F27F006D7759 /* CasperImagingLaunchAgent.pkg in Resources */,
+				7CDCE26C1985A2B8005CE10C /* Clock.png in Resources */,
 				7C13059F193FC0CE0060F343 /* MainMenu.xib in Resources */,
 				7C130598193FC0B60060F343 /* Images.xcassets in Resources */,
 				7C1305AA193FC10A0060F343 /* DMGFormat.icns in Resources */,
 				7CBE0403194F14020068CA84 /* Warning.png in Resources */,
 				7C1305A8193FC10A0060F343 /* Casper Imaging.tiff in Resources */,
+				7C878911198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg in Resources */,
 				7C130591193FC0B60060F343 /* Credits.rtf in Resources */,
 				7CDC96EE196AEDBA00C359A1 /* RootUser.pkg in Resources */,
 				7C801962196EA9AE0079952B /* AutoCasperNBI.png in Resources */,
