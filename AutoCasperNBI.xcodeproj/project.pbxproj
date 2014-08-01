@@ -23,6 +23,8 @@
 		7C1305AE193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C1305A7193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns */; };
 		7C19700A198058F00092062D /* Scripts.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C197009198058F00092062D /* Scripts.icns */; };
 		7C23C474195A3AEB00FAC70A /* Screensharing.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C23C473195A3AEB00FAC70A /* Screensharing.icns */; };
+		7C27FA26198C357900BD5A07 /* AlertStopIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C27FA25198C357900BD5A07 /* AlertStopIcon.icns */; };
+		7C27FA28198C3D9500BD5A07 /* complete.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7C27FA27198C3D9500BD5A07 /* complete.aif */; };
 		7C39447E1960C57D00BF371B /* Package.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447D1960C57D00BF371B /* Package.icns */; };
 		7C3944801960C7DA00BF371B /* CertStackLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */; };
 		7C47FE0C196C8B1D00E1DAD9 /* rc.netboot.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C47FE0B196C8B1D00E1DAD9 /* rc.netboot.pkg */; };
@@ -63,6 +65,8 @@
 		7C1305A7193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ToolbarDesktopFolderIcon.icns; sourceTree = "<group>"; };
 		7C197009198058F00092062D /* Scripts.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Scripts.icns; sourceTree = "<group>"; };
 		7C23C473195A3AEB00FAC70A /* Screensharing.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Screensharing.icns; sourceTree = "<group>"; };
+		7C27FA25198C357900BD5A07 /* AlertStopIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AlertStopIcon.icns; sourceTree = "<group>"; };
+		7C27FA27198C3D9500BD5A07 /* complete.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = complete.aif; sourceTree = "<group>"; };
 		7C39447D1960C57D00BF371B /* Package.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Package.icns; sourceTree = "<group>"; };
 		7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CertStackLarge@2x.png"; sourceTree = "<group>"; };
 		7C47FE0B196C8B1D00E1DAD9 /* rc.netboot.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = rc.netboot.pkg; sourceTree = "<group>"; };
@@ -150,6 +154,7 @@
 		7C130587193FC0B60060F343 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				7C27FA27198C3D9500BD5A07 /* complete.aif */,
 				7C1305A0193FC0F70060F343 /* Images */,
 				7C130588193FC0B60060F343 /* AutoCasperNBI-Info.plist */,
 				7C130589193FC0B60060F343 /* InfoPlist.strings */,
@@ -163,6 +168,7 @@
 		7C1305A0193FC0F70060F343 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				7C27FA25198C357900BD5A07 /* AlertStopIcon.icns */,
 				7CDCE26B1985A2B8005CE10C /* Clock.png */,
 				7C197009198058F00092062D /* Scripts.icns */,
 				7C801961196EA9AE0079952B /* AutoCasperNBI.png */,
@@ -240,11 +246,13 @@
 				7C1305AB193FC10A0060F343 /* NetBootVolume.icns in Resources */,
 				7C1305AC193FC10A0060F343 /* osx-jss-login.png in Resources */,
 				7CBE0401194F14020068CA84 /* Major Warning.png in Resources */,
+				7C27FA26198C357900BD5A07 /* AlertStopIcon.icns in Resources */,
 				7C23C474195A3AEB00FAC70A /* Screensharing.icns in Resources */,
 				7CEDD051195B8243009DA982 /* Installer.icns in Resources */,
 				7C3944801960C7DA00BF371B /* CertStackLarge@2x.png in Resources */,
 				7C47FE0C196C8B1D00E1DAD9 /* rc.netboot.pkg in Resources */,
 				7C1305AE193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns in Resources */,
+				7C27FA28198C3D9500BD5A07 /* complete.aif in Resources */,
 				7C13058B193FC0B60060F343 /* InfoPlist.strings in Resources */,
 				7C19700A198058F00092062D /* Scripts.icns in Resources */,
 				7CBE0402194F14020068CA84 /* Succeeded.png in Resources */,

@@ -16,7 +16,7 @@ script AutoCasperNBIAppDelegate
 --- Objects
 
 	-- IBOutlets
-    property defaults : missing value -- for saved prefs
+    property defaults : missing value
     property hostMacOSVersion : missing value
     property hostMacOSBuildVersion : missing value
     property mainWindow : missing value
@@ -104,6 +104,9 @@ script AutoCasperNBIAppDelegate
     property netBootDmgUsedSpace : missing value
     property netBootReducedDmgMountPath : missing value
     property netBootExpandedTotalSize : missing value
+    property userNotifyWindow : missing value
+    property userNotifyError : missing value
+    property userNotifySuccess : missing value
     
     --- Booleans
     property selectedOSDMGTextFieldEnabled : false
@@ -146,6 +149,8 @@ script AutoCasperNBIAppDelegate
     property installRCNetBootSelected : false
     property timeServerOptionsEnabled : false
     property createReadOnlyDMG : false
+    property userNotifyErrorHidden : true
+    property userNotifySuccessHidden : true
 
     -- Others
     property requiredSpace : 20
@@ -354,27 +359,43 @@ script AutoCasperNBIAppDelegate
         -- Set to text
         set adminUserName to adminUserName as text
         
-        -- Check to see if supplied User is a member of the Administrator group
-        if ("80" is not in (do shell script "id " & adminUserName & " -G")) then
+        try
+        
+            -- Check to see if supplied User is a member of the Administrator group
+            if ("80" is not in (do shell script "id " & adminUserName & " -G")) then
+                
+                --Log Action
+                set logMe to "User " & adminUserName & " is not a part of the Administrators group"
+                
+                -- Log To file
+                logToFile_(me)
+                
+            else
+                
+                --Log Action
+                set logMe to "User " & adminUserName & " is part of the Administrators group"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Checking variable
+                set isAdminUser to true
+                
+            end if
+        
+        on error
             
-            --Log Action
-            set logMe to "User " & adminUserName & " is not a part of the Administrators group"
-            
-            -- Log To file
-            logToFile_(me)
-            
-        else
-            
-            --Log Action
-            set logMe to "User " & adminUserName & " is part of the Administrators group"
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Checking variable
-            set isAdminUser to true
-            
-        end if
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+        
+            -- Set Error message
+            set my userNotifyError to "Authentication failed. Please retry the administrative credentials."
+   
+            -- Notify of errors or success
+            userNotify_(me)
+        
+        end try
+        
         
         -- If the User is an Administrator
         if isAdminUser is true then
@@ -391,10 +412,16 @@ script AutoCasperNBIAppDelegate
                 openMainWindow_(me)
                 
             on error
+            
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
                 
-                -- Display error to user
-                display dialog "Authentication failed. Please renter the Administrator credentials."with icon 2 buttons {"OK"}
+                -- Set Error message
+                set my userNotifyError to "Authentication failed. Please retry the administrative credentials."
                 
+                -- Notify of errors or success
+                userNotify_(me)
+            
             end try
             
         end if
@@ -736,7 +763,7 @@ script AutoCasperNBIAppDelegate
 
     end selectedAppCheck_
 
-    -- On enter, check the JSS URL details & try & get version of the JSS
+    -- Check the JSS URL details & try & get version of the JSS
     on checkJSSURL_(sender)
         
         -- Make sure jssURL has a value before we proceed
@@ -1811,6 +1838,9 @@ script AutoCasperNBIAppDelegate
     -- Prompt user for location to create the .nbi
     on netBootLocation_(sender)
         
+        -- Check the JSS URL details & try & get version of the JSS
+        checkJSSURL_(me)
+        
         -- Set NetBoot Description
         enablenetBootDescription_(me)
 
@@ -1933,11 +1963,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Calculating space needed" with icon 0 buttons {"OK"}
-        
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+            
+            -- Set Error message
+            set my userNotifyError to "Error: Calculating space needed"
+            
+            -- Notify of errors or success
+            userNotify_(me)
         
         end try
 
@@ -2085,7 +2118,7 @@ script AutoCasperNBIAppDelegate
         on error number 1
         
             -- Error to user prompting for what to do next
-            display dialog "There is already afolder called: " & quoted form of netBootNameTextField & " in " & quoted form of netBootSelectedLocation & return & return & "Do you want to select another folder or delete the existing?" with icon 2 buttons {"Delete Existing", "New Folder"}
+            display dialog "There is already a folder called: " & quoted form of netBootNameTextField & " in " & quoted form of netBootSelectedLocation & return & return & "Do you want to select another folder or delete the existing?" with icon 2 buttons {"Delete Existing", "New Folder"}
             
             -- If user selected "Delete Existing"
             if button returned of the result is "Delete Existing" then
@@ -2166,12 +2199,15 @@ script AutoCasperNBIAppDelegate
             
             -- Log To file
             logToFile_(me)
-        
-            -- Display error to user
-            display dialog "Error: Failed to create NetBoot.dmg" with icon 0 buttons {"OK"}
-        
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+            
+            -- Set Error message
+            set my userNotifyError to "Error: Failed to create NetBoot.dmg"
+            
+            -- Notify of errors or success
+            userNotify_(me)
 
         end try
 
@@ -2215,12 +2251,15 @@ script AutoCasperNBIAppDelegate
             
             -- Log To file
             logToFile_(me)
-        
-            -- Display error to user
-            display dialog "Error: Cannot mount NetBoot.dmg" with icon 0 buttons {"OK"}
+
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Cannot mount NetBoot.dmg"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -2269,12 +2308,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
 
-            -- Display error to user
-            display dialog "Error: Cannot copy contents of " & selectedOSdmgMountPath & " to " & quoted form of netBootDmgMountPath with icon 0 buttons {"OK"}
-                
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
-                    
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+
+            -- Set Error message
+            set my userNotifyError to "Error: Cannot copy contents of " & selectedOSdmgMountPath & " to " & quoted form of netBootDmgMountPath
+
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end copyOSDmgToNetBootDmg_
@@ -2779,11 +2821,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Display error to user
-            display dialog "Error: Deleting files" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Deleting files"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -2898,11 +2943,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Emptying /private/tmp" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Emptying /private/tmp"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -2947,12 +2995,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Emptying /private/var/tmp/" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Emptying /private/var/tmp/"
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end emptyPrivateVarTmp_
@@ -2996,12 +3047,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
 
-            -- Display error to user
-            display dialog "Error: Emptying /Volumes/" with icon 0 buttons {"OK"}
-            
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
-            
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+
+            -- Set Error message
+            set my userNotifyError to "Error: Emptying /Volumes/"
+
+            -- Notify of errors or success
+            userNotify_(me)
+
         end try
         
     end emptyVolumesFolder_
@@ -3045,12 +3099,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Emptying /dev/" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Emptying /dev/"
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end emptyDevFolder_
@@ -3094,12 +3151,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Emptying /var/run/" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Emptying /var/run/"
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end emptyVarRunFolder_
@@ -3158,11 +3218,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Display error to user
-            display dialog "Error: Disabling Software Update" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Disabling Software Update"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
 
@@ -3322,12 +3385,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Bypassing Setup Assistants" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Bypassing Setup Assistants"
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end bypassSetupAssistants_
@@ -3367,16 +3433,19 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
 
-            -- Display error to user
-            display dialog "Error: Writing to /Library/Preferences/com.apple.TimeMachine.plist" with icon 0 buttons {"OK"}
-            
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
-            
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+
+            -- Set Error message
+            set my userNotifyError to "Error: Writing to /Library/Preferences/com.apple.TimeMachine.plist"
+
+            -- Notify of errors or success
+            userNotify_(me)
+
         end try
         
     end disableTimeMachinePrompt_
-    
+
     -- Delete the file delet /Library/Preferences/com.apple.dockfixup.plist
     on deleteDockFixUp_(sender)
         
@@ -3416,11 +3485,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Display error to user
-            display dialog "Error: Deleting /Library/Preferences/com.apple.dockfixup.plist" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Writing to /Library/Preferences/com.apple.dockfixup.plist"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -3465,11 +3537,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Display error to user
-            display dialog "Error: Copying com.apple.PowerManagement.plist" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Copying com.apple.PowerManagement.plist"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -3541,11 +3616,14 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
             
-                -- Display error to user
-                display dialog "Error: Creating ARD User" with icon 0 buttons {"OK"}
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
                 
-                -- Detach mounted volumes
-                tidyUpTimeKids_(me)
+                -- Set Error message
+                set my userNotifyError to "Error: Creating ARD User"
+                
+                -- Notify of errors or success
+                userNotify_(me)
                 
             end try
             
@@ -3611,11 +3689,14 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
             
-                -- Display error to user
-                display dialog "Error: Wrting VNC Settings" with icon 0 buttons {"OK"}
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
                 
-                -- Detach mounted volumes
-                tidyUpTimeKids_(me)
+                -- Set Error message
+                set my userNotifyError to "Error: Writing VNC Settings"
+                
+                -- Notify of errors or success
+                userNotify_(me)
                 
             end try
             
@@ -3683,11 +3764,14 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
                 
-                -- Display error to user
-                display dialog "Error: Writing Time Server & Zone Settings" with icon 0 buttons {"OK"}
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
                 
-                -- Detach mounted volumes
-                tidyUpTimeKids_(me)
+                -- Set Error message
+                set my userNotifyError to "Error: Writing Time Server & Zone Settings"
+                
+                -- Notify of errors or success
+                userNotify_(me)
             
             end try
         
@@ -3739,11 +3823,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Installing AutoCasperNBI LaunchDaemon & required files" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Installing AutoCasperNBI LaunchDaemon & required files"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -3788,12 +3875,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
 
-            -- Display error to user
-            display dialog "Error: Installing Root User" with icon 0 buttons {"OK"}
-            
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
-            
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+
+            -- Set Error message
+            set my userNotifyError to "Error: Installing Root User"
+
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end installRootUserpkg_
@@ -3837,11 +3927,14 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
             
-                -- Display error to user
-                display dialog "Error: Installing modified rc.netboot file" with icon 0 buttons {"OK"}
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
                 
-                -- Detach mounted volumes
-                tidyUpTimeKids_(me)
+                -- Set Error message
+                set my userNotifyError to "Error: Installing modified rc.netboot file"
+                
+                -- Notify of errors or success
+                userNotify_(me)
                 
             end try
             
@@ -3915,12 +4008,15 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
             
-                -- Display error to user
-                display dialog "Error: Copying Desktop Image" with icon 0 buttons {"OK"}
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
                 
-                -- Detach mounted volumes
-                tidyUpTimeKids_(me)
+                -- Set Error message
+                set my userNotifyError to "Error: Copying Desktop Image"
                 
+                -- Notify of errors or success
+                userNotify_(me)
+            
             end try
             
         else
@@ -3999,12 +4095,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: There was an issue copying  " & selectedAppPath & " to " & variableVariable  with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: There was an issue copying  " & selectedAppPath & " to " & variableVariable
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end copyCasperImagingApp_
@@ -4059,11 +4158,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Display error to user
-            display dialog "Error: Installing the Casper Imaging plist" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Installing the Casper Imaging plist"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
 
@@ -4108,11 +4210,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Installing Casper Imaging LaunchAgent" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Installing Casper Imaging LaunchAgent"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -4163,11 +4268,14 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
             
-                -- Display error to user
-                display dialog "Error: Importing JSS CA Cert" with icon 0 buttons {"OK"}
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
                 
-                -- Detach mounted volumes
-                tidyUpTimeKids_(me)
+                -- Set Error message
+                set my userNotifyError to "Error: Importing JSS CA Cert"
+                
+                -- Notify of errors or success
+                userNotify_(me)
                 
             end try
         
@@ -4218,11 +4326,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Creating dyld shared cache files" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Creating dyld shared cache files"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -4334,11 +4445,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Deleting extensions" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Deleting extensions"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -4436,11 +4550,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Generating kernel cache" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Generating kernel cache"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -4506,12 +4623,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Copying booter.efi" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Copying booter.efi"
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end copyBootEfi_
@@ -4555,12 +4675,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Copying PlatformSupport.plist" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Copying PlatformSupport.plist"
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end copyPlatformSupportPlist_
@@ -4604,12 +4727,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Copying NBImageInfo.plist" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Copying NBImageInfo.plist"
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end copyNBImageInfoPlist_
@@ -4990,11 +5116,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Display error to user
-            display dialog "Error: Writing NBImageInfo.plist" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Writing NBImageInfo.plist"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
 
@@ -5039,11 +5168,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Disabling Spolight Indexing" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Disabling Spolight Indexing"
+            
+            -- Notify of errors or success
+            userNotify_(me)
         
         end try
         
@@ -5142,11 +5274,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Display error to user
-            display dialog "Error: Calculating space needed" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Calculating space needed"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
 
@@ -5194,12 +5329,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Failed to create NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Failed to create NetBoot.reduced.dmg"
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
         
     end createReducedNetBootImage_
@@ -5243,12 +5381,15 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Cannot mount NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Cannot mount NetBoot.reduced.dmg"
             
+            -- Notify of errors or success
+            userNotify_(me)
+        
         end try
 
     end mountReducedNetBootDmg_
@@ -5291,11 +5432,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Cannot copy contents of " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Cannot copy contents of " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -5399,11 +5543,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Updating RootPath in NBImageInfo.plist" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Updating RootPath in NBImageInfo.plist"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
         
@@ -5470,11 +5617,14 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
         
-            -- Display error to user
-            display dialog "Error: Failed to delete NetBoot.dmg" with icon 0 buttons {"OK"}
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
             
-            -- Detach mounted volumes
-            tidyUpTimeKids_(me)
+            -- Set Error message
+            set my userNotifyError to "Error: Failed to delete NetBoot.dmg"
+            
+            -- Notify of errors or success
+            userNotify_(me)
             
         end try
 
@@ -5547,11 +5697,14 @@ script AutoCasperNBIAppDelegate
                     -- Log To file
                     logToFile_(me)
                 
-                    -- Display error to user
-                    display dialog "Error: Expanding NetBoot.reduced.dmg" with icon 0 buttons {"OK"}
+                    -- Set to false to display
+                    set my userNotifyErrorHidden to false
                     
-                    -- Detach mounted volumes
-                    tidyUpTimeKids_(me)
+                    -- Set Error message
+                    set my userNotifyError to "Error: Expanding NetBoot.reduced.dmg"
+                    
+                    -- Notify of errors or success
+                    userNotify_(me)
                 
                 end try
                 
@@ -5612,11 +5765,14 @@ script AutoCasperNBIAppDelegate
                     -- Log To file
                     logToFile_(me)
                     
-                    -- Display error to user
-                    display dialog "Error: Expanding NetBoot.dmg" with icon 0 buttons {"OK"}
+                    -- Set to false to display
+                    set my userNotifyErrorHidden to false
                     
-                    -- Detach mounted volumes
-                    tidyUpTimeKids_(me)
+                    -- Set Error message
+                    set my userNotifyError to "Error: Expanding NetBoot.dmg"
+                    
+                    -- Notify of errors or success
+                    userNotify_(me)
                     
                 end try
                 
@@ -5679,7 +5835,7 @@ script AutoCasperNBIAppDelegate
                     -- Log To file
                     logToFile_(me)
                     
-                else
+            else
                 
                 ---- Unmount NetBoot.dmg ----
                 try
@@ -5749,11 +5905,14 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
                 
-                -- Display error to user
-                display dialog "Error: Creating Read-Only DMG" with icon 0 buttons {"OK"}
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
                 
-                -- Detach mounted volumes
-                tidyUpTimeKids_(me)
+                -- Set Error message
+                set my userNotifyError to "Error: Creating Read-Only DMG"
+                
+                -- Notify of errors or success
+                userNotify_(me)
             
             end try
         
@@ -5769,7 +5928,7 @@ script AutoCasperNBIAppDelegate
         
     end createReadOnlyDMG_
 
-    -- Detach mounted volumes
+    -- Reset build process variables
     on tidyUpTimeKids_(sender)
         
         -- close build process window
@@ -5800,17 +5959,50 @@ script AutoCasperNBIAppDelegate
             
             -- Log To file
             logToFile_(me)
-        
-            -- Notify on completion
-            display dialog "NetBoot successfully created at the following location:" & return & return & netBootDirectory with icon 1 buttons {"OK"}
             
-            -- Set netBootCreationSuccessful value, for notifying later
-            set my netBootCreationSuccessful to false
-        
+            -- Play complete.aif
+            do shell script "afplay " & quoted form of pathToResources & "/complete.aif"
+                
+            -- Set to false to display
+            set my userNotifySuccessHidden to false
+            
+            -- Set Error message
+            set my userNotifySuccess to "NetBoot successfully created at the following location:" & return & return & netBootDirectory
+            
+            -- Notify of errors or success
+            userNotify_(me)
+
         end if
         
     end weDidIt_
-	
+
+    -- Notify of errors or success
+    on userNotify_(sender)
+        
+        -- activate user notify window
+        activate
+        userNotifyWindow's makeKeyAndOrderFront_(null)
+        
+	end userNotify_
+
+    -- Close User Notify Window
+    on userNotifyClose_(sender)
+        
+        -- close user notify window
+        userNotifyWindow's orderOut_(null)
+        
+        -- Reset variables
+        set my netBootCreationSuccessful to false
+        set my userNotifyError to missing value
+        set my userNotifyErrorHidden to true
+        set my userNotifySuccess to missing value
+        set my userNotifySuccessHidden to true
+        
+        -- Reset build process variables
+        tidyUpTimeKids_(me)
+        
+    end userNotifyClose_
+    
     -- Insert code here to do any housekeeping before your application quits
 	on applicationShouldTerminate_(sender)
         

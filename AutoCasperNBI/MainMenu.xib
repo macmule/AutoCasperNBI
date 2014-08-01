@@ -15,7 +15,7 @@
         <window title="AutoCasperNBI" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES"/>
             <rect key="contentRect" x="156" y="73" width="442" height="578"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="442" height="578"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -784,6 +784,7 @@
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="6Rf-dT-Ksa"/>
                 <outlet property="optionsWindow" destination="Zut-qe-a6h" id="qUR-w9-P6L"/>
                 <outlet property="showBuildProcessWindow" destination="7PY-gM-M3V" id="2dV-xN-uCe"/>
+                <outlet property="userNotifyWindow" destination="O6j-Qi-9Zv" id="cur-Io-vA1"/>
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -791,7 +792,7 @@
         <window title="Options" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="Zut-qe-a6h" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES" utility="YES"/>
             <rect key="contentRect" x="246" y="103" width="442" height="587"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="QIQ-sE-VWL">
                 <rect key="frame" x="0.0" y="0.0" width="442" height="587"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -803,11 +804,11 @@
                         <tabViewItems>
                             <tabViewItem label="Standard" identifier="1" id="ObJ-EC-sRC">
                                 <view key="view" ambiguous="YES" id="sgz-Bf-xLl">
-                                    <rect key="frame" x="10" y="33" width="417" height="507"/>
+                                    <rect key="frame" x="10" y="33" width="206" height="0.0"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="NetBoot Optional Settings" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="2Nc-gH-i2I">
-                                            <rect key="frame" x="6" y="359" width="408" height="148"/>
+                                            <rect key="frame" x="6" y="-148" width="408" height="148"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="406" height="132"/>
@@ -922,7 +923,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Screen Sharing" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="qGi-wO-ZeY">
-                                            <rect key="frame" x="6" y="163" width="408" height="197"/>
+                                            <rect key="frame" x="6" y="-344" width="408" height="197"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="406" height="181"/>
@@ -1099,7 +1100,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Desktop Picture" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="ygq-cO-tbF">
-                                            <rect key="frame" x="6" y="0.0" width="408" height="164"/>
+                                            <rect key="frame" x="6" y="-507" width="408" height="164"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="406" height="148"/>
@@ -2790,7 +2791,7 @@
         <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="7PY-gM-M3V" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <rect key="contentRect" x="272" y="172" width="517" height="100"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="Yrv-gK-4fd">
                 <rect key="frame" x="0.0" y="0.0" width="517" height="100"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2839,7 +2840,7 @@
         <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="1GG-CU-yDP" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <rect key="contentRect" x="120" y="792" width="450" height="178"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <view key="contentView" id="Six-b7-zBW">
                 <rect key="frame" x="0.0" y="0.0" width="450" height="178"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2910,6 +2911,9 @@
                         <buttonCell key="cell" type="push" title="Enter" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OTL-Ro-hdy">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
                         </buttonCell>
                         <connections>
                             <action selector="adminCheck:" target="Voe-Tx-rLC" id="DfV-i5-glp"/>
@@ -2950,8 +2954,76 @@
                 </subviews>
             </view>
         </window>
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="O6j-Qi-9Zv" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
+            <rect key="contentRect" x="120" y="65" width="450" height="90"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
+            <view key="contentView" id="jEb-Me-7HE">
+                <rect key="frame" x="0.0" y="0.0" width="450" height="90"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qn4-lL-fSL">
+                        <rect key="frame" x="5" y="5" width="80" height="80"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="AutoCasperNBI" id="bSm-1j-SfR"/>
+                        <connections>
+                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="userNotifySuccessHidden" id="fsb-DI-eIX"/>
+                        </connections>
+                    </imageView>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u0a-bU-Imv">
+                        <rect key="frame" x="355" y="4" width="80" height="28"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="buD-8I-B2A">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="smallSystem"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="userNotifyClose:" target="Voe-Tx-rLC" id="3YC-Zv-aFI"/>
+                        </connections>
+                    </button>
+                    <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TYf-6U-Gds">
+                        <rect key="frame" x="3" y="5" width="82" height="80"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="AlertStopIcon" id="8xV-l4-z61"/>
+                        <connections>
+                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="userNotifyErrorHidden" id="aJs-R7-hYg"/>
+                        </connections>
+                    </imageView>
+                    <textField hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nhq-UX-5dN">
+                        <rect key="frame" x="91" y="36" width="341" height="49"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" id="nVx-q2-ErR">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                        <connections>
+                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="userNotifySuccessHidden" id="d0J-H4-xv0"/>
+                            <binding destination="Voe-Tx-rLC" name="value" keyPath="userNotifySuccess" id="iMg-ie-ANc"/>
+                        </connections>
+                    </textField>
+                    <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nm8-Fd-AyK">
+                        <rect key="frame" x="91" y="36" width="341" height="34"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" id="N84-rY-a54">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                        <connections>
+                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="userNotifyErrorHidden" id="lB5-Gc-iVE"/>
+                            <binding destination="Voe-Tx-rLC" name="value" keyPath="userNotifyError" id="mfx-Ib-h9H"/>
+                        </connections>
+                    </textField>
+                </subviews>
+            </view>
+        </window>
     </objects>
     <resources>
+        <image name="AlertStopIcon" width="512" height="512"/>
         <image name="AutoCasperNBI" width="512" height="512"/>
         <image name="Casper Imaging" width="128" height="128"/>
         <image name="CertStackLarge" width="76" height="65"/>
