@@ -20,6 +20,13 @@ There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
+0.10<br>
+— Changed User Notification dialogs from AppleScript display dialogs to
+XIBs to stop timeout errors with dialogs<br>
+—Added checkJSSURL function to build-precheck.<br>
+— Added return command completion to a some windows<br>
+— Added complete.aif to play when complete<br>
+<br>
 0.9<br>
 — Added Time Server & Zone options<br>
 — Added option to create a Read-only dmg which has been imagescanned
