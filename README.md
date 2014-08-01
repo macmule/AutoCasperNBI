@@ -21,6 +21,15 @@ Currently, AutoCasperNBI checks that 20GB of space is free.. But i’ll amend la
 Please run from /Applications (I’ll make a check for that later).<br>
 <br>
 VERSIONS<br>
+
+0.9
+— Added Time Server & Zone options
+— Added option to create a Read-only dmg which has been imagescanned
+for ASRing to removable media
+— Added error logging.
+— Removed OS version check so now should be able to create .nbi’s from
+10.7+ (have only tested 10.8.x & 10.9.x)
+
 <br>
 0.8<br>
 —Reverse engineered Apple’s createNetBoot.sh (found:
