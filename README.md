@@ -4,7 +4,7 @@ Once you have an OS.dmg & Casper Imaging app selected, you should be able to bui
 <br>
 The JSS URL & options under the options tab, are optional.<br>
 <br>
-The addditoanl tabs functions are to come when I figure out how to tie the GUI elements in, anthing else to add to advanced tab?<br>
+The addditoanl tabs functions are to come when I figure out how to tie the GUI elements in<br>
 <br>
 Any options you set, should be written to a plist ~/Library/Preferences/com.macmule.AutoCasperNBI.plist.<br>
 <br>
