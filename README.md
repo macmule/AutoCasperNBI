@@ -13,6 +13,8 @@ GitHub repo is here: https://github.com/macmule/AutoCasperNBI<br>
 <br>
 Latest built beta can be downloaded from:  https://pentland-brands.box.com/shared/static/mppkb45edd5fxp1s8sv4.dmg<br>
 <br>
+Please post questions or issues in the following thread: https://jamfnation.jamfsoftware.com/discussion.html?id=11356<br>
+<br>
 If you wish to contact me direct, please use: http://macmule.com/contact/<br>
 <br>
 ISSUES<br>
