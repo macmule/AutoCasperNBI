@@ -1,5 +1,6 @@
 The idea of this app is to take an OS.dmg either from AutoDMG or an OS.dmg captured from a never booted Mac (use case is forked builds).<br>
 <br>
+Then select a copy of Casper Imaging.app<br>
 Once you have an OS.dmg & Casper Imaging app selected, you should be able to build an .nbi.<br>
 <br>
 The JSS URL & options under the options tab, are optional.<br>
