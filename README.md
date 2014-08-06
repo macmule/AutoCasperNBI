@@ -23,6 +23,9 @@ There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
+0.11<br>
+— Can now create 10.7.x NBI’s & run on 10.7.x<br>
+— Amended sequence order<br>
 0.10<br>
 — Changed User Notification dialogs from AppleScript display dialogs to
 XIBs to stop timeout errors with dialogs<br>
