@@ -31,6 +31,7 @@
 		7C6D0A011969F27F006D7759 /* CasperImagingLaunchAgent.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C6D0A001969F27F006D7759 /* CasperImagingLaunchAgent.pkg */; };
 		7C801962196EA9AE0079952B /* AutoCasperNBI.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C801961196EA9AE0079952B /* AutoCasperNBI.png */; };
 		7C878911198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C878910198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg */; };
+		7CB60994199189E20068574D /* root.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CB60993199189E20068574D /* root.plist */; };
 		7CBBEC33197CFEB000250F49 /* com.apple.PowerManagement.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */; };
 		7CBE0400194F14020068CA84 /* Error.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CBE03FC194F14020068CA84 /* Error.png */; };
 		7CBE0401194F14020068CA84 /* Major Warning.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CBE03FD194F14020068CA84 /* Major Warning.png */; };
@@ -73,6 +74,7 @@
 		7C6D0A001969F27F006D7759 /* CasperImagingLaunchAgent.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = CasperImagingLaunchAgent.pkg; sourceTree = "<group>"; };
 		7C801961196EA9AE0079952B /* AutoCasperNBI.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AutoCasperNBI.png; sourceTree = "<group>"; };
 		7C878910198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = AutoCasperNBIStartup.pkg; sourceTree = "<group>"; };
+		7CB60993199189E20068574D /* root.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = root.plist; sourceTree = "<group>"; };
 		7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.apple.PowerManagement.plist; sourceTree = "<group>"; };
 		7CBE03FC194F14020068CA84 /* Error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Error.png; sourceTree = "<group>"; };
 		7CBE03FD194F14020068CA84 /* Major Warning.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Major Warning.png"; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 		7C130586193FC0B60060F343 /* AutoCasperNBI */ = {
 			isa = PBXGroup;
 			children = (
+				7CB60993199189E20068574D /* root.plist */,
 				7C878910198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg */,
 				7CC636E5197D444E008473CE /* NBImageInfo.plist */,
 				7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */,
@@ -264,6 +267,7 @@
 				7C130598193FC0B60060F343 /* Images.xcassets in Resources */,
 				7C1305AA193FC10A0060F343 /* DMGFormat.icns in Resources */,
 				7CBE0403194F14020068CA84 /* Warning.png in Resources */,
+				7CB60994199189E20068574D /* root.plist in Resources */,
 				7C1305A8193FC10A0060F343 /* Casper Imaging.tiff in Resources */,
 				7C878911198BB9DD00A96DC1 /* AutoCasperNBIStartup.pkg in Resources */,
 				7C130591193FC0B60060F343 /* Credits.rtf in Resources */,

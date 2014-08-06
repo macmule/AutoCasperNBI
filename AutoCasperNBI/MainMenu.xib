@@ -2808,7 +2808,7 @@
                             <binding destination="Voe-Tx-rLC" name="value" keyPath="buildProcessTextField" id="8h0-L9-zOI"/>
                         </connections>
                     </textField>
-                    <progressIndicator fixedFrame="YES" maxValue="460" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="b0H-od-wL6">
+                    <progressIndicator fixedFrame="YES" maxValue="470" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="b0H-od-wL6">
                         <rect key="frame" x="93" y="40" width="406" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <connections>
@@ -3001,8 +3001,8 @@ DQ
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
-                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="userNotifySuccessHidden" id="d0J-H4-xv0"/>
                             <binding destination="Voe-Tx-rLC" name="value" keyPath="userNotifySuccess" id="iMg-ie-ANc"/>
+                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="userNotifySuccessHidden" id="d0J-H4-xv0"/>
                         </connections>
                     </textField>
                     <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nm8-Fd-AyK">
@@ -3014,8 +3014,8 @@ DQ
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
-                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="userNotifyErrorHidden" id="lB5-Gc-iVE"/>
                             <binding destination="Voe-Tx-rLC" name="value" keyPath="userNotifyError" id="mfx-Ib-h9H"/>
+                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="userNotifyErrorHidden" id="lB5-Gc-iVE"/>
                         </connections>
                     </textField>
                 </subviews>
