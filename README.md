@@ -23,6 +23,15 @@ There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
+0.12<br>
+— Added OS & Input Language selection<br>
+— Added simple Finder selection<br>
+— Added pre-checks to correctly write to plist when needed.<br>
+— Corrected behaviour when progress window showing so it doesn’t disappear.<br>
+— Added 10.10 NBI creation support (Full 10.10 support to come)<br>
+— Changed root users dock, adding Casper Imaging to it.<br>
+— Changed AutoCasperNBI LaunchDaemon to launch once, to try & resolve issues with hanging on restart<br>
+<br>
 0.11<br>
 — Can now create 10.7.x NBI’s & run on 10.7.x<br>
 — Amended sequence order<br>
