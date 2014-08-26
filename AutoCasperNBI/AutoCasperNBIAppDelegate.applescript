@@ -107,6 +107,9 @@ script AutoCasperNBIAppDelegate
     property userNotifyWindow : missing value
     property userNotifyError : missing value
     property userNotifySuccess : missing value
+    property inputLayoutID : missing value
+    property languageCode : missing value
+    property mytest : missing value
     
     --- Booleans
     property selectedOSDMGTextFieldEnabled : false
@@ -151,6 +154,10 @@ script AutoCasperNBIAppDelegate
     property createReadOnlyDMG : false
     property userNotifyErrorHidden : true
     property userNotifySuccessHidden : true
+    property optionsWindowPreCheckPassed : true
+    property buildButtonPreCheckPassed : true
+    property closeButtonPreCheckPassed : true
+    property simpleFinderEnabled : false
 
     -- Others
     property requiredSpace : 20
@@ -162,6 +169,8 @@ script AutoCasperNBIAppDelegate
     property netBootDmgResize : 0
     property timeServerSelected : "time.apple.com"
     property timeZoneSelected : "Americas/Los_Angeles"
+    property languageSelected : "English : en"
+    property inputLanguageSelected : "U.S."
     
 --- HANDLERS ---
 
@@ -169,7 +178,7 @@ script AutoCasperNBIAppDelegate
     on startYourEngines_(sender)
         
         -- Date for log file
-        set logDate to do shell script "date +%F"
+        set logDate to do shell script "/bin/date +%F"
         
         -- Log that we've launched
         set logMe to "\\n"
@@ -187,10 +196,10 @@ script AutoCasperNBIAppDelegate
         logToFile_(me)
 
         -- Get OS of host mac to verify that we can create an .nbi from supplied OS.dmg
-        set my hostMacOSVersion to (do shell script "sw_vers -productVersion")
+        set my hostMacOSVersion to (do shell script "/usr/bin/sw_vers -productVersion")
     
         -- Get host macs Build version for logging/debugging
-        set my hostMacOSBuildVersion to (do shell script "sw_vers -buildVersion")
+        set my hostMacOSBuildVersion to (do shell script "/usr/bin/sw_vers -buildVersion")
         
         -- Log OS version & build of host mac
         set logMe to  "Running on OS " & hostMacOSVersion & " (" & hostMacOSBuildVersion & ")"
@@ -206,7 +215,7 @@ script AutoCasperNBIAppDelegate
         logToFile_(me)
         
         -- Get a UUID for folder path
-        set tempUUID to do shell script "uuidgen"
+        set tempUUID to do shell script "/usr/bin/uuidgen"
         set logMe to "UUID " & tempUUID
         
         -- Log To file
@@ -234,11 +243,13 @@ script AutoCasperNBIAppDelegate
         netBootServeOverNFS:netBootServeOverNFS, ¬
         vncEnabled:vncEnabled, ¬
         vncPassword:vncPassword, ¬
-        timeServerOptionsEnabled:timeServerOptionsEnabled, ¬
         timeServerSelected:timeServerSelected, ¬
-        timeZoneSelected:timeZoneSelected,  ¬
+        timeZoneSelected:timeZoneSelected, ¬
+        languageSelected:languageSelected, ¬
+        inputLanguageSelected:inputLanguageSelected, ¬
         installRCNetBootSelected:installRCNetBootSelected, ¬
-        createReadOnlyDMG:createReadOnlyDMG})
+        createReadOnlyDMG:createReadOnlyDMG, ¬
+        simpleFinderEnabled:simpleFinderEnabled })
     end regDefaults_
     
     -- Get values from plist
@@ -257,29 +268,46 @@ script AutoCasperNBIAppDelegate
         tell defaults to set my netBootServeOverNFS to objectForKey_("netBootServeOverNFS")
         tell defaults to set my vncEnabled to objectForKey_("vncEnabled") as boolean
         tell defaults to set my vncPassword to objectForKey_("vncPassword")
-        tell defaults to set my timeServerOptionsEnabled to objectForKey_("timeServerOptionsEnabled") as boolean
         tell defaults to set my timeServerSelected to objectForKey_("timeServerSelected")
         tell defaults to set my timeZoneSelected to objectForKey_("timeZoneSelected")
+        tell defaults to set my languageSelected to objectForKey_("languageSelected")
+        tell defaults to set my inputLanguageSelected to objectForKey_("inputLanguageSelected")
         tell defaults to set my installRCNetBootSelected to objectForKey_("installRCNetBootSelected") as boolean
         tell defaults to set my createReadOnlyDMG to objectForKey_("createReadOnlyDMG") as boolean
+        tell defaults to set my simpleFinderEnabled to objectForKey_("simpleFinderEnabled") as boolean
     end retrieveDefaults_
     
     ----- BUTTON HANDLERS ----
     -- Open Options window
     on showOptionsWindow_(sender)
         
-        -- Disable main windows buttons
-        set my optionWindowEnabled to false
+        -- reset value
+        set optionsWindowPreCheckPassed to true
         
-         -- reload options from plist
-        retrieveDefaults_(me)
+        -- Make sure a name is specified for the NetBoot Image, error if not.
+        netBootName_(me)
         
-        -- Set NetBoot Description
-        enablenetBootDescription_(me)
+        -- Error if incorrect value specified
+        netBootImageIndexCheck_(me)
         
-        -- activate options window
-        activate
-        optionsWindow's makeKeyAndOrderFront_(null)
+        set optionsWindowPreCheckPassed to optionsWindowPreCheckPassed as boolean
+        
+        if optionsWindowPreCheckPassed is true then
+            
+            -- Disable main windows buttons
+            set my optionWindowEnabled to false
+            
+             -- reload options from plist
+            retrieveDefaults_(me)
+            
+            -- Set NetBoot Description
+            enablenetBootDescription_(me)
+            
+            -- activate options window
+            activate
+            optionsWindow's makeKeyAndOrderFront_(null)
+        
+        end if
         
     end showOptionsWindow_
     
@@ -362,7 +390,7 @@ script AutoCasperNBIAppDelegate
         try
         
             -- Check to see if supplied User is a member of the Administrator group
-            if ("80" is not in (do shell script "id " & adminUserName & " -G")) then
+            if ("80" is not in (do shell script "/usr/bin/id " & adminUserName & " -G")) then
                 
                 --Log Action
                 set logMe to "User " & adminUserName & " is not a part of the Administrators group"
@@ -406,7 +434,7 @@ script AutoCasperNBIAppDelegate
             try
                 
                 -- Perform a check of privileges
-                do shell script "ls " user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/ls " user name adminUserName password adminUsersPassword with administrator privileges
                 
                 -- Open the Main Window
                 openMainWindow_(me)
@@ -446,23 +474,23 @@ script AutoCasperNBIAppDelegate
     on logToFile_(sender)
         
         -- Comment out before release.. this will send log messages to Xcode's log
-        --log logMe
+        log logMe
         
         -- Get time & date of command execution
-        set timeStamp to do shell script "date"
+        set timeStamp to do shell script "/bin/date"
         
         try
             
             -- Write message to log file
-            do shell script "echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+            do shell script "/bin/echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
             
         on error
             
             -- Create directory if doesn't exist
-            do shell script "mkdir ~/Library/Logs/AutoCasperNBI/"
+            do shell script "/bin/mkdir ~/Library/Logs/AutoCasperNBI/"
             
             -- Write message to log file
-            do shell script "echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+            do shell script "/bin/echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
             
         end try
         
@@ -517,8 +545,11 @@ script AutoCasperNBIAppDelegate
         -- Delay needed to update label
         delay 0.1
         
+        -- Set to front window
+        tell application "System Events" to set frontmost of process "AutoCasperNBI" to true
+        
         --  Try & mount dropped file
-        set selectedOSdmgMountPath to do shell script "hdiutil attach " & quoted form of selectedOSdmgPath & " -nobrowse -owners on | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' | head -1" as quoted form
+        set selectedOSdmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of selectedOSdmgPath & " -nobrowse -owners on | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' | head -1" as quoted form
         
         -- If selectedOSdmgMountPath, then we've failed to mount as it's not a dmg.
         if selectedOSdmgMountPath is equal to "" then
@@ -538,10 +569,10 @@ script AutoCasperNBIAppDelegate
             try
                 
                 -- Try & get OS version
-                set selectedOSdmgVersion to do shell script "defaults read " & quoted form of selectedOSdmgMountPath & "/System/Library/CoreServices/SystemVersion.plist ProductVersion"
+                set selectedOSdmgVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedOSdmgMountPath & "/System/Library/CoreServices/SystemVersion.plist ProductVersion"
                 
                 -- Try & get build version
-                set selectedOSBuilddmgVersion to do shell script "defaults read " & quoted form of selectedOSdmgMountPath & "/System/Library/CoreServices/SystemVersion.plist ProductBuildVersion"
+                set selectedOSBuilddmgVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedOSdmgMountPath & "/System/Library/CoreServices/SystemVersion.plist ProductBuildVersion"
                 
                 -- If we have both OS & build versions, display them
                 set my selectedOSDMGTextField to "Mac OS " & selectedOSdmgVersion & " (" & selectedOSBuilddmgVersion & ")"
@@ -568,7 +599,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
             
                 -- Error advising we cannot get the OS version from dmg
-                set my selectedOSDMGTextField to "Cannot read OS Version from " & selectedOSdmgMountPath
+                set my selectedOSDMGTextField to "Cannot read OS Version"
                 
                 -- Reset OSDMG Icons & hide cog
                 doResetOSDMGIcons_(me)
@@ -680,7 +711,7 @@ script AutoCasperNBIAppDelegate
         delay 0.1
         
         -- Get Bundle Name of selected app
-        set selectedAppBundleName to do shell script "defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleName"
+        set selectedAppBundleName to do shell script "/usr/bin/defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleName"
         
         --Log Action
         set logMe to "Bundle Name: " & selectedAppBundleName
@@ -694,7 +725,7 @@ script AutoCasperNBIAppDelegate
             try
                
                 -- If Casper Imaging, return version
-                set selectedCasperImagingAppVersion to do shell script "defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleGetInfoString"
+                set selectedCasperImagingAppVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleGetInfoString"
                 
                 --Log Action
                 set logMe to "Casper Imaging Version: " & selectedCasperImagingAppVersion
@@ -768,7 +799,10 @@ script AutoCasperNBIAppDelegate
         
         -- Make sure jssURL has a value before we proceed
         if jssURL is not equal to missing value
-            
+        
+            -- Update plist
+            tell defaults to setObject_forKey_(jssURL, "jssURL")
+        
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
             
@@ -790,7 +824,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Try & get URL using insecure method, this way it will work with or without a valid SSL cert
-                set jssURLHtml to do shell script "curl -k " & jssURL & "/jss.html"
+                set jssURLHtml to do shell script "/usr/bin/curl -k " & jssURL & "/jss.html"
 
                 --Log Action
                 set logMe to "Received JSS version"
@@ -879,9 +913,6 @@ script AutoCasperNBIAppDelegate
             
             -- Update lable with JSS Version
             set my enteredJSSURLTextField to "JSS " & jssVersion
-            
-            -- Update plist
-            tell defaults to setObject_forKey_(jssURL, "jssURL")
 
             -- Compare JSS & Casper Imaging Versions
             checkJSSAndImagingVersions_(me)
@@ -991,7 +1022,7 @@ script AutoCasperNBIAppDelegate
                 -- Reset JSS URL icons
                 doResetJSSURLIcons_(me)
                 
-                set my disableOptionsAndBuild to FALSE
+                set my disableOptionsAndBuild to false
                 
                 -- Show warning labels
                 set my warningSelectedApp to true
@@ -1039,6 +1070,12 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
+            -- Set to false so we don't proceed showing options window
+            set optionsWindowPreCheckPassed to false
+            
+            -- Set to false so we don't proceed with build
+            set buildButtonPreCheckPassed to false
+            
         else
         
             --Log Action
@@ -1046,7 +1083,7 @@ script AutoCasperNBIAppDelegate
             
             -- Log To file
             logToFile_(me)
-        
+            
         end if
         
     end netBootName_
@@ -1110,11 +1147,17 @@ script AutoCasperNBIAppDelegate
         if (netBootImageIndexTextField less than netBootImageIndexMinValue) or (netBootImageIndexTextField greater than netBootImageIndexMaxValue) or (netBootImageIndexTextField is equal to missing value) then
         
             -- Display error to user
-            display dialog "Please select a value between " & netBootImageIndexMinValue & " & " & netBootImageIndexMaxValue with icon 0 buttons {"OK"}
+            display dialog "Please select an Index between " & netBootImageIndexMinValue & " & " & netBootImageIndexMaxValue with icon 0 buttons {"OK"}
         
             -- Reset using below function.
             netBootImageIndex_(me)
-        
+            
+            -- Set to false so we proceed showing options window
+            set optionsWindowPreCheckPassed to false
+            
+            -- Set to false so we don't proceed with build
+            set buildButtonPreCheckPassed to false
+            
         end if
 
     end netBootImageIndexCheck_
@@ -1165,81 +1208,6 @@ script AutoCasperNBIAppDelegate
     end netBootServeOption_
 
 ----- OPTIONS WINDOW  -----
-
-    -- Bound to "Resize Image by"
-    on netBootImageExpand_(sender)
-        
-        -- Set netBootImageExpandEnabled to boolean of value
-        set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
-        
-        -- Set options depending on checkbox
-        if netBootImageExpandEnabled is true then
-            
-            --Log Action
-            set logMe to "NetBoot resize enabled"
-            
-            -- Log To file
-            logToFile_(me)
-            
-        else
-        
-            --Log Action
-            set logMe to "NetBoot resize option unchecked"
-            
-            -- Log To file
-            logToFile_(me)
-            
-        end if
-        
-        -- Update plist with selection
-        tell defaults to setObject_forKey_(netBootImageExpandEnabled, "netBootImageExpandEnabled")
-        
-    end netBootImageExpand_
-
-    -- Bound to NetBoot Image Resize value
-    on netBootImageExpandEnteredValue_(sender)
-        
-        -- If we have a value
-        if netBootImageExpandValue is equal to missing value
-        
-            -- Display error to user
-            display dialog "Please select a value to resize the NetBoot Image or deselect Resize by" with icon 0 buttons {"OK"}
-            
-        end if
-        
-        -- Update plist with selection
-        tell defaults to setObject_forKey_(netBootImageExpandValue, "netBootImageExpandValue")
-        
-    end netBootImageExpandEnteredValue_
-
-    -- Bound to "Reduce Image Size"
-    on netBootImageReduce_(sender)
-        
-        -- Set netBootImageReduceEnabled to boolean of value
-        set netBootImageReduceEnabled to netBootImageReduceEnabled as boolean
-        
-        -- Set options depending on checkbox
-        if netBootImageReduceEnabled is true then
-            
-           --Log Action
-            set logMe to "NetBoot Reduce by enabled"
-            
-            -- Log To file
-            logToFile_(me)
-        
-        else
-            --Log Action
-            set logMe to "NetBoot Reduce option unchecked"
-            
-            -- Log To file
-            logToFile_(me)
-        
-        end if
-        
-        -- Update plist with selection
-        tell defaults to setObject_forKey_(netBootImageReduceEnabled, "netBootImageReduceEnabled")
-        
-    end netBootImageReduce_
 
     -- Bound to "Enable Description"
     on enablenetBootDescription_(sender)
@@ -1305,18 +1273,117 @@ script AutoCasperNBIAppDelegate
     -- Verify that the description field has a value & reset & prompt if not
     on netBootDescriptionCheck_(sender)
         
-        -- If the description field is emptied.
-        if netBootDescription is equal to missing value then
-            
-            -- Display error to user
-            display dialog "Please select enter a Description or uncheck Set NetBoot Description" with icon 0 buttons {"OK"}
-            
-            -- Reset description to auto generated
-            enablenetBootDescription_(me)
-            
+        -- Set netBootDescriptionEnabled to boolean of value
+        set netBootDescriptionEnabled to netBootDescriptionEnabled as boolean
+        
+        --If enabled
+        if netBootDescriptionEnabled is true then
+        
+            -- If the description field is emptied.
+            if netBootDescription is equal to missing value then
+                
+                -- Set to false so we don't proceed
+                set closeButtonPreCheckPassed to false
+                
+                -- Reset description to auto generated
+                enablenetBootDescription_(me)
+                
+                -- Display error to user
+                display dialog "Please select enter a Description or uncheck Set NetBoot Description" with icon 0 buttons {"OK"}
+
+                
+            end if
+        
         end if
 
     end netBootDescriptionCheck_
+
+    -- Bound to "Reduce Image Size"
+    on netBootImageReduce_(sender)
+        
+        -- Set netBootImageReduceEnabled to boolean of value
+        set netBootImageReduceEnabled to netBootImageReduceEnabled as boolean
+        
+        -- Set options depending on checkbox
+        if netBootImageReduceEnabled is true then
+            
+            --Log Action
+            set logMe to "NetBoot Reduce by enabled"
+            
+            -- Log To file
+            logToFile_(me)
+            
+        else
+        
+            --Log Action
+            set logMe to "NetBoot Reduce option unchecked"
+            
+            -- Log To file
+            logToFile_(me)
+            
+        end if
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(netBootImageReduceEnabled, "netBootImageReduceEnabled")
+        
+    end netBootImageReduce_
+
+    -- Bound to "Expand by"
+    on netBootImageExpand_(sender)
+        
+        -- Set netBootImageExpandEnabled to boolean of value
+        set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
+        
+        -- Set options depending on checkbox
+        if netBootImageExpandEnabled is true then
+            
+            --Log Action
+            set logMe to "NetBoot expand enabled"
+            
+            -- Log To file
+            logToFile_(me)
+            
+        else
+            
+            --Log Action
+            set logMe to "NetBoot expand option unchecked"
+            
+            -- Log To file
+            logToFile_(me)
+            
+        end if
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(netBootImageExpandEnabled, "netBootImageExpandEnabled")
+        
+    end netBootImageExpand_
+
+    -- Bound to NetBoot Image Resize value
+    on netBootImageExpandEnteredValue_(sender)
+        
+        -- Set netBootImageExpandEnabled to boolean of value
+        set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
+        
+        -- If we're expanding the NetBoot Image
+        if netBootImageExpandEnabled is true then
+            
+            -- If we have a value
+            if netBootImageExpandValue is equal to missing value
+            
+                -- Display error to user
+                display dialog "Please select a value to resize the NetBoot Image or deselect \"Expand By\"" with icon 0 buttons {"OK"}
+                
+                -- Set to false so we don't proceed
+                set closeButtonPreCheckPassed to false
+            
+            end if
+        
+            -- Update plist with selection
+            tell defaults to setObject_forKey_(netBootImageExpandValue, "netBootImageExpandValue")
+            
+        end if
+
+    end netBootImageExpandEnteredValue_
 
     -- Bound to "Enable ARD"
     on ardOption_(sender)
@@ -1345,23 +1412,43 @@ script AutoCasperNBIAppDelegate
     -- Check the value entered in the ARD Username textfield
     on checkardUsername_(sender)
         
-        -- If textfield is empty
-        if my ardUsername is missing value then
-            
-            -- Delete ardUsername from plist
-            tell defaults to removeObjectForKey_("ardUsername")
-            
-            -- Set check to false
-            set my ardDetailsCheck to false
-            
-        else
-
-            -- Update plist with selection
-            tell defaults to setObject_forKey_(ardUsername, "ardUsername")
-            
-            -- Set check to true
-            set my ardDetailsCheck to true
+        -- Set to boolean of value
+        set ardEnabled to ardEnabled as boolean
         
+        -- If ard enabled
+        if ardEnabled is true
+        
+            -- If textfield is empty
+            if ardUsername is equal to missing value then
+                
+                -- Delete ardUsername from plist
+                tell defaults to removeObjectForKey_("ardUsername")
+                
+                -- Display error to user
+                display dialog "Please enter a Username for the ARD user or deselect the ARD option" with icon 0 buttons {"OK"}
+                
+                --Log Action
+                log "Error: Please enter a Username for the ARD user or deselect the ARD option"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set to false so we don't proceed
+                set closeButtonPreCheckPassed to false
+                
+            else
+                
+                -- Update plist with selection
+                tell defaults to setObject_forKey_(ardUsername, "ardUsername")
+                
+                --Log Action
+                log "ARD Username written to plist"
+                
+                -- Log To file
+                logToFile_(me)
+                
+            end if
+
         end if
 
     end checkardUsername_
@@ -1369,19 +1456,45 @@ script AutoCasperNBIAppDelegate
     -- Check the value entered in the ARD Password textfield
     on checkardPassword_(sender)
         
-        -- If textfield is empty
-        if my ardPassword is missing value then
-            
-            -- Delete ardPassword from plist
-            tell defaults to removeObjectForKey_("ardPassword")
-
-        else
+        -- Set to boolean of value
+        set ardEnabled to ardEnabled as boolean
         
-            -- Update plist with selection
-            tell defaults to setObject_forKey_(ardPassword, "ardPassword")
+        -- If ard enabled
+        if ardEnabled is true
+        
+            -- If textfield is empty
+            if ardPassword is equal to missing value then
+            
+                -- Delete ardPassword from plist
+                tell defaults to removeObjectForKey_("ardPassword")
+                
+                -- Display error to user
+                display dialog "Please enter a password for the ARD user or deselect the ARD option" with icon 0 buttons {"OK"}
+                
+                --Log Action
+                log "Error: Please enter a password for the ARD user or deselect the ARD option"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set to false so we don't proceed
+                set closeButtonPreCheckPassed to false
+                
+            else
+                
+                -- Update plist with selection
+                tell defaults to setObject_forKey_(ardPassword, "ardPassword")
+                
+                --Log Action
+                log "ARD password written to plist"
+                
+                -- Log To file
+                logToFile_(me)
+            
+            end if
             
         end if
-        
+
     end checkardPassword_
 
     -- Bound to "Enable VNC"
@@ -1410,180 +1523,72 @@ script AutoCasperNBIAppDelegate
 
     -- Check the value entered in the vnc Password textfield
     on checkvncPassword_(sender)
-        
-        -- If textfield is empty
-        if my vncPassword is missing value then
-            
-            -- Delete vncPassword from plist
-            tell defaults to removeObjectForKey_("vncPassword")
-            
-        else
-        
-            -- Update plist with selection
-            tell defaults to setObject_forKey_(vncPassword, "vncPassword")
-            
-        end if
-        
-        -- If no VNC password
-        if vncPassword is equal to missing value
-        
-            -- Display error to user
-            display dialog "Please enter a password VNC, or deselect the VNC option" with icon 0 buttons {"OK"}
-            
-            -- VNC password check status
-            set vncPassCheck to false
-            
-        end if
 
-        -- Set variableVariable to vncPassword
-        set variableVariable to vncPassword as text
-
-        -- Check character to length of variableVariable
-        if vncPassword is not equal to missing value and length of variableVariable is greater than 8
-
-            -- Display error to user
-            display dialog "Please enter a Password that is less than 8 characters" with icon 0 buttons {"OK"}
-
-            -- VNC password check status
-            set vncPassCheck to false
-
-        else
-
-            -- VNC password check status
-            set vncPassCheck to true
-
-        end if
-
-    end checkvncPassword_
-
-    -- Check NetBoot Resize value
-    on checkNetBootExpandValue_(sender)
-        
-        -- reload options from plist
-        retrieveDefaults_(me)
-        
         -- Set to boolean of value
-        set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
+        set vncEnabled to vncEnabled as boolean
         
-        -- If we're looking to Resize the NetBoot Image
-        if netBootImageExpandEnabled is true
+        -- If VNC enabled
+        if vncEnabled is true
         
-            -- If we do not have a value to Resize the Image by
-            if netBootImageExpandValue is equal to missing value
-        
+            -- If textfield is empty
+            if vncPassword is equal to missing value then
+                
+                -- Delete vncPassword from plist
+                tell defaults to removeObjectForKey_("vncPassword")
+                
+                -- Display error to user
+                display dialog "Please enter a VNC password, or deselect the VNC option" with icon 0 buttons {"OK"}
+                
                 --Log Action
-                set logMe to "Error: NetBoot expand enabled, but no value given for expansion"
+                log "Error: Please enter a VNC password, or deselect the VNC option"
                 
                 -- Log To file
                 logToFile_(me)
-        
-                -- Bound to NetBoot Image Resize value
-                netBootImageExpandEnteredValue_(me)
+                
+                -- Set to false so we don't proceed
+                set closeButtonPreCheckPassed to false
                 
             else
             
-                -- Bound to the Close button on options window
-                checkScreenSharingDetails_(me)
-        
-            end if
-
-        else
-
-            -- Bound to the Close button on options window
-            checkScreenSharingDetails_(me)
-
-        end if
-
-    end checkNetBootExpandValue_
-
-    -- Bound to the Close button on options window
-    on checkScreenSharingDetails_(sender)
-        
-            -- If ARD is enabled, check for Username & Password
-            if ardEnabled is true
-            
-                -- If no ARD Username
-                if ardUsername is equal to missing value
+                -- Set to text of value
+                set vncPassword to vncPassword as text
                 
-                    -- Display error to user
-                    display dialog "Please enter a username for ARD or deselect the ARD option" with icon 0 buttons {"OK"}
+                -- If vncPassword's length is more than 8 characters
+                if length of vncPassword is greater than 8
+                
+                    -- Delete vncPassword from plist
+                    tell defaults to removeObjectForKey_("vncPassword")
                     
-                    -- ARD details check status
-                    set ardDetailsCheck to false
-                
-                end if
-
-                -- If no ARD password
-                if ardPassword is equal to missing value
-                
                     -- Display error to user
-                    display dialog "Please enter a password for the ARD user or deselect the ARD option" with icon 0 buttons {"OK"}
-
-                    -- ARD details check status
-                    set ardDetailsCheck to false
-
-                end if
-
-            else
-
-                -- ARD details check status (true as not enabled)
-                set ardDetailsCheck to true
-
-            end if
-
-            -- If VNC is enabled, check for password
-            if vncEnabled is true
-
-                -- If no VNC password
-                if vncPassword is equal to missing value
-
-                    -- Display error to user
-                    display dialog "Please enter a password VNC, or deselect the VNC option" with icon 0 buttons {"OK"}
-
-                    -- VNC password check status
-                    set vncPassCheck to false
-
-
-                end if
-
-                -- Set variableVariable to vncPassword
-                set variableVariable to vncPassword as text
-
-                -- Check character to length of variableVariable
-                if vncPassword is not equal to missing value and length of variableVariable is greater than 8
-
-                    -- Display error to user
-                    display dialog "Please enter a Password that is less than 8 characters" with icon 0 buttons {"OK"}
-
-                    -- VNC password check status
-                    set vncPassCheck to false
-
+                    display dialog "Please enter a VNC Password that is less than 8 characters" with icon 0 buttons {"OK"}
+                    
+                    --Log Action
+                    log "Error: Please enter a VNC Password that is less than 8 characters"
+                    
+                    -- Log To file
+                    logToFile_(me)
+                    
+                    -- Set to false so we don't proceed
+                    set closeButtonPreCheckPassed to false
+            
                 else
-
-                    -- VNC password check status
-                    set vncPassCheck to true
+            
+                    -- Update plist with selection
+                    tell defaults to setObject_forKey_(vncPassword, "vncPassword")
+                    
+                    --Log Action
+                    log "VNC password written to plist"
+                    
+                    -- Log To file
+                    logToFile_(me)
 
                 end if
-
-            else
-
-                -- VNC password check status (true as not enabled)
-                set vncPassCheck to true
-
+            
             end if
-
-        -- If we have passed the ARD & VNC checks, either with details or as they are not enabled
-        if ardDetailsCheck is true and vncPassCheck is true
-
-                -- close options window
-                optionsWindow's orderOut_(null)
-
-                -- enable options
-                set my optionWindowEnabled to true
 
         end if
-
-    end checkScreenSharingDetails_
+        
+    end checkvncPassword_
 
     -- To load at launch, verifying that we have correct values for ARD & VNC in plist
     on checkPasswords_(sender)
@@ -1623,7 +1628,7 @@ script AutoCasperNBIAppDelegate
         if vncEnabled is true then
             
             -- Get VNC password from plist
-            tell defaults to set my vncPassword to objectForKey_("vncPassword")
+            tell defaults to set vncPassword to objectForKey_("vncPassword")
             
             -- If No VNC Password
             if vncPassword is equal to missing value then
@@ -1669,7 +1674,7 @@ script AutoCasperNBIAppDelegate
         
         if customDesktopImageEnabled is false
         
-            -- Delete jssURL from plist
+            -- Delete desktop image path from plist
             tell defaults to removeObjectForKey_("customDesktopImagePath")
         
             -- Set lable to blank
@@ -1712,6 +1717,9 @@ script AutoCasperNBIAppDelegate
     -- If custom Desktop Image has a value, then check file exists & update error if it does not.
     on checkDesktopImage_(sender)
         
+        -- Set veriable to boolean
+        set customDesktopImageEnabled to customDesktopImageEnabled as boolean
+        
         -- If custom desktop image is selected
         if customDesktopImageEnabled is true
         
@@ -1732,7 +1740,7 @@ script AutoCasperNBIAppDelegate
                     set customDesktopImagePath to customDesktopImagePath as text
                     
                     -- Check for file
-                    do shell script "ls " & quoted form of customDesktopImagePath
+                    do shell script "/bin/ls " & quoted form of customDesktopImagePath
                     
                     -- True if file exists
                     set desktopImageExists to true
@@ -1756,16 +1764,60 @@ script AutoCasperNBIAppDelegate
 
     end checkDesktopImage_
 
-    -- Bound to "Set time server & zone" checkbox, sets plist
-    on timeServerOptionsEnabled_(sender)
+    -- Check that a custom desktop image has been selected
+    on checkcustomDesktopImagePath_(sender)
         
-        -- Set to variable to boolean
-        set timeServerOptionsEnabled to timeServerOptionsEnabled as boolean
+        -- Set to boolean of value
+        set customDesktopImageEnabled to customDesktopImageEnabled as boolean
         
-        -- Update plist with selection
-        tell defaults to setObject_forKey_(timeServerOptionsEnabled, "timeServerOptionsEnabled")
+        -- If ard enabled
+        if customDesktopImageEnabled is true
         
-    end timeServerOptionsEnabled_
+            -- If textfield is empty
+            if customDesktopImagePath is equal to missing value then
+                
+                -- Delete customDesktopImagePath from plist
+                tell defaults to removeObjectForKey_("customDesktopImagePath")
+                
+                -- Display error to user
+                display dialog "Please select a Desktop Image or deselect the Desktop Image option" with icon 0 buttons {"OK"}
+                
+                --Log Action
+                log "Error: Please select a Desktop Image or deselect the Desktop Image option"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set to false so we don't proceed
+                set closeButtonPreCheckPassed to false
+                
+            else
+                
+                -- If custom Desktop Image has a value, then check file exists & update error if it does not.
+                checkDesktopImage_(me)
+                
+            end if
+            
+        end if
+
+    end checkcustomDesktopImagePath_
+
+--    -- Bound to "Set time server & zone" checkbox, sets plist
+--    on timeServerOptionsEnabled_(sender)
+--
+--        -- Set to variable to boolean
+--        set timeServerOptionsEnabled to timeServerOptionsEnabled as boolean
+--
+--        -- Update plist with selection
+--        tell defaults to setObject_forKey_(timeServerOptionsEnabled, "timeServerOptionsEnabled")
+--
+--        --Log Action
+--        set logMe to "Enable Time Server options: " & timeServerOptionsEnabled
+--
+--        -- Log To file
+--        logToFile_(me)
+--
+--    end timeServerOptionsEnabled_
 
     -- Bound to Time Server Text field
     on timeServerCheck_(sender)
@@ -1788,7 +1840,10 @@ script AutoCasperNBIAppDelegate
             -- Update plist with selection
             tell defaults to setObject_forKey_(timeServerSelected, "timeServerSelected")
             
-            else
+            -- Set to false so we don't proceed
+            set closeButtonPreCheckPassed to false
+            
+        else
             
             --Log Action
             set logMe to "Time Server: " & timeServerSelected
@@ -1804,15 +1859,50 @@ script AutoCasperNBIAppDelegate
     end timeServerCheck_
 
     -- Bound to Time Zone drop down
-    on timeZoneTest_(sender)
+    on timeZone_(sender)
         
         -- Update plist with selection
         tell defaults to setObject_forKey_(timeZoneSelected, "timeZoneSelected")
         
-    end timeZoneTest_
+        --Log Action
+        set logMe to "Time Zone selected: " & timeZoneSelected
+        
+        -- Log To file
+        logToFile_(me)
+        
+    end timeZone_
+
+    -- Bound to OS Language drop down
+    on netBootLanguage_(sender)
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(languageSelected, "languageSelected")
+        
+        --Log Action
+        set logMe to "Language Selected: " & languageSelected
+        
+        -- Log To file
+        logToFile_(me)
+        
+    end netBootLanguage_
+
+
+    -- Bound to Input Language drop down
+    on inputLanguage_(sender)
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(inputLanguageSelected, "inputLanguageSelected")
+        
+        --Log Action
+        set logMe to "Input Language Selected: " & inputLanguageSelected
+        
+        -- Log To file
+        logToFile_(me)
+        
+    end inputLanguage_
 
     -- Bound to "Install modified rc.netboot file" checkbox, sets plist
-    on installRCNetBootSelected_(sender)
+    on installRCNetBootCheckBox_(sender)
         
         -- Set to variable to boolean
         set installRCNetBootSelected to installRCNetBootSelected as boolean
@@ -1820,29 +1910,138 @@ script AutoCasperNBIAppDelegate
         -- Update plist with selection
         tell defaults to setObject_forKey_(installRCNetBootSelected, "installRCNetBootSelected")
         
-    end installRCNetBootSelected_
+        --Log Action
+        set logMe to "Install rc.netboot set to: " & installRCNetBootSelected
+        
+        -- Log To file
+        logToFile_(me)
+        
+    end installRCNetBootCheckBox_
 
     -- Bound to "Create Read-Only DMG" checkbox, sets plist
-    on createReadOnlyDMGSelected_(sender)
+    on createReadOnlyDMGCheckBox_(sender)
         
         -- Set to variable to boolean
         set createReadOnlyDMG to createReadOnlyDMG as boolean
         
         -- Update plist with selection
-        tell defaults to setObject_forKey_( createReadOnlyDMG, "createReadOnlyDMG")
+        tell defaults to setObject_forKey_(createReadOnlyDMG, "createReadOnlyDMG")
         
-    end createReadOnlyDMGSelected_
+        --Log Action
+        set logMe to "Create a ReadOnly DMG set to: " & createReadOnlyDMG
+        
+        -- Log To file
+        logToFile_(me)
+        
+    end createReadOnlyDMGCheckBox_
+
+    -- Bound to "Enable Simple Finder" checkbox, sets plist
+    on simpleFinderCheckBox_(sender)
+        
+        -- Set to variable to boolean
+        set simpleFinderEnabled to simpleFinderEnabled as boolean
+        
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(simpleFinderEnabled, "simpleFinderEnabled")
+        
+        --Log Action
+        set logMe to "Enable Simple Finder set to : " & simpleFinderEnabled
+        
+        -- Log To file
+        logToFile_(me)
+        
+    end simpleFinderCheckBox_
+
+----- CLOSE OPTIONS WINDOW CHECK -----
+
+    -- Make sure all variables are set if enabled, if passed close options window
+    on closeOptionsWindowCheck_(sender)
+        
+        -- reset value
+        set closeButtonPreCheckPassed to true
+        
+        -- Verify that the description field has a value & reset & prompt if not
+        netBootDescriptionCheck_(me)
+        
+        -- Bound to NetBoot Image Resize value
+        netBootImageExpandEnteredValue_(me)
+        
+        -- Check the value entered in the ARD Username textfield
+        checkardUsername_(me)
+               
+        -- Check the value entered in the ARD Password textfield
+        checkardPassword_(me)
+            
+        -- Check the value entered in the vnc Password textfield
+        checkvncPassword_(me)
+        
+        -- Check that a custom desktop image has been selected
+        checkcustomDesktopImagePath_(me)
+        
+        -- Bound to Time Server Text field
+        timeServerCheck_(me)
+
+        -- Set to boolean of value
+        set closeButtonPreCheckPassed to closeButtonPreCheckPassed as boolean
+
+        -- Proceed if we've passed precheck
+        if closeButtonPreCheckPassed is true then
+            
+            -- reload options from plist
+            retrieveDefaults_(me)
+        
+            -- close options window
+            optionsWindow's orderOut_(null)
+
+            -- enable options
+            set my optionWindowEnabled to true
+                
+        end if
+
+    end closeOptionsWindowCheck_
 
 ----- BUILD PRE-CHECK -----
+
+    -- Make sure all variables are set if enabled
+    on buildPreCheck_(sender)
+        
+        -- reset value
+        set buildButtonPreCheckPassed to true
+        
+        -- Make sure a name is specified for the NetBoot Image, error if not.
+        netBootName_(me)
+        
+        -- Error if incorrect value specified
+        netBootImageIndexCheck_(me)
+        
+        -- Set to boolean of value
+        set buildButtonPreCheckPassed to buildButtonPreCheckPassed as boolean
+        
+        -- Proceed if we've passed precheck
+        if buildButtonPreCheckPassed is true then
+            
+            -- Disable main windows buttons
+            set my optionWindowEnabled to false
+            
+            -- reload options from plist
+            retrieveDefaults_(me)
+            
+            -- Check the JSS URL details & try & get version of the JSS
+            checkJSSURL_(me)
+            
+            -- Set NetBoot Description
+            enablenetBootDescription_(me)
+
+            -- Prompt user for location to create the .nbi
+            netBootLocation_(me)
+
+        end if
+        
+    end buildPreCheck_
 
     -- Prompt user for location to create the .nbi
     on netBootLocation_(sender)
         
-        -- Check the JSS URL details & try & get version of the JSS
-        checkJSSURL_(me)
-        
-        -- Set NetBoot Description
-        enablenetBootDescription_(me)
 
         try
             
@@ -1913,7 +2112,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Get total size of selectedOSdmg
-            set selectedOSdmgTotalSize to do shell script "diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Total Size\" | awk '{ print $3 }'"
+            set selectedOSdmgTotalSize to do shell script "/usr/sbin/diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Total Size\" | awk '{ print $3 }'"
             
             --Log Action
             set logMe to "Total size of " & quoted form of selectedOSdmgMountPath & "is " & selectedOSdmgTotalSize & "GB"
@@ -1922,7 +2121,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
 
             -- Get the value of the free space available on selectedOSdmg
-            set selectedOSdmgFreeSpace to do shell script "diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
+            set selectedOSdmgFreeSpace to do shell script "/usr/sbin/diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
 
             --Log Action
             set logMe to "There is " & selectedOSdmgFreeSpace & "GB space free on " & quoted form of selectedOSdmgMountPath
@@ -2032,7 +2231,7 @@ script AutoCasperNBIAppDelegate
                     -- Update label
                     set my customDesktopImageLabel to "Cannot Find: " & customDesktopImagePath
                     
-                    display dialog "Cannot Find: " & customDesktopImagePath & ".Do you wish to proceed?" with icon 2 buttons {"No", "Yes"}
+                    display dialog "Cannot Find: " & customDesktopImagePath & ". Do you wish to proceed?" with icon 2 buttons {"No", "Yes"}
                     
                     -- If user selected no
                     if button returned of the result is "No" then
@@ -2104,7 +2303,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Create .nbi folder
-            do shell script "mkdir " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/mkdir " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log action
             set logMe to "Successfully created " & quoted form of netBootDirectory
@@ -2130,7 +2329,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Delete existing folder
-                do shell script "rm -rf " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log action
                 set logMe to "Deleted " & quoted form of netBootDirectory
@@ -2180,8 +2379,19 @@ script AutoCasperNBIAppDelegate
             -- Set to text value, to avoid an issue when name changed
             set netBootNameTextField to netBootNameTextField as text
             
-            -- Create a the NetBoot.dmg
-            do shell script "hdiutil create " & quoted form of netBootDirectory & "/NetBoot -size " & netBootDmgRequiredSize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
+            -- If we're building an OS newer than 10.9
+            if selectedOSdmgVersionMajor is greater than 9
+            
+                -- Create the NetBoot.dmg
+                do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot -size " & netBootDmgRequiredSize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"GPTSPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            else
+            
+                -- Create the NetBoot.dmg
+                do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot -size " & netBootDmgRequiredSize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            
+            end if
             
             --Log action
             set logMe to "Successfully created NetBoot.dmg in " & quoted form of netBootDirectory
@@ -2233,7 +2443,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Mount the NetBoot.dmg & get the mount path
-            set netBootDmgMountPath to do shell script "hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+            set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Mounted to: " & netBootDmgMountPath
@@ -2289,7 +2499,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Copy contents of the SelectedOSdmg to NetBootdmg
-            do shell script "ditto " & quoted form of selectedOSdmgMountPath & " " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/ditto " & quoted form of selectedOSdmgMountPath & " " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log action
             set logMe to "Successfully copied " & quoted form of selectedOSdmgPath & " to " & quoted form of netBootDirectory & "/NetBoot.dmg"
@@ -2428,7 +2638,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Application\\ Support/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Application\\ Support/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Application Support/"
@@ -2442,7 +2652,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Audio/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Audio/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Audio/"
@@ -2456,7 +2666,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Caches/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Caches/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Caches/"
@@ -2470,7 +2680,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Desktop\\ Pictures/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Desktop\\ Pictures/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Desktop Pictures/"
@@ -2484,7 +2694,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Dictionaries/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Dictionaries/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Dictionaries/"
@@ -2498,7 +2708,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Documentation/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Documentation/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Documentation/"
@@ -2512,7 +2722,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Fonts/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Fonts/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Fonts/"
@@ -2526,7 +2736,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Logs/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Logs/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Logs/"
@@ -2540,7 +2750,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Modem\\ Scripts/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Modem\\ Scripts/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Modem Scripts/"
@@ -2554,7 +2764,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Printers/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Printers/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Printers/"
@@ -2568,7 +2778,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Receipts/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Receipts/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Receipts/"
@@ -2582,7 +2792,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Screen\\ Savers/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Screen\\ Savers/*" user name adminUserName password adminUsersPassword with administrator privileges
     
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Screen Savers/"
@@ -2596,7 +2806,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/Updates/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Updates/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Updates/"
@@ -2610,7 +2820,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/User\\ Pictures/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/User\\ Pictures/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/User Pictures/"
@@ -2624,7 +2834,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Library/WebServer/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/WebServer/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/WebServer/"
@@ -2657,7 +2867,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Address\\ Book\\ Plug-Ins/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Address\\ Book\\ Plug-Ins/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Address Book Plug-Ins/"
@@ -2671,7 +2881,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Automator/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Automator/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Automator/"
@@ -2685,7 +2895,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Caches/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Caches/*" user name adminUserName password adminUsersPassword with administrator privileges
    
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Caches/"
@@ -2699,7 +2909,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Compositions/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Compositions/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Compositions/"
@@ -2718,7 +2928,7 @@ script AutoCasperNBIAppDelegate
                     do shell script "unlink " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
                     
                     -- Delete DefaultDesktop.jpg
-                    do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                    do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
                     
                 end try
                 
@@ -2734,7 +2944,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/InternetAccounts/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/InternetAccounts/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/InternetAccounts/"
@@ -2762,7 +2972,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Printers/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Printers/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Printers/"
@@ -2776,7 +2986,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Screen\\ Savers/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Screen\\ Savers/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Screen Savers/"
@@ -2790,7 +3000,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Speech/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Speech/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Speech/"
@@ -2804,7 +3014,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/User\\ Templates/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/User\\ Templates/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/User Templates/"
@@ -2875,7 +3085,7 @@ script AutoCasperNBIAppDelegate
         try
             
             -- Delete the below, silently error if doesn't exist
-            do shell script "rm " & quoted form of netBootDmgMountPath & "/private/var/vm/swapfile*" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm " & quoted form of netBootDmgMountPath & "/private/var/vm/swapfile*" user name adminUserName password adminUsersPassword with administrator privileges
         
         end try
         
@@ -2910,7 +3120,7 @@ script AutoCasperNBIAppDelegate
         try
             
             -- Delete the below file, silently error if doesn't exist
-            do shell script "rm " & quoted form of netBootDmgMountPath & "/private/var/vm/sleepimage" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm " & quoted form of netBootDmgMountPath & "/private/var/vm/sleepimage" user name adminUserName password adminUsersPassword with administrator privileges
         
         end try
         
@@ -2945,7 +3155,7 @@ script AutoCasperNBIAppDelegate
         try
 
             -- Empty the below folder
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/private/tmp/*" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/private/tmp/*" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/private/tmp/"
@@ -2997,7 +3207,7 @@ script AutoCasperNBIAppDelegate
         try
             
             -- Empty the below folder
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/private/var/tmp/*" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/private/var/tmp/*" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/private/var/tmp/"
@@ -3049,7 +3259,7 @@ script AutoCasperNBIAppDelegate
         try
             
             -- Empty the below folder
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/Volumes/*" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Volumes/*" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/Volumes/"
@@ -3101,7 +3311,7 @@ script AutoCasperNBIAppDelegate
         try
             
             -- Empty the below folder
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/dev/*" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/dev/*" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/dev/"
@@ -3153,7 +3363,7 @@ script AutoCasperNBIAppDelegate
         try
             
             -- Empty the below folder
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/var/run/*" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/var/run/*" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/var/run/"
@@ -3205,7 +3415,7 @@ script AutoCasperNBIAppDelegate
         try
             
             -- Empty the below folder
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Software\\ Update.app" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Software\\ Update.app" user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/Software Update.app"
@@ -3220,7 +3430,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Empty the below folder
-            do shell script "rm " & quoted form of netBootDmgMountPath & "/System/Library/LaunchDaemons/com.apple.softwareupdate*" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm " & quoted form of netBootDmgMountPath & "/System/Library/LaunchDaemons/com.apple.softwareupdate*" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/LaunchDaemons/com.apple.softwareupdate*"
@@ -3272,7 +3482,7 @@ script AutoCasperNBIAppDelegate
         try
             
             -- Delete the below folder, silently error if doesn't exist
-            do shell script "rm " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/preferences.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/preferences.plist" user name adminUserName password adminUsersPassword with administrator privileges
         
         end try
         
@@ -3299,7 +3509,7 @@ script AutoCasperNBIAppDelegate
         try
             
             -- Delete the below folder, silently error if doesn't exist
-            do shell script "rm " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist" user name adminUserName password adminUsersPassword with administrator privileges
             
         end try
         
@@ -3366,13 +3576,13 @@ script AutoCasperNBIAppDelegate
             set my buildProccessProgressBar to 140
             
             -- Write DidSeeCloudSetup to com.apple.SetupAssistant
-            do shell script "defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist DidSeeCloudSetup -bool true" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist DidSeeCloudSetup -bool true" user name adminUserName password adminUsersPassword with administrator privileges
             
             -- Write GestureMovieSeen to com.apple.SetupAssistant
-            do shell script "defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist GestureMovieSeen none" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist GestureMovieSeen none" user name adminUserName password adminUsersPassword with administrator privileges
             
             -- Write LastSeenCloudProductVersion to com.apple.SetupAssistant
-            do shell script "defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist LastSeenCloudProductVersion " & quoted form of selectedOSdmgVersion user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist LastSeenCloudProductVersion " & quoted form of selectedOSdmgVersion user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "iCloud Bypass options written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
@@ -3387,7 +3597,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             --Delete the MiniLauncher
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup\\ Assistant.app/Contents/SharedSupport/MiniLauncher" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup\\ Assistant.app/Contents/SharedSupport/MiniLauncher" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Deleted " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
@@ -3435,7 +3645,7 @@ script AutoCasperNBIAppDelegate
             set variableVariable to netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
             
             -- Set TimeMachine to not prompt for new disks for backup
-            do shell script "defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist DoNotOfferNewDisksForBackup -bool YES" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist DoNotOfferNewDisksForBackup -bool YES" user name adminUserName password adminUsersPassword with administrator privileges
             
             -- Log Action
             set logMe to "com.apple.TimeMachine.plist amended at " & netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
@@ -3491,7 +3701,7 @@ script AutoCasperNBIAppDelegate
             if selectedOSdmgVersionMajor is 10
             
                 -- Delete com.apple.dockfixup.plist
-                do shell script "rm " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Dock.app/Contents/Resources/com.apple.dockfixup.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Dock.app/Contents/Resources/com.apple.dockfixup.plist" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/Dock.app/Contents/Resources/com.apple.dockfixup.plist"
@@ -3502,7 +3712,7 @@ script AutoCasperNBIAppDelegate
             else
             
                 -- Delete com.apple.dockfixup.plist
-                do shell script "rm " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.dockfixup.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.dockfixup.plist" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Deleted " & netBootDmgMountPath & "/Library/Preferences/com.apple.dockfixup.plist"
@@ -3556,7 +3766,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
         
             -- Copy the plist
-            do shell script "ditto " & quoted form of pathToResources & "/com.apple.PowerManagement.plist " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/com.apple.PowerManagement.plist " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Copied com.apple.PowerManagement.plist"
@@ -3608,7 +3818,7 @@ script AutoCasperNBIAppDelegate
                 set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Settings/ARDUser.plist"
                 
                 -- Encode ardUsername
-                set ardUsernameEncoded to do shell script "echo " & ardUsername & " | openssl base64 "
+                set ardUsernameEncoded to do shell script "/bin/echo " & ardUsername & " | openssl base64 "
                 
                 --Log Action
                 set logMe to "ARD Username encoded"
@@ -3617,7 +3827,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Write encoded ARD Username to plist
-                do shell script "defaults write " & quoted form of variableVariable & " ARDUsername "  & ardUsernameEncoded  user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " ARDUsername "  & ardUsernameEncoded  user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Written ARD Username to " & variableVariable
@@ -3626,7 +3836,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Encode ardPassword
-                set ardPasswordEncoded to do shell script "echo " & ardPassword & " | openssl base64 "
+                set ardPasswordEncoded to do shell script "/bin/echo " & ardPassword & " | openssl base64 "
                 
                 --Log Action
                 set logMe to "ARD Password encoded"
@@ -3635,7 +3845,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Write encoded ARD Password to plist
-                do shell script "defaults write " & quoted form of variableVariable & " ARDPassword "  & ardPasswordEncoded  user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " ARDPassword "  & ardPasswordEncoded  user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Written ARD Password to " & variableVariable
@@ -3707,7 +3917,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Write hashed vncPassword to /Library/Preferences/com.apple.VNCSettings.txt on .nbi
-                do shell script "echo " & vncPassword & " | perl -we 'BEGIN { @k = unpack \"C*\", pack \"H*\", \"1734516E8BA8C5E2FF1C39567390ADCA\"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack \"C*\", $_; foreach (@k) { printf \"%02X\", $_ ^ (shift @p || 0) }; print \"
+                do shell script "/bin/echo " & vncPassword & " | perl -we 'BEGIN { @k = unpack \"C*\", pack \"H*\", \"1734516E8BA8C5E2FF1C39567390ADCA\"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack \"C*\", $_; foreach (@k) { printf \"%02X\", $_ ^ (shift @p || 0) }; print \"
                 \"' | sudo tee " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
@@ -3758,7 +3968,7 @@ script AutoCasperNBIAppDelegate
     on setTimeServerAndZone_(sender)
         
         -- If VNC option has been enabled
-        if timeServerOptionsEnabled is equal to true then
+        --if timeServerOptionsEnabled is equal to true then
         
             try
                 
@@ -3774,7 +3984,7 @@ script AutoCasperNBIAppDelegate
                 set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Settings/TimeSettings.plist"
                 
                 -- Write Time Server to plist
-                do shell script "defaults write " & quoted form of variableVariable & " timeServer "  & timeServerSelected  user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " timeServer "  & timeServerSelected  user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Written Time Server " & timeServerSelected & " to " & variableVariable
@@ -3783,7 +3993,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Write encoded Time Zone to plist
-                do shell script "defaults write " & quoted form of variableVariable & " timeZone "  & timeZoneSelected  user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " timeZone "  & timeZoneSelected  user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Written Time Zone " & timeZoneSelected & " to " & variableVariable
@@ -3813,12 +4023,12 @@ script AutoCasperNBIAppDelegate
             
             end try
         
-        else
+        --else
         
             -- Install AutoCasperNBIStartup.pkg
-            installAutoCasperNBIStartup_(me)
+            --installAutoCasperNBIStartup_(me)
         
-        end if
+        --end if
         
     end setTimeServerAndZone_
 
@@ -3904,8 +4114,8 @@ script AutoCasperNBIAppDelegate
             
             considering numeric strings
                 
-                -- If we're building a 10.7 .nbi
-                if selectedOSdmgVersionMajor is 7
+                -- If we're building a pre 10.8.nbi
+                if selectedOSdmgVersionMajor is less than 8
                  
                      --Log Action
                      set logMe to "Trying to copy Lion Root user plist"
@@ -3922,7 +4132,7 @@ script AutoCasperNBIAppDelegate
                      set my buildProccessProgressBar to 205
                      
                      -- Copy the root.plist
-                     do shell script "ditto " & quoted form of pathToResources & "/root.plist " & quoted form of netBootDmgMountPath & "/private/var/db/dslocal/nodes/Default/users/" user name adminUserName password adminUsersPassword with administrator privileges
+                     do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/root.plist " & quoted form of netBootDmgMountPath & "/private/var/db/dslocal/nodes/Default/users/" user name adminUserName password adminUsersPassword with administrator privileges
                      
                      --Log Action
                      set logMe to "Successfully copied Lion Root user plist"
@@ -4112,7 +4322,7 @@ script AutoCasperNBIAppDelegate
             set my buildProccessProgressBar to 230
             
             -- Cut the trailing /
-            set selectedAppPathToCopy to do shell script "echo " & quoted form of selectedAppPath & " | rev | cut -c 2- | rev"
+            set selectedAppPathToCopy to do shell script "/bin/echo " & quoted form of selectedAppPath & " | rev | cut -c 2- | rev"
             
             --Log Action
             set logMe to "Casper Imaging.app to copy resides " & selectedAppPathToCopy
@@ -4196,7 +4406,7 @@ script AutoCasperNBIAppDelegate
             set variableVariable to netBootDmgMountPath & "/private/var/root/Library/Preferences/com.jamfsoftware.jss.plist"
             
             -- Write Casper Imaging plist to allow invalid cert,
-            do shell script "defaults write " & quoted form of variableVariable & " allowInvalidCertificate -bool true" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " allowInvalidCertificate -bool true" user name adminUserName password adminUsersPassword with administrator privileges
             
             -- Log Action
             set logMe to "com.jamfsoftware.jss.plist created & allow invalid certificate set"
@@ -4208,7 +4418,7 @@ script AutoCasperNBIAppDelegate
             if jssURL is not equal missing value
             
                 -- Write JSS URL to plist,
-                do shell script "defaults write " & quoted form of variableVariable & " url -string " & jssURL user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " url -string " & jssURL user name adminUserName password adminUsersPassword with administrator privileges
       
                 --Log Action
                 set logMe to "plist updated with JSS url"
@@ -4322,18 +4532,15 @@ script AutoCasperNBIAppDelegate
                 -- Download CA Cert from JSS to /Library/Application Support/AutoCasperNBI/Certificates/UUID
                 do shell script "curl -k -o " & quoted form of variableVariable & tempUUID & ".cer " & jssURL & "/CA/SCEP?operation=getcacert" user name adminUserName password adminUsersPassword with administrator privileges
          
-                 -- Log Action
-                 set logMe to "Downloaded JSS CA Cert to " & quoted form of variableVariable
+                -- Log Action
+                set logMe to "Downloaded JSS CA Cert to " & quoted form of variableVariable
                  
-                 -- Log To file
-                 logToFile_(me)
+                -- Log To file
+                logToFile_(me)
          
-                -- Create dlyd shared cache files
-                --createDlydCaches_(me)
-                
-                -- Get size of NetBoot.dmg
-                getNetBootDmgSize_(me)
-                
+                -- Enable Simple Finder if selected
+                enableSimpleFinder_(me)
+         
             on error
             
                 --Log Action
@@ -4354,20 +4561,883 @@ script AutoCasperNBIAppDelegate
             end try
         
         else
-        
-            -- Create dlyd shared cache files
-            --createDlydCaches_(me)
-            
-            -- Get size of NetBoot.dmg
-            getNetBootDmgSize_(me)
+            -- Enable Simple Finder if selected
+            enableSimpleFinder_(me)
         
         end if
 
     end importJSSCACert_
 
+    -- Enable Simple Finder if selected
+    on enableSimpleFinder_(sender)
+        
+        -- Set to boolean of value
+        set simpleFinderEnabled to simpleFinderEnabled as boolean
+        
+        -- If we're enabling simple Finder
+        if simpleFinderEnabled is true
+        
+            try
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Enabling Simple Finder"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 270
+                
+                --Log Action
+                set logMe to "Trying enable Simple Finder"
+                
+                -- Log To file
+                logToFile_(me)
+
+                -- Enable Simple Finder
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.finder.plist InterfaceLevel simple" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                --Log Action
+                set logMe to "Simple Finder enabled"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set the language of the .nbi
+                setNetBootLanguage_(me)
+                
+            on error
+            
+                --Log Action
+                set logMe to "Error: Enabling Simple Finder"
+                
+                -- Log To file
+                logToFile_(me)
+                
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
+                
+                -- Set Error message
+                set my userNotifyError to "Error: Failed to create NetBoot.reduced.dmg"
+                
+                -- Notify of errors or success
+                userNotify_(me)
+            
+            end try
+            
+        else
+        
+            -- Set the language of the .nbi
+            setNetBootLanguage_(me)
+        
+        end if
+
+    end enableSimpleFinder_
+
+    -- Set the language of the .nbi
+    on setNetBootLanguage_(sender)
+        
+        try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Setting NetBoot's OS Language"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 280
+            
+            --Log Action
+            set logMe to "Getting language code for selected language " & languageSelected
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Language codes taken from /System/Library/PrivateFrameworks/IntlPreferences.framework/Versions/A/Resources/Languages.strings
+            
+            -- Set to text of value
+            set languageSelected to languageSelected as text
+            
+            -- Get Language code from languages selected (code is after : in the drop down).
+            set languageCode to text ((offset of ":" in languageSelected) + 2) thru -1 of languageSelected
+            
+            --Log Action
+            set logMe to "Language Code is: " & languageCode
+            
+            -- Log To file
+            logToFile_(me)
+            
+            --Log Action
+            set logMe to "Trying to set NetBoot's OS Language"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set Language
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/.GlobalPreferences.plist AppleLanguages -array " & quoted form of languageCode & " en fr de \"zh-Hans\" \"zh-Hant\" ja es it nl ko pt \"pt-PT\" da fi nb sv ru pl tr ar th cs hu ca hr el he ro sk uk id ms vi" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "NetBoot's OS Language set"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set the NetBoot's Input Language
+            setNetBootInputLanguage_(me)
+            
+        on error
+            
+            --Log Action
+            set logMe to "Error: Setting NetBoot's Language"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+            
+            -- Set Error message
+            set my userNotifyError to "Error: Setting NetBoot's Language"
+            
+            -- Notify of errors or success
+            userNotify_(me)
+            
+        end try
+        
+    end setNetBootLanguage_
+
+    -- Set the NetBoot's Input Language
+    on setNetBootInputLanguage_(sender)
+        
+        try
+            
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Setting NetBoot's Input Language"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 290
+                
+                --Log Action
+                set logMe to "Trying to get input layout id for  " & inputLanguageSelected
+                
+                -- Log To file
+                logToFile_(me)
+            
+                -- Set to text of value
+                set inputLanguageSelected to inputLanguageSelected as text
+                
+                -- Set Keyboard ID depending on Input Language.
+                if inputLanguageSelected is equal to "AfghanDari" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-2092"
+                    
+                else if inputLanguageSelected is equal to "AfghanPashto" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-2094"
+                    
+                else if inputLanguageSelected is equal to "AfghanUzbek" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-2093"
+                    
+                else if inputLanguageSelected is equal to "Arabic" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-17920"
+                    
+                else if inputLanguageSelected is equal to "ArabicPC" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-17921"
+                    
+                else if inputLanguageSelected is equal to "Arabic-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-18000"
+                    
+                else if inputLanguageSelected is equal to "Armenian-HMQWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-28161"
+                    
+                else if inputLanguageSelected is equal to "Armenian-WesternQWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-28164"
+                    
+                else if inputLanguageSelected is equal to "Australian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "15"
+                    
+                else if inputLanguageSelected is equal to "Austrian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "92"
+                    
+                else if inputLanguageSelected is equal to "Azeri" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-49"
+                    
+                else if inputLanguageSelected is equal to "Bangla" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-22528"
+                    
+                else if inputLanguageSelected is equal to "Bangla-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-22529"
+                    
+                else if inputLanguageSelected is equal to "Belgian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "6"
+                    
+                else if inputLanguageSelected is equal to "Brazilian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "71"
+                    
+                else if inputLanguageSelected is equal to "British" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "2"
+                    
+                else if inputLanguageSelected is equal to "British-PC" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "250"
+                    
+                else if inputLanguageSelected is equal to "Bulgarian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19528"
+                    
+                else if inputLanguageSelected is equal to "Bulgarian-Phonetic" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19529"
+                    
+                else if inputLanguageSelected is equal to "Byelorussian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19517"
+                    
+                else if inputLanguageSelected is equal to "Canadian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "29"
+                    
+                else if inputLanguageSelected is equal to "Canadian-CSA" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "80"
+                    
+                else if inputLanguageSelected is equal to "Cherokee-Nation" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-26112"
+                    
+                else if inputLanguageSelected is equal to "Cherokee-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-26113"
+                    
+                else if inputLanguageSelected is equal to "Czech-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "30778"
+                    
+                else if inputLanguageSelected is equal to "Devanagari" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "20480"
+                    
+                else if inputLanguageSelected is equal to "Devanagari-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-20481"
+                    
+                else if inputLanguageSelected is equal to "Dutch" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "26"
+                    
+                else if inputLanguageSelected is equal to "Dvorak" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "16300"
+                    
+                else if inputLanguageSelected is equal to "Dvorak-Left" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "16302"
+                    
+                else if inputLanguageSelected is equal to "DVORAK-QWERTYCMD" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "16301"
+                    
+                else if inputLanguageSelected is equal to "Dvorak-Right" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "16303"
+                    
+                else if inputLanguageSelected is equal to "Estonian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "30764"
+                    
+                else if inputLanguageSelected is equal to "Faroese" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-47"
+                    
+                else if inputLanguageSelected is equal to "Finnish" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "17"
+                    
+                else if inputLanguageSelected is equal to "FinnishExtended" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-17"
+                    
+                else if inputLanguageSelected is equal to "FinnishSami-PC" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-18"
+                    
+                else if inputLanguageSelected is equal to "French" then
+                
+                    -- set to value required
+                    set inputLayoutID to "1"
+                    
+                else if inputLanguageSelected is equal to "French-numerical" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "1111"
+                    
+                else if inputLanguageSelected is equal to "Georgian-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-27650"
+                    
+                else if inputLanguageSelected is equal to "German" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "3"
+                    
+                else if inputLanguageSelected is equal to "Greek" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-18944"
+                    
+                else if inputLanguageSelected is equal to "GreekPolytonic" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-18945"
+                    
+                else if inputLanguageSelected is equal to "Gujarati" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-21504"
+                    
+                else if inputLanguageSelected is equal to "Gujarati-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-21505"
+                    
+                else if inputLanguageSelected is equal to "Gurmukhi" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-20992"
+                    
+                else if inputLanguageSelected is equal to "Gurmukhi-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-20993"
+                    
+                else if inputLanguageSelected is equal to "Hawaiian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-50"
+                    
+                else if inputLanguageSelected is equal to "Hebrew" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-18432"
+                    
+                else if inputLanguageSelected is equal to "Hebrew-PC" then
+                
+                    -- set to value required
+                    set inputLayoutID to "-18433"
+                    
+                else if inputLanguageSelected is equal to "Hebrew-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-18500"
+                    
+                else if inputLanguageSelected is equal to "Hungarian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "30763"
+                    
+                else if inputLanguageSelected is equal to "Icelandic" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-21"
+                    
+                else if inputLanguageSelected is equal to "Inuktitut-Nunavut" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-30604"
+                    
+                else if inputLanguageSelected is equal to "Inuktitut-Nutaaq" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-30602"
+                    
+                else if inputLanguageSelected is equal to "Inuktitut-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-30600"
+                    
+                else if inputLanguageSelected is equal to "InuttitutNunavik" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-30603"
+                    
+                else if inputLanguageSelected is equal to "Irish" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "50"
+                    
+                else if inputLanguageSelected is equal to "IrishExtended" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-500"
+                    
+                else if inputLanguageSelected is equal to "Italian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "4"
+                    
+                else if inputLanguageSelected is equal to "Italian-Pro" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "223"
+                    
+                else if inputLanguageSelected is equal to "Jawi-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-19000"
+                    
+                else if inputLanguageSelected is equal to "Kannada" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-24064"
+                    
+                else if inputLanguageSelected is equal to "Kannada-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-24065"
+                    
+                else if inputLanguageSelected is equal to "Kazakh" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-19501"
+                    
+                else if inputLanguageSelected is equal to "Khmer" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-26114"
+                    
+                else if inputLanguageSelected is equal to "Kurdish-Sorani" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-17926"
+                    
+                else if inputLanguageSelected is equal to "Latvian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "30765"
+                    
+                else if inputLanguageSelected is equal to "Lithuanian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "30761"
+                    
+                else if inputLanguageSelected is equal to "Macedonian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19523"
+                    
+                else if inputLanguageSelected is equal to "Malayalam" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-24576"
+                    
+                else if inputLanguageSelected is equal to "Malayalam-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-24577"
+                    
+                else if inputLanguageSelected is equal to "Maltese" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-501"
+                    
+                else if inputLanguageSelected is equal to "Maori" then
+                
+                    -- set to value required
+                    set inputLayoutID to "-51"
+                    
+                else if inputLanguageSelected is equal to "Myanmar-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-25601"
+                    
+                else if inputLanguageSelected is equal to "Nepali" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-20484"
+                    
+                else if inputLanguageSelected is equal to "NorthernSami" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-1200"
+                    
+                else if inputLanguageSelected is equal to "Norwegian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "12"
+                    
+                else if inputLanguageSelected is equal to "NorwegianExtended" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-12"
+                    
+                else if inputLanguageSelected is equal to "NorwegianSami-PC" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-13"
+                    
+                else if inputLanguageSelected is equal to "Oriya" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-22016"
+                    
+                else if inputLanguageSelected is equal to "Oriya-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-22017"
+                    
+                else if inputLanguageSelected is equal to "Persian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "--17960"
+                    
+                else if inputLanguageSelected is equal to "Persian-ISIRI290" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-2901"
+                    
+                else if inputLanguageSelected is equal to "Persian-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-1959"
+                    
+                else if inputLanguageSelected is equal to "Polish" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "30762"
+                    
+                else if inputLanguageSelected is equal to "PolishPro" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "30788"
+                    
+                else if inputLanguageSelected is equal to "Portuguese" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "10"
+                    
+                else if inputLanguageSelected is equal to "Romanian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-39"
+                    
+                else if inputLanguageSelected is equal to "Romanian-Standard" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-38"
+                    
+                else if inputLanguageSelected is equal to "Russian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19456"
+                    
+                else if inputLanguageSelected is equal to "RussianWin" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19458"
+                    
+                else if inputLanguageSelected is equal to "Russian-Phonetic" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19457"
+                    
+                else if inputLanguageSelected is equal to "RussianWin" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19458"
+                    
+                else if inputLanguageSelected is equal to "Sami-PC" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-1201"
+                    
+                else if inputLanguageSelected is equal to "Serbian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19521"
+                    
+                else if inputLanguageSelected is equal to "Serbian-Latin" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-19521"
+                    
+                else if inputLanguageSelected is equal to "Sami-PC" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-1201"
+                    
+                else if inputLanguageSelected is equal to "Sinhala" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-25088"
+                    
+                else if inputLanguageSelected is equal to "Sinhala-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-25089"
+                    
+                else if inputLanguageSelected is equal to "Slovak" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "30777"
+                    
+                else if inputLanguageSelected is equal to "Slovak-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "30779"
+                    
+                else if inputLanguageSelected is equal to "Slovenian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-66"
+                    
+                else if inputLanguageSelected is equal to "Spanish" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "8"
+                    
+                else if inputLanguageSelected is equal to "Spanish-ISO" then
+                
+                    -- set to value required
+                    set inputLayoutID to "87"
+                    
+                else if inputLanguageSelected is equal to "Swedish" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "224"
+                    
+                else if inputLanguageSelected is equal to "Swedish-Pro" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "7"
+                    
+                else if inputLanguageSelected is equal to "SwedishSami-PC" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-15"
+                    
+                else if inputLanguageSelected is equal to "SwissFrench" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "18"
+                    
+                else if inputLanguageSelected is equal to "SwissGerman" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19"
+                    
+                else if inputLanguageSelected is equal to "Telugu" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-23552"
+                    
+                else if inputLanguageSelected is equal to "Telugu-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-23553"
+                    
+                else if inputLanguageSelected is equal to "Thai" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-26624"
+                    
+                else if inputLanguageSelected is equal to "Thai-PattaChote" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-226626"
+                    
+                else if inputLanguageSelected is equal to "TibetanOtaniUS" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-26628"
+                    
+                else if inputLanguageSelected is equal to "Tibetan-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-26625"
+                    
+                else if inputLanguageSelected is equal to "Tibetan-Wylie" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-2398"
+                    
+                else if inputLanguageSelected is equal to "Turkish" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-24"
+                    
+                else if inputLanguageSelected is equal to "Turkish-QWERTY" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-35"
+                    
+                else if inputLanguageSelected is equal to "Turkish-QWERTY-PC" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-36"
+                    
+                else if inputLanguageSelected is equal to "Ukrainian" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "19518"
+                    
+                else if inputLanguageSelected is equal to "UnicodeHexInput" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-1"
+                    
+                else if inputLanguageSelected is equal to "Urdu" then
+                
+                    -- set to value required
+                    set inputLayoutID to "--17925"
+                    
+                else if inputLanguageSelected is equal to "U.S." then
+                    
+                    -- set to value required
+                    set inputLayoutID to "0"
+                    
+                else if inputLanguageSelected is equal to "USExtended" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-2"
+                
+                else if inputLanguageSelected is equal to "USInternational-PC" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "15000"
+                    
+                else if inputLanguageSelected is equal to "Uyghur" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-27000"
+                    
+                else if inputLanguageSelected is equal to "Vietnamese" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-31232"
+                    
+                else if inputLanguageSelected is equal to "Welsh" then
+                    
+                    -- set to value required
+                    set inputLayoutID to "-790"
+                    
+                end if
+                
+            --Log Action
+            set logMe to "Keyboard Layout ID set to " & inputLayoutID
+                
+            -- Log To file
+            logToFile_(me)
+
+            --Log Action
+            set logMe to "Trying to set NetBoot's Input Language"
+
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set variableVariables's value
+            set variableVariable to quoted form of ("com.apple.keylayout." & inputLanguageSelected)
+
+            -- Set Source ID
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleCurrentKeyboardLayoutInputSourceID " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+            
+            -- Set Ascii Input Source
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleDefaultAsciiInputSource -dict InputSourceKind \"Keyboard Layout\" \"KeyboardLayout ID\" -int " & quoted form of inputLayoutID & " \"KeyboardLayout Name\" " & quoted form of inputLanguageSelected user name adminUserName password adminUsersPassword with administrator privileges
+
+            -- Set Enabled Input Sources
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleEnabledInputSources -array '{ InputSourceKind = \"Keyboard Layout\"; \"KeyboardLayout ID\" = " & quoted form of inputLayoutID & "; \"KeyboardLayout Name\" = " & quoted form of inputLanguageSelected & "; }'"  user name adminUserName password adminUsersPassword with administrator privileges
+
+            -- Set Input Source History
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleInputSourceHistory -array '{ InputSourceKind = \"Keyboard Layout\"; \"KeyboardLayout ID\" = " & quoted form of inputLayoutID & "; \"KeyboardLayout Name\" = " & quoted form of inputLanguageSelected & "; }'" user name adminUserName password adminUsersPassword with administrator privileges
+
+            -- Set Selected Input Sources
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources -array '{ InputSourceKind = \"Keyboard Layout\"; \"KeyboardLayout ID\" = " & quoted form of inputLayoutID & "; \"KeyboardLayout Name\" = " & quoted form of inputLanguageSelected & "; }'" user name adminUserName password adminUsersPassword with administrator privileges
+
+            --Log Action
+            set logMe to "NetBoot's Input Language set"
+
+            -- Log To file
+            logToFile_(me)
+            
+            -- Get size of NetBoot.dmg
+            getNetBootDmgSize_(me)
+
+        on error
+
+            --Log Action
+            set logMe to "Error: Setting NetBoot's Input Language"
+
+            -- Log To file
+            logToFile_(me)
+
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+
+            -- Set Error message
+            set my userNotifyError to "Error: Setting NetBoot's Input Language"
+
+            -- Notify of errors or success
+            userNotify_(me)
+
+        end try
+        
+    end setNetBootInputLanguage_
+
     -- Get size of NetBoot.dmg
     on getNetBootDmgSize_(sender)
-        
+    
         try
             
             -- Update Build Process Window's Text Field
@@ -4376,7 +5446,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 270
+            set my buildProccessProgressBar to 300
             
             --Log Action
             set logMe to "Trying to get the Total size of " & quoted form of netBootDmgMountPath
@@ -4385,7 +5455,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Get total size of NetBoot.dmg
-            set netBootDmgTotalSize to do shell script "diskutil info " & quoted form of netBootDmgMountPath & " | grep \"Total Size\" | awk '{ print $3 }'"
+            set netBootDmgTotalSize to do shell script "/usr/sbin/diskutil info " & quoted form of netBootDmgMountPath & " | grep \"Total Size\" | awk '{ print $3 }'"
             
             --Log Action
             set logMe to "Total size of " & quoted form of netBootDmgMountPath & "is " & netBootDmgTotalSize & "GB"
@@ -4394,7 +5464,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Get the value of the free space available on NetBoot.dmg
-            set netBootDmgFreeSpace to do shell script "diskutil info " & quoted form of netBootDmgMountPath & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
+            set netBootDmgFreeSpace to do shell script "/usr/sbin/diskutil info " & quoted form of netBootDmgMountPath & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
             
             --Log Action
             set logMe to "There is " & netBootDmgFreeSpace & "GB space free on " & quoted form of netBootDmgMountPath
@@ -4480,7 +5550,7 @@ script AutoCasperNBIAppDelegate
         delay 0.1
         
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 280
+        set my buildProccessProgressBar to 310
         
         --Log action
         set logMe to "Trying to create NetBoot.reduced.dmg in " & netBootDirectory
@@ -4493,8 +5563,18 @@ script AutoCasperNBIAppDelegate
         
         try
             
-            -- Create a the NetBoot.dmg
-            do shell script "hdiutil create " & quoted form of netBootDirectory & "/NetBoot.reduced -size " & netBootDmgResize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
+            -- If we're building an OS newer than 10.9
+            if selectedOSdmgVersionMajor is greater than 9
+            
+                -- Create the NetBoot.dmg
+                do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot.reduced -size " & netBootDmgResize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"GPTSPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            else
+            
+                -- Create the NetBoot.dmg
+                do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot.reduced -size " & netBootDmgResize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            end if
             
             --Log action
             set logMe to "Successfully created NetBoot.reduced.dmg in " & quoted form of netBootDirectory
@@ -4537,7 +5617,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 290
+            set my buildProccessProgressBar to 320
             
             --Log Action
             set logMe to "Trying to mount: " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg"
@@ -4546,7 +5626,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Mount the NetBoot.dmg & get the mount path
-            set netBootReducedDmgMountPath to do shell script "hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+            set netBootReducedDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Mounted to: " & netBootReducedDmgMountPath
@@ -4588,7 +5668,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 300
+            set my buildProccessProgressBar to 330
             
             --Log action
             set logMe to "Copying contents of " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath
@@ -4597,7 +5677,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Copy contents of the SelectedOSdmg to NetBootdmg
-            do shell script "ditto " & quoted form of netBootDmgMountPath & " " & quoted form of netBootReducedDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/ditto " & quoted form of netBootDmgMountPath & " " & quoted form of netBootReducedDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log action
             set logMe to "Successfully copied " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath
@@ -4643,7 +5723,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 310
+            set my buildProccessProgressBar to 340
             
             ---- Unmount NetBoot.dmg ----
             try
@@ -4655,7 +5735,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Detach Volume
-                do shell script "hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+                do shell script "/usr/bin/hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
                 
             end try
             
@@ -4665,7 +5745,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 315
+            set my buildProccessProgressBar to 345
             
             --Log action
             set logMe to "Deleting " & quoted form of netBootDirectory & "/NetBoot.dmg"
@@ -4673,8 +5753,8 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            -- Create a the NetBoot.dmg
-            do shell script "rm -f " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+            -- Delete NetBoot.dmg
+            do shell script "/bin/rm -f " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log action
             set logMe to "Deleted " & quoted form of netBootDirectory & "/NetBoot.dmg"
@@ -4726,7 +5806,7 @@ script AutoCasperNBIAppDelegate
                     delay 0.1
                     
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 320
+                    set my buildProccessProgressBar to 350
                     
                     considering numeric strings
                         
@@ -4745,7 +5825,7 @@ script AutoCasperNBIAppDelegate
                         logToFile_(me)
                         
                         -- Detach Volume
-                        do shell script "hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
+                        do shell script "/usr/bin/hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
                         
                     end try
                     
@@ -4760,7 +5840,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Expand NetBoot.reduced.dmg by the value given before
-                    do shell script "hdiutil resize -size " & netBootExpandedTotalSize & "g " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                    do shell script "/usr/bin/hdiutil resize -size " & netBootExpandedTotalSize & "g " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                     
                     -- Update Build Process Window's Text Field
                     set my buildProcessTextField to "Mounting NetBoot.reduced.dmg"
@@ -4768,7 +5848,7 @@ script AutoCasperNBIAppDelegate
                     delay 0.1
                     
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 325
+                    set my buildProccessProgressBar to 355
                     
                     --Log Action
                     set logMe to "Trying to mount: " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg"
@@ -4777,7 +5857,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Mount the NetBoot.dmg & get the mount path
-                    set netBootDmgMountPath to do shell script "hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+                    set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
                     
                     --Log Action
                     set logMe to "Mounted to: " & netBootReducedDmgMountPath
@@ -4817,7 +5897,7 @@ script AutoCasperNBIAppDelegate
                     delay 0.1
                     
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 320
+                    set my buildProccessProgressBar to 350
                     
                     considering numeric strings
                         
@@ -4836,7 +5916,7 @@ script AutoCasperNBIAppDelegate
                         logToFile_(me)
                         
                         -- Detach Volume
-                        do shell script "hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+                        do shell script "/usr/bin/hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
                         
                     end try
                     
@@ -4851,7 +5931,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Expand NetBoot.dmg by the value given before
-                    do shell script "hdiutil resize -size " & netBootExpandedTotalSize & "g " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                    do shell script "/usr/bin/hdiutil resize -size " & netBootExpandedTotalSize & "g " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                     
                     -- Update Build Process Window's Text Field
                     set my buildProcessTextField to "Mounting NetBoot.dmg"
@@ -4859,7 +5939,7 @@ script AutoCasperNBIAppDelegate
                     delay 0.1
                     
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 325
+                    set my buildProccessProgressBar to 355
                     
                     --Log Action
                     set logMe to "Trying to mount: " & quoted form of netBootDirectory & "/NetBoot.dmg"
@@ -4868,7 +5948,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Mount the NetBoot.dmg & get the mount path
-                    set netBootDmgMountPath to do shell script "hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+                    set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
                     
                     --Log Action
                     set logMe to "Mounted to: " & netBootReducedDmgMountPath
@@ -4920,7 +6000,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 330
+            set my buildProccessProgressBar to 360
             
             --Log Action
             set logMe to "Trying to disable Spotlight Indexing on " & netBootDmgMountPath
@@ -4929,7 +6009,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Disable Spotlight Indexing
-            do shell script "mdutil -i off " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/mdutil -i off " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Disabled Spotlight Indexing on " & netBootDmgMountPath
@@ -4963,16 +6043,16 @@ script AutoCasperNBIAppDelegate
 
     -- Create dlyd shared cache files
     on createDlydCaches_(sender)
-        
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Creating dyld shared cache files"
-        
-        delay 0.1
-        
-        -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 340
 
         try
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Creating dyld shared cache files"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 370
             
             --Log Action
             set logMe to "Creating dyld shared cache files on: " & netBootDmgMountPath
@@ -4980,7 +6060,7 @@ script AutoCasperNBIAppDelegate
             -- Log To file
             logToFile_(me)
             
-            do shell script "update_dyld_shared_cache -root " & quoted form of netBootDmgMountPath & " -universal_boot -force" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/update_dyld_shared_cache -root " & quoted form of netBootDmgMountPath & " -universal_boot -force" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Successfully created dyld caches"
@@ -5015,8 +6095,6 @@ script AutoCasperNBIAppDelegate
     -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
     on manualKernelCacheReductionCheck_(sender)
         
-        -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
-        --manualKernelCacheReductionCheck_(me)
         considering numeric strings
             
             -- If we're running on 10.9.0 - .3 then reduce kernel cache
@@ -5060,7 +6138,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 350
+            set my buildProccessProgressBar to 380
             
             --Log Action
             set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
@@ -5069,7 +6147,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Delete extensions
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/AMD*"  user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/AMD*"  user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
@@ -5084,7 +6162,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Delete extesntions
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATI*" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATI*" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATI*"
@@ -5099,7 +6177,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Delete extesntions
-            do shell script "rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATTO*" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATTO*" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
@@ -5143,7 +6221,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 360
+            set my buildProccessProgressBar to 390
             
             --Log Action
             set logMe to "Trying to create folder " & netBootDirectory & "/i386/x86_64"
@@ -5152,7 +6230,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Create the x86_64 folder
-            do shell script "mkdir -p " & quoted form of netBootDirectory & "/i386/x86_64" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/mkdir -p " & quoted form of netBootDirectory & "/i386/x86_64" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Created folder " & netBootDirectory & "/i386/x86_64"
@@ -5167,7 +6245,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 364
+            set my buildProccessProgressBar to 394
             
             --Log Action
             set logMe to "Updating kernel cache on: " & netBootDmgMountPath
@@ -5176,7 +6254,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Update
-            do shell script "kextcache -update-volume  " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/sbin/kextcache -update-volume  " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Updated kernel cache on: " & netBootDmgMountPath
@@ -5191,7 +6269,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 368
+            set my buildProccessProgressBar to 398
             
             --Log Action
             set logMe to "Generating kernel cache"
@@ -5200,9 +6278,19 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             try
+                
+                -- If we're building an OS newer than 10.9
+                if selectedOSdmgVersionMajor is greater than 9
 
-                -- Generate kernel cache, silently error as this will error when on 10.9.4 when skipping extensions
-                do shell script "kextcache -arch x86_64 -l -n -K " & quoted form of netBootDmgMountPath & "/mach_kernel -c " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
+                    -- Generate kernel cache, silently error as this will error when on 10.9.4 when skipping extensions. Different location used in 10.10.
+                    do shell script "/usr/sbin/kextcache -arch x86_64 -l -n -K " & quoted form of netBootDmgMountPath & "/System/Library/Kernels/kernel -c " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
+
+                else
+
+                    -- Generate kernel cache, silently error as this will error when on 10.9.4 when skipping extensions. Location used pre 10.10
+                    do shell script "/usr/sbin/kextcache -arch x86_64 -l -n -K " & quoted form of netBootDmgMountPath & "/mach_kernel -c " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
+                
+                end if
 
             end try
             
@@ -5214,13 +6302,13 @@ script AutoCasperNBIAppDelegate
             
             considering numeric strings
                 
-            if selectedOSdmgVersionMajor is 7
+            if selectedOSdmgVersionMajor is less than 8
             
                 -- If we're creating a 10.7 .nbi, you the kernelcache to a second location
-                do shell script "ditto " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDirectory & "/i386/" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/ditto " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDirectory & "/i386/" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
-                set logMe to "Copied kernel cache on as NetBoot is 10.7.x"
+                set logMe to "Copied kernel cache on as NetBoot is older than 10.8"
                 
                 -- Log To file
                 logToFile_(me)
@@ -5264,7 +6352,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 370
+            set my buildProccessProgressBar to 400
             
             --Log Action
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
@@ -5273,7 +6361,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Copy the plist
-            do shell script "ditto " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/ditto " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Copied " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
@@ -5288,13 +6376,13 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Unlock booter
-            do shell script "chflags nouchg " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/chflags nouchg " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Unlocked " & quoted form of netBootDirectory & "/i386/booter"
             
             -- Correct ownership
-            do shell script "chown -R root:admin " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/sbin/chown -R root:admin " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Set ownership to root:admin on " & netBootDirectory & "/i386/booter"
@@ -5337,7 +6425,7 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 380
+            set my buildProccessProgressBar to 410
             
             --Log Action
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
@@ -5346,7 +6434,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Copy the plist
-            do shell script "ditto " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/ditto " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Copied " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
@@ -5387,7 +6475,7 @@ script AutoCasperNBIAppDelegate
         delay 0.1
         
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 390
+        set my buildProccessProgressBar to 420
         
         try
             
@@ -5398,7 +6486,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Copy the plist
-            do shell script "ditto " & quoted form of pathToResources & "/NBImageInfo.plist " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/NBImageInfo.plist " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Copied NBImageInfo.plist"
@@ -5442,7 +6530,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 400
+                set my buildProccessProgressBar to 430
                 
                 --Log Action
                 set logMe to "Trying to change permissions on " & netBootDirectory & "/NBImageInfo.plist"
@@ -5451,7 +6539,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Making NBImageInfo.plist writable
-                do shell script "chmod 777 "  & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/chmod 777 "  & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Set permissions on " & netBootDirectory & "/NBImageInfo.plist to 777"
@@ -5469,7 +6557,7 @@ script AutoCasperNBIAppDelegate
                     delay 0.1
                     
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 404
+                    set my buildProccessProgressBar to 434
                     
                     --Log Action
                     set logMe to "Trying to set .nbi description to " & netBootDescription
@@ -5478,7 +6566,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Set NetBoot to Description
-                    do shell script "defaults write "& quoted form of netBootDirectory & "/NBImageInfo.plist Description -string " & quoted form of netBootDescription user name adminUserName password adminUsersPassword with administrator privileges
+                    do shell script "/usr/bin/defaults write "& quoted form of netBootDirectory & "/NBImageInfo.plist Description -string " & quoted form of netBootDescription user name adminUserName password adminUsersPassword with administrator privileges
                     
                     --Log Action
                     set logMe to "Set .nbi Description"
@@ -5495,7 +6583,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 406
+                set my buildProccessProgressBar to 436
                 
                 --Log Action
                 set logMe to "Trying to set .nbi Index"
@@ -5504,7 +6592,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
-                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Index -int " & netBootImageIndexTextField user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Index -int " & netBootImageIndexTextField user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Set .nbi Index"
@@ -5519,7 +6607,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 408
+                set my buildProccessProgressBar to 438
                 
                 --Log Action
                 set logMe to "Trying to set .nbi IsInstall value"
@@ -5528,7 +6616,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Set IsInstall value
-                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist IsInstall -bool NO" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist IsInstall -bool NO" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Set .nbi IsInstall value"
@@ -5543,7 +6631,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 410
+                set my buildProccessProgressBar to 440
                 
                 --Log Action
                 set logMe to "Trying to set .nbi Name to " & netBootNameTextField
@@ -5552,7 +6640,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
-                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Name -string " & quoted form of netBootNameTextField user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Name -string " & quoted form of netBootNameTextField user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Set .nbi Name to " & netBootNameTextField
@@ -5567,7 +6655,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 312
+                set my buildProccessProgressBar to 442
 
                 --Log Action
                 set logMe to "Trying to set .nbi to Diskless"
@@ -5576,7 +6664,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
-                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist  SupportsDiskless -bool YES" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist  SupportsDiskless -bool YES" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Set .nbi to Diskless"
@@ -5591,7 +6679,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 414
+                set my buildProccessProgressBar to 444
                 
                 --Log Action
                 set logMe to "Trying to set .nbi to RootPath"
@@ -5600,7 +6688,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
-                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Set .nbi to RootPath"
@@ -5622,7 +6710,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 416
+                set my buildProccessProgressBar to 446
                 
                 --Log Action
                 set logMe to "Trying to set .nbi to ImageType"
@@ -5631,7 +6719,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
-                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist ImageType -string netboot" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist ImageType -string netboot" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Set .nbi to ImageType"
@@ -5646,7 +6734,7 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 418
+                set my buildProccessProgressBar to 448
                 
                 --Log Action
                 set logMe to "Trying to set .nbi to osVersion"
@@ -5655,7 +6743,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
-                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist osVersion -string 10." & selectedOSdmgVersionMajor user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist osVersion -string 10." & selectedOSdmgVersionMajor user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "Set .nbi to osVersion"
@@ -5692,7 +6780,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Set NetBoot Serve over NFS
-                    do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Type -string NFS" user name adminUserName password adminUsersPassword with administrator privileges
+                    do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Type -string NFS" user name adminUserName password adminUsersPassword with administrator privileges
                     
                     --Log Action
                     set logMe to "Set .nbi to being served over NFS"
@@ -5718,7 +6806,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Set NetBoot Serve over HTTP
-                    do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Type -string HTTP" user name adminUserName password adminUsersPassword with administrator privileges
+                    do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Type -string HTTP" user name adminUserName password adminUsersPassword with administrator privileges
                     
                     --Log Action
                     set logMe to "Set .nbi to being served over NFS"
@@ -5744,7 +6832,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
 
             -- Set NetBoot to Diskless
-            do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist IsEnabled -bool YES" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist IsEnabled -bool YES" user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
             set logMe to "Set .nbi to Enabled"
@@ -5771,7 +6859,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
 
                 -- Set NetBoot to Diskless
-                do shell script "defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.reduced.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.reduced.dmg" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Set .nbi to RootPath"
@@ -5783,7 +6871,7 @@ script AutoCasperNBIAppDelegate
 
             ---- Fix Plist ----
             -- Correct ownership
-            do shell script "chown -R root:wheel " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/sbin/chown -R root:wheel " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
             set logMe to "Set ownership to root:wheel on " & netBootDirectory & "/NBImageInfo.plist"
@@ -5807,7 +6895,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
 
             -- Making NBImageInfo.plist writable
-            do shell script "chmod 644 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/chmod 644 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
             set logMe to "Set permissons on " & netBootDirectory & "/NBImageInfo.plist to 644"
@@ -5868,7 +6956,7 @@ script AutoCasperNBIAppDelegate
                         logToFile_(me)
                         
                         -- Detach Volume
-                        do shell script "hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
+                        do shell script "/usr/bin/hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
                         
                     end try
                     
@@ -5879,7 +6967,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Make a Read-Only copy of NetBoot.reduced.dmg
-                    do shell script "hdiutil convert -format UDZO -o " & quoted form of netBootDirectory & "/NetBoot.readonly.dmg " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                    do shell script "/usr/bin/hdiutil convert -format UDZO -o " & quoted form of netBootDirectory & "/NetBoot.readonly.dmg " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                     
                     --Log Action
                     set logMe to "Created " & netBootDirectory & "/NetBoot.readonly.dmg"
@@ -5905,7 +6993,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Detach Volume
-                    do shell script "hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+                    do shell script "/usr/bin/hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
                     
                 end try
                 
@@ -5916,7 +7004,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                 
                     -- Make a Read-Only copy of NetBoot.dmg
-                    do shell script "hdiutil convert -format UDZO -o " & quoted form of netBootDirectory & "/NetBoot.readonly.dmg " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                    do shell script "/usr/bin/hdiutil convert -format UDZO -o " & quoted form of netBootDirectory & "/NetBoot.readonly.dmg " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                     
                     --Log Action
                     set logMe to "Created " & netBootDirectory & "/NetBoot.readonly.dmg"
@@ -5941,7 +7029,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- ASR scan NetBoot.readonly.dmg
-                do shell script "asr -imagescan " & quoted form of netBootDirectory & "/NetBoot.readonly.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/sbin/asr -imagescan " & quoted form of netBootDirectory & "/NetBoot.readonly.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "ASR scanned " & netBootDirectory & "/NetBoot.readonly.dmg"
@@ -6019,7 +7107,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Play complete.aif
-            do shell script "afplay " & quoted form of pathToResources & "/complete.aif"
+            do shell script "/usr/bin/afplay " & quoted form of pathToResources & "/complete.aif"
                 
             -- Set to false to display
             set my userNotifySuccessHidden to false
@@ -6093,7 +7181,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Detach Volume
-            do shell script "hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+            do shell script "/usr/bin/hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
             
         end try
         
@@ -6107,7 +7195,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Detach Volume
-            do shell script "hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
+            do shell script "/usr/bin/hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
             
         end try
         
@@ -6121,7 +7209,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Detach Volume
-            do shell script "hdiutil detach " & quoted form of selectedOSdmgMountPath & " -force"
+            do shell script "/usr/bin/hdiutil detach " & quoted form of selectedOSdmgMountPath & " -force"
             
         end try
         

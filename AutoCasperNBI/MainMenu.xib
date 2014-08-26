@@ -230,15 +230,6 @@
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ju9-64-ROQ">
-                        <rect key="frame" x="117" y="275" width="4" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="x7T-K3-yco">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="w0J-uw-3oP">
                         <rect key="frame" x="6" y="305" width="430" height="118"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -267,7 +258,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                     <connections>
-                                        <action selector="checkJSSURL:" target="Voe-Tx-rLC" id="dYl-Zc-qgx"/>
+                                        <action selector="checkJSSURL:" target="Voe-Tx-rLC" id="P5U-wH-Auw"/>
                                         <binding destination="Voe-Tx-rLC" name="enabled" keyPath="disableOptionsAndBuild" id="Cp0-7a-RJ5">
                                             <dictionary key="options">
                                                 <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -376,7 +367,7 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <action selector="netBootLocation:" target="Voe-Tx-rLC" id="MYI-Ap-XlG"/>
+                            <action selector="buildPreCheck:" target="Voe-Tx-rLC" id="5Ob-iY-31c"/>
                             <binding destination="Voe-Tx-rLC" name="enabled" keyPath="disableOptionsAndBuild" id="UkT-ks-Ju3">
                                 <dictionary key="options">
                                     <integer key="NSNoSelectionPlaceholder" value="0"/>
@@ -443,21 +434,27 @@
                                     <rect key="frame" x="206" y="83" width="204" height="19"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <string key="toolTip">The NetBoot's name as it will appear in the Startup Disk pane in System Preferences &amp; Startup Manager. This is needed, but if you are using the NETSUS appliance, it will show as "Faux NetBoot"</string>
-                                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Required" drawsBackground="YES" id="opj-5r-fCA">
+                                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Required" drawsBackground="YES" id="opj-5r-fCA">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        <connections>
+                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="netBootNameTextField" id="Nse-2B-jx4">
+                                                <dictionary key="options">
+                                                    <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                    <bool key="NSConditionallySetsEditable" value="NO"/>
+                                                    <bool key="NSContinuouslyUpdatesValue" value="YES"/>
+                                                    <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
+                                                    <bool key="NSValidatesImmediately" value="YES"/>
+                                                </dictionary>
+                                            </binding>
+                                        </connections>
                                     </textFieldCell>
                                     <connections>
-                                        <action selector="netBootName:" target="Voe-Tx-rLC" id="tO8-Wb-psB"/>
+                                        <action selector="netBootName:" target="Voe-Tx-rLC" id="Xti-Nc-KKr"/>
                                         <binding destination="Voe-Tx-rLC" name="enabled" keyPath="disableOptionsAndBuild" id="Whu-Lf-ra7">
                                             <dictionary key="options">
                                                 <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                            </dictionary>
-                                        </binding>
-                                        <binding destination="Voe-Tx-rLC" name="value" keyPath="netBootNameTextField" id="cf0-s9-1Sd">
-                                            <dictionary key="options">
-                                                <bool key="NSContinuouslyUpdatesValue" value="YES"/>
                                             </dictionary>
                                         </binding>
                                     </connections>
@@ -685,7 +682,7 @@
                                 <button toolTip="Supresses the Apple &amp; iCloud setup assistants" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LUj-AH-VeR">
                                     <rect key="frame" x="214" y="71" width="205" height="20"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Supress setup assistants" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="vbh-D0-q40">
+                                    <buttonCell key="cell" type="check" title="Suppress setup assistants" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="vbh-D0-q40">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
                                     </buttonCell>
@@ -789,7 +786,7 @@
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <userDefaultsController representsSharedInstance="YES" id="YXj-Bi-peB"/>
-        <window title="Options" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="Zut-qe-a6h" customClass="NSPanel">
+        <window title="Options" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="Zut-qe-a6h" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES" utility="YES"/>
             <rect key="contentRect" x="246" y="103" width="442" height="587"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
@@ -815,15 +812,15 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button toolTip="Try to resize the NetBoot.dmg to the size given. This step will error if given size is to small for the dmg." fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bto-zK-ZXI">
-                                                        <rect key="frame" x="234" y="6" width="71" height="20"/>
+                                                        <rect key="frame" x="234" y="6" width="78" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Resize to" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="YFh-N6-FMZ">
+                                                        <buttonCell key="cell" type="check" title="Expand by" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="YFh-N6-FMZ">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="netBootImageExpand:" target="Voe-Tx-rLC" id="XfU-aB-dkZ"/>
-                                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="netBootImageExpandEnabled" id="gKf-2P-7Z8">
+                                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="netBootImageExpandEnabled" id="632-Sy-bqb">
                                                                 <dictionary key="options">
                                                                     <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
                                                                     <bool key="NSConditionallySetsEnabled" value="NO"/>
@@ -886,9 +883,9 @@
                                                         <imageCell key="cell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NetBootVolume" id="5GB-3g-1oU"/>
                                                     </imageView>
                                                     <textField toolTip="Try to resize the NetBoot.dmg to the size given. This step will error if given size is to small for the dmg." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wQ1-Tq-Oqc">
-                                                        <rect key="frame" x="305" y="7" width="20" height="19"/>
+                                                        <rect key="frame" x="311" y="7" width="20" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" placeholderString=" 0" drawsBackground="YES" id="UUf-6S-Chq">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" placeholderString=" 0" drawsBackground="YES" id="UUf-6S-Chq">
                                                             <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" id="Xxm-Ht-nfk"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -899,17 +896,18 @@
                                                         </textFieldCell>
                                                         <connections>
                                                             <action selector="netBootImageExpandEnteredValue:" target="Voe-Tx-rLC" id="6bu-v2-yLY"/>
-                                                            <binding destination="Voe-Tx-rLC" name="enabled" keyPath="netBootImageExpandEnabled" id="eYl-Sa-1jO"/>
-                                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="netBootImageExpandValue" id="A7e-PC-tgM">
+                                                            <binding destination="Voe-Tx-rLC" name="enabled" keyPath="netBootImageExpandEnabled" id="eps-je-uCq"/>
+                                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="netBootImageExpandValue" id="Qzj-8M-1Gr">
                                                                 <dictionary key="options">
                                                                     <bool key="NSContinuouslyUpdatesValue" value="YES"/>
+                                                                    <integer key="NSNullPlaceholder" value="0"/>
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
                                                                 </dictionary>
                                                             </binding>
                                                         </connections>
                                                     </textField>
                                                     <textField toolTip="Try to resize the NetBoot.dmg to the size given. This step will error if given size is to small for the dmg." horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dmb-4y-QMv">
-                                                        <rect key="frame" x="325" y="3" width="70" height="20"/>
+                                                        <rect key="frame" x="331" y="3" width="70" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="GB (approx)." id="ryv-k3-61n">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -988,25 +986,28 @@
                                                     <secureTextField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLI-fp-Fvx">
                                                         <rect key="frame" x="209" y="38" width="60" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" allowsUndo="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" placeholderString="" drawsBackground="YES" usesSingleLineMode="YES" id="ArN-aQ-Iqe">
+                                                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" allowsUndo="NO" borderStyle="bezel" alignment="left" placeholderString="" drawsBackground="YES" usesSingleLineMode="YES" id="ArN-aQ-Iqe">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             <allowedInputSourceLocales>
                                                                 <string>NSAllRomanInputSourcesLocaleIdentifier</string>
                                                             </allowedInputSourceLocales>
+                                                            <connections>
+                                                                <binding destination="Voe-Tx-rLC" name="value" keyPath="vncPassword" id="cpv-Bg-zXz">
+                                                                    <dictionary key="options">
+                                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                                        <bool key="NSConditionallySetsEditable" value="NO"/>
+                                                                        <bool key="NSContinuouslyUpdatesValue" value="YES"/>
+                                                                        <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
+                                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                                    </dictionary>
+                                                                </binding>
+                                                            </connections>
                                                         </secureTextFieldCell>
                                                         <connections>
-                                                            <action selector="checkvncPassword:" target="Voe-Tx-rLC" id="dhs-0W-aks"/>
+                                                            <action selector="checkvncPassword:" target="Voe-Tx-rLC" id="Trs-v9-hoK"/>
                                                             <binding destination="Voe-Tx-rLC" name="enabled" keyPath="vncEnabled" id="pMt-iQ-9Uv"/>
-                                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="vncPassword" id="wUP-tk-oSa">
-                                                                <dictionary key="options">
-                                                                    <bool key="NSConditionallySetsEditable" value="NO"/>
-                                                                    <bool key="NSContinuouslyUpdatesValue" value="YES"/>
-                                                                    <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
-                                                                    <bool key="NSValidatesImmediately" value="YES"/>
-                                                                </dictionary>
-                                                            </binding>
                                                         </connections>
                                                     </secureTextField>
                                                     <secureTextField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qPQ-eC-DfO">
@@ -1023,13 +1024,12 @@
                                                         <connections>
                                                             <action selector="checkardPassword:" target="Voe-Tx-rLC" id="rfD-eR-szx"/>
                                                             <binding destination="Voe-Tx-rLC" name="enabled" keyPath="ardEnabled" id="fLx-xJ-bqL"/>
-                                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="ardPassword" id="0Nn-JJ-GWt">
+                                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="ardPassword" id="i1U-vM-Bs1">
                                                                 <dictionary key="options">
                                                                     <bool key="NSConditionallySetsEditable" value="NO"/>
                                                                     <bool key="NSContinuouslyUpdatesValue" value="YES"/>
                                                                     <string key="NSNullPlaceholder">Required, if ARD enabled.</string>
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
-                                                                    <bool key="NSValidatesImmediately" value="YES"/>
                                                                 </dictionary>
                                                             </binding>
                                                         </connections>
@@ -1184,34 +1184,29 @@
                                     <rect key="frame" x="10" y="33" width="417" height="507"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="K61-40-fmP">
-                                            <rect key="frame" x="6" y="0.0" width="402" height="92"/>
+                                        <box autoresizesSubviews="NO" fixedFrame="YES" title="Finder" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="K61-40-fmP">
+                                            <rect key="frame" x="6" y="-1" width="402" height="92"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="400" height="76"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjh-6D-MSN">
-                                                        <rect key="frame" x="1" y="15" width="93" height="56"/>
+                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjh-6D-MSN">
+                                                        <rect key="frame" x="10" y="-1" width="80" height="80"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <imageCell key="cell" enabled="NO" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Installer" id="lIn-l4-yRO"/>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Finder" id="lIn-l4-yRO"/>
                                                     </imageView>
-                                                    <textField hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1zF-x0-CDz">
-                                                        <rect key="frame" x="88" y="31" width="308" height="28"/>
+                                                    <button toolTip="Sets Finder to be in Simple mode, his hides desktop icons &amp; stops windows from being opened." fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Eij-9n-CHu">
+                                                        <rect key="frame" x="110" y="31" width="151" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" enabled="NO" sendsActionOnEndEditing="YES" title="NOT AVAILABLE YET" id="Y1m-CP-s9x">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <button hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Eij-9n-CHu">
-                                                        <rect key="frame" x="88" y="25" width="308" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Creates the .jamfTarget file on 1st OS HD found." bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="zkm-gL-ZsY">
+                                                        <buttonCell key="cell" type="check" title="Enable simple Finder" bezelStyle="regularSquare" imagePosition="left" inset="2" id="zkm-gL-ZsY">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="simpleFinderCheckBox:" target="Voe-Tx-rLC" id="LtT-1g-YbL"/>
+                                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="simpleFinderEnabled" id="bfO-mr-Amh"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                             </view>
@@ -1219,26 +1214,26 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Create a Read-Only DMG" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="Jq2-yr-hk4">
-                                            <rect key="frame" x="6" y="288" width="402" height="92"/>
+                                            <rect key="frame" x="6" y="176" width="402" height="92"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="400" height="76"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YrR-cP-Aki">
-                                                        <rect key="frame" x="8" y="8" width="93" height="65"/>
+                                                        <rect key="frame" x="10" y="6" width="80" height="70"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="DMGFormat" id="pzG-My-KQY"/>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="CDiskImage" id="pzG-My-KQY"/>
                                                     </imageView>
                                                     <button toolTip="Creates a Read-Only DMG in the NBI folder that has been scanned so can be ASR'd onto removable media" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FqG-0G-APB">
-                                                        <rect key="frame" x="100" y="27" width="254" height="32"/>
+                                                        <rect key="frame" x="110" y="24" width="254" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Create a Read-Only DMG" bezelStyle="regularSquare" imagePosition="left" alignment="left" lineBreakMode="charWrapping" inset="2" id="fAQ-q4-ehB">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="createReadOnlyDMGSelected:" target="Voe-Tx-rLC" id="goG-3X-Kwc"/>
+                                                            <action selector="createReadOnlyDMGCheckBox:" target="Voe-Tx-rLC" id="luV-hf-n7P"/>
                                                             <binding destination="Voe-Tx-rLC" name="value" keyPath="createReadOnlyDMG" id="Ox6-X0-Elh"/>
                                                         </connections>
                                                     </button>
@@ -1248,7 +1243,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="rc.netboot" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="2fe-d7-VeK">
-                                            <rect key="frame" x="6" y="192" width="402" height="92"/>
+                                            <rect key="frame" x="6" y="87" width="402" height="92"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="400" height="76"/>
@@ -1260,14 +1255,14 @@
                                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Scripts" id="dlj-VP-vkK"/>
                                                     </imageView>
                                                     <button toolTip="Installs a modifed rc.netboot file, this will not create shadow files on the NetBoot server." fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PRX-SN-lqI">
-                                                        <rect key="frame" x="100" y="33" width="183" height="18"/>
+                                                        <rect key="frame" x="109" y="31" width="183" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Install modified rc.netboot file" bezelStyle="regularSquare" imagePosition="left" inset="2" id="d8b-nD-hbI">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="installRCNetBootSelected:" target="Voe-Tx-rLC" id="GgT-dW-AbN"/>
+                                                            <action selector="installRCNetBootCheckBox:" target="Voe-Tx-rLC" id="qUV-Eq-izV"/>
                                                             <binding destination="Voe-Tx-rLC" name="value" keyPath="installRCNetBootSelected" id="9wd-o8-9fO"/>
                                                         </connections>
                                                     </button>
@@ -1276,32 +1271,22 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="CCQ-eK-7he">
-                                            <rect key="frame" x="6" y="96" width="402" height="92"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="400" height="76"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Time Server" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="lFf-zJ-HTY">
-                                            <rect key="frame" x="6" y="384" width="402" height="123"/>
+                                            <rect key="frame" x="6" y="386" width="402" height="121"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="400" height="107"/>
+                                                <rect key="frame" x="1" y="1" width="400" height="105"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rsg-Rp-TMW">
-                                                        <rect key="frame" x="10" y="10" width="90" height="90"/>
+                                                        <rect key="frame" x="10" y="8" width="90" height="90"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Clock" id="HSb-Si-NG6"/>
                                                     </imageView>
                                                     <popUpButton toolTip="Time Zone for the .nbi, list was taken from sudo systemsetup -listtimezones" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="N3R-9l-upc">
-                                                        <rect key="frame" x="174" y="24" width="211" height="22"/>
+                                                        <rect key="frame" x="169" y="28" width="216" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="MBr-HG-LO8">
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="MBr-HG-LO8">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="QiL-ld-oak">
@@ -2567,21 +2552,19 @@
                                                             </connections>
                                                         </popUpButtonCell>
                                                         <connections>
-                                                            <action selector="timeZoneTest:" target="Voe-Tx-rLC" id="s55-se-3Nv"/>
-                                                            <binding destination="Voe-Tx-rLC" name="enabled" keyPath="timeServerOptionsEnabled" id="UCg-oD-ZR0"/>
+                                                            <action selector="timeZone:" target="Voe-Tx-rLC" id="ZPY-qK-KEG"/>
                                                         </connections>
                                                     </popUpButton>
                                                     <textField toolTip="Time Server for the .nbi to use" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Eh-vb-90H">
-                                                        <rect key="frame" x="177" y="53" width="205" height="19"/>
+                                                        <rect key="frame" x="172" y="57" width="210" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="" drawsBackground="YES" id="5i9-Ga-pmp">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="" drawsBackground="YES" id="5i9-Ga-pmp">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
                                                             <action selector="timeServerCheck:" target="Voe-Tx-rLC" id="c89-Pv-dY0"/>
-                                                            <binding destination="Voe-Tx-rLC" name="enabled" keyPath="timeServerOptionsEnabled" id="Lj6-YR-Ona"/>
                                                             <binding destination="Voe-Tx-rLC" name="value" keyPath="timeServerSelected" id="eKl-dm-9Q5">
                                                                 <dictionary key="options">
                                                                     <bool key="NSConditionallySetsEditable" value="NO"/>
@@ -2591,31 +2574,563 @@
                                                             </binding>
                                                         </connections>
                                                     </textField>
-                                                    <button toolTip="Enables custom Time Server &amp; Zone to be set on the .nbi" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aFl-64-Smq">
-                                                        <rect key="frame" x="105" y="80" width="176" height="20"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Set time server &amp; zone" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="a1b-75-hWj">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="timeServerOptionsEnabled:" target="Voe-Tx-rLC" id="Cuz-4n-0Td"/>
-                                                            <binding destination="Voe-Tx-rLC" name="value" keyPath="timeServerOptionsEnabled" id="IBt-V3-ZTi"/>
-                                                        </connections>
-                                                    </button>
                                                     <textField toolTip="Time Server for the .nbi to use" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brg-Am-zxK">
-                                                        <rect key="frame" x="106" y="54" width="70" height="17"/>
+                                                        <rect key="frame" x="101" y="57" width="70" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Time Server:" id="b4T-My-Xy5">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Time Server:" id="b4T-My-Xy5">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField toolTip="Time Zone for the .nbi, list was taken from sudo systemsetup -listtimezones" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FAC-Z3-i3P">
-                                                        <rect key="frame" x="112" y="27" width="64" height="17"/>
+                                                        <rect key="frame" x="101" y="30" width="70" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Time Zone:" id="44r-mg-Uif">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Time Zone:" id="44r-mg-Uif">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                        <box autoresizesSubviews="NO" fixedFrame="YES" title="Localisation" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="Ga5-dP-ZkQ">
+                                            <rect key="frame" x="6" y="267" width="402" height="121"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="400" height="105"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sbL-lw-Vfl">
+                                                        <rect key="frame" x="13" y="9" width="90" height="90"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Localization" id="6Dw-5o-2Z7"/>
+                                                    </imageView>
+                                                    <popUpButton toolTip="Language for the NBI. This list is the tier 1 languages from the languagesetup command." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1Ff-Jx-0VG">
+                                                        <rect key="frame" x="207" y="58" width="178" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="Ioz-Jm-CrH">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <menu key="menu" title="OtherViews" id="Ls3-dn-O1R">
+                                                                <items>
+                                                                    <menuItem title="Arabic : ar" id="2N9-z4-1fy">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Brazilian : pt" id="Qsq-vd-Oa8">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Catalan : ca" id="f6a-hq-cm7">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Chinese (Simplified) : zh-Hans" id="VmI-zU-IIP">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Chinese (Traditional) : zh-Hant" id="Hsj-fE-Ywx">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Croatian : hr" id="Dlm-Mh-TS4">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Czech : cs" id="Pfw-dM-P9S">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Danish : da" id="60o-JH-Mmg">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Dutch : nl" id="49J-Qh-jP1">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="English : en" id="bLa-B5-bFn">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Finnish : fi" id="NO8-4N-rsQ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="French : fr" id="GMQ-x3-oMG">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="German : de" id="xam-mf-3X9">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Greek : el" id="WgN-N4-fuB">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Hebrew : he" id="xMl-sd-PjM">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Hungarian : hu" id="gxR-Gf-en4">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Italian : it" id="MZX-Ks-Wah">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Japanese : ja" id="uBW-q6-8K9">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Korean : ko" id="tz7-f5-Ps4">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Norwegian : no" id="9be-nU-Scn">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Polish : pl" id="hyA-i9-65L">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Portuguese (Portugal) : pt-PT" id="yI4-nI-1i9">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Romanian : ro" id="Dap-GW-5cA">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Russian : ru" id="Niy-Ra-BbM">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Slovak : sk" id="1Ur-U9-kuS">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Spanish : es" id="wzq-A1-dQc">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Swedish : sv" id="wVF-1I-tvh">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Thai : th" id="9j3-eQ-wrv">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Turkish : tr" id="inP-bB-xb2">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Ukrainian : uk" id="6Np-BS-ddf">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                </items>
+                                                            </menu>
+                                                            <connections>
+                                                                <binding destination="Voe-Tx-rLC" name="selectedValue" keyPath="languageSelected" id="2gf-vk-3Cj"/>
+                                                            </connections>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="netBootLanguage:" target="Voe-Tx-rLC" id="ECt-Gw-4zc"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GQp-Xw-aXm">
+                                                        <rect key="frame" x="207" y="27" width="178" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <string key="toolTip">Keyboard Input Language for the NBI. This list is written as per com.apple.HIToolbox requires the keyboards names, even with dodgy capitalisation.</string>
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="RZ0-Mu-wGL">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <menu key="menu" title="OtherViews" id="jWp-Xm-zIG">
+                                                                <items>
+                                                                    <menuItem title="AfghanDari" id="sVo-VL-dfL">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="AfghanPashto" id="Qlx-OJ-U6m">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="AfghanUzbek" id="97t-5K-Z4V">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Arabic" id="K21-Oh-iim">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="ArabicPC" id="XkA-C7-Nvi">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Arabic-QWERTY" id="kRA-aj-N4d">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Armenian-HMQWERTY" id="4U0-Du-AWO">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Armenian-WesternQWERTY" id="Cv3-x4-Qsj">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Australian" id="ptm-QX-clQ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Austrian" id="vCk-7N-LC1">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Azeri" id="mBt-F0-fJe">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Bangla" id="bfR-IC-sqq">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Bangla-QWERTY" id="7CL-aq-4Ne">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Belgian" id="gjB-fm-Bl6">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Brazilian" id="2dk-NZ-Ut8">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="British" id="qDW-LL-0cZ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="British-PC" id="RpO-V9-7Yj">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Bulgarian" id="Qwl-p7-rIQ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Bulgarian-Phonetic" id="rn4-Ca-orx">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Byelorussian" id="yfN-CQ-8sn">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Cherokee-Nation" id="GEp-iC-Bpn">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Cherokee-QWERTY" id="I0m-UT-kPQ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Canadian" id="ege-YS-JZe">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Canadian-CSA" id="E1R-0U-yMT">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Czech-QWERTY" id="fhR-ch-rjw">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Devanagari" id="IHR-Tw-2Yi">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Devanagari-QWERTY" id="KeO-wD-sic">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Dutch" id="V1r-Jc-vLE">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Dvorak" id="zdg-Ge-Yyl">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Dvorak-Left" id="htI-fQ-8lL">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="DVORAK-QWERTYCMD" id="C3X-Ce-lgy">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Dvorak-Right" id="ygm-Hm-vrV">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Estonian" id="VjK-ck-PWy">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Faroese" id="zfp-K5-DwO">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Finnish" id="4fL-r9-vbH">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="FinnishExtended" id="Aaf-3s-JIf">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="FinnishSami-PC" id="jYm-4U-xKJ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="French" id="XcV-dU-RRO">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="French-numerical" id="5o3-YT-g51">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Georgian-QWERTY" id="1hI-PU-sYG">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="German" id="4rD-D4-SRN">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Greek" id="i2x-3d-JXx">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="GreekPolytonic" id="aky-L5-2j2">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Gujarati" id="578-j4-FQN">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Gujarati-QWERTY" id="xAj-B6-5DN">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Gurmukhi" id="Nkh-Vf-Qii">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Gurmukhi-QWERTY" id="hwm-Bd-BC5">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Hawaiian" id="rrn-42-QqB">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Hebrew" id="hLS-b6-tPe">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Hebrew-PC" id="qXp-oe-ipl">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Hebrew-QWERTY" id="udY-a1-VZq">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Faroese" id="xRF-B1-4fU">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Hungarian" id="suM-Gn-fO2">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Icelandic" id="RyT-mt-9Mg">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Inuktitut-Nunavut" id="dmz-zD-2fL">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Inuktitut-Nutaaq" id="kn8-v3-mLF">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Inuktitut-QWERTY" id="cnf-j8-upD">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="InuttitutNunavik" id="p1B-2k-9B7">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Irish" id="A83-ui-lbZ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="IrishExtended" id="S6m-Ep-5T3">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Italian" id="xbx-by-ZuZ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Italian-Pro" id="L1P-oi-NQz">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Jawi-QWERTY" id="Tbz-qs-yBn">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Kannada" id="T84-xf-DNq">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Kannada-QWERTY" id="CQa-Oq-b6n">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Kazakh" id="RzJ-3P-7a9">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Khmer" id="RDk-RK-HRl">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Kurdish-Sorani" id="s7r-Yn-KEs">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Latvian" id="IO7-Ev-dmj">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Lithuanian" id="VV9-fx-4Nb">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Macedonian" id="jac-1b-vyk">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Malayalam" id="HAc-Re-6tS">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Malayalam-QWERTY" id="S2G-W3-sev">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Maltese" id="J22-0j-6Bc">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Maori" id="Hna-gy-Nxz">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Myanmar-QWERTY" id="kUl-ad-hCs">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Nepali" id="bPb-UR-m3I">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="NorthernSami" id="oIg-wG-1eM">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Norwegian" id="7Ju-gr-Vk0">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="NorwegianExtended" id="Whx-kw-7NL">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="NorwegianSami-PC" id="ynK-AI-Yrq">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Oriya" id="WMk-Hu-SKu">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Oriya-QWERTY" id="0wd-WP-oe3">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Persian" id="KBn-eS-yMm">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Persian-ISIRI2901" id="lPw-Hc-8Wp">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Persian-QWERTY" id="Ncu-dn-KhF">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="PolishPro" id="ebq-YO-T5I">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Portuguese" id="uFc-vo-DDo">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Romanian" id="COX-W3-fr0">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Romanian-Standard" id="xMx-na-nFB">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Russian" id="p3Z-zy-LCu">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="RussianWin" id="oPB-ts-OI9">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Russian-Phonetic" id="9z9-xj-sa7">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Sami-PC" id="jrU-5F-y1x">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Serbian" id="U4l-16-kkt">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Serbian-Latin" id="0fr-56-9VB">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Sinhala" id="xYe-kw-nwb">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Sinhala-QWERTY" id="Mb8-1a-1IJ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Slovak" id="IfK-pL-HYU">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Slovak-QWERTY" id="uF2-Kk-cYG">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Slovenian" id="87A-uy-mhu">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Spanish" id="qAy-oI-QHP">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Spanish-ISO" id="xZ9-J1-pj1">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Swedish" id="I0C-49-Edq">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Swedish-Pro" id="gg6-WO-Wm4">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="SwedishSami-PC" id="UCB-8c-mOB">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="SwissFrench" id="dwF-Ek-Lo4">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="SwissGerman" id="kBO-0f-JCM">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Telugu" id="UWt-dg-1W7">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Telugu-QWERTY" id="osN-0w-Sgf">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Thai" id="UiT-WO-RPn">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Thai-PattaChote" id="aCA-ce-TeD">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="TibetanOtaniUS" id="KHQ-M8-kGV">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Tibetan-QWERTY" id="WYO-VG-HrN">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Tibetan-Wylie" id="k8B-VK-Emg">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Turkish" id="3Wk-oZ-qqZ">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Turkish-QWERTY" id="gq4-NY-N2Y">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Turkish-QWERTY-PC" id="qSG-y3-lAF">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Ukrainian" id="W4e-Tk-e6W">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="UnicodeHexInput" id="jnB-eh-fwY">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Urdu" id="oAk-jY-0Oe">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="U.S." id="5Ew-UL-3u8">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="U.S.Extended" id="zzJ-os-aHj">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="USInternational-PC" id="xiz-fl-hFN">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Uyghur" id="mJT-Hn-XAT">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Vietnamese" id="UB4-Xe-Zeu">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Welsh" id="GwS-PZ-D3d">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                </items>
+                                                            </menu>
+                                                            <connections>
+                                                                <binding destination="Voe-Tx-rLC" name="selectedValue" keyPath="inputLanguageSelected" id="Trz-vh-ZxQ"/>
+                                                            </connections>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="inputLanguage:" target="Voe-Tx-rLC" id="uBN-OC-lZQ"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                    <textField toolTip="Language for the NBI. This list is the tier 1 languages from the languagesetup command." horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vr8-nw-f4T">
+                                                        <rect key="frame" x="105" y="61" width="105" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="NetBoot Language:" id="Rlg-25-NQU">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tIi-o3-XvZ">
+                                                        <rect key="frame" x="119" y="30" width="91" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <string key="toolTip">Keyboard Input Language for the NBI. This list is written as per com.apple.HIToolbox requires the keyboards names, even with dodgy capitalisation.</string>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Input Language:" id="KjB-dl-us4">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -2631,11 +3146,11 @@
                             </tabViewItem>
                             <tabViewItem label="Additionals" identifier="" id="yBn-YA-wrH">
                                 <view key="view" id="4B1-q3-eFT">
-                                    <rect key="frame" x="10" y="25" width="417" height="512"/>
+                                    <rect key="frame" x="10" y="33" width="417" height="507"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Install Additonal Packages" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="U5x-dj-6QB">
-                                            <rect key="frame" x="6" y="262" width="405" height="250"/>
+                                            <rect key="frame" x="6" y="257" width="405" height="250"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="403" height="234"/>
@@ -2702,7 +3217,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="JSS CA Certificates" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="ixf-Rj-6cI">
-                                            <rect key="frame" x="6" y="8" width="405" height="250"/>
+                                            <rect key="frame" x="6" y="3" width="405" height="250"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="403" height="234"/>
@@ -2781,14 +3296,14 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <action selector="checkNetBootExpandValue:" target="Voe-Tx-rLC" id="Ziw-It-7WI"/>
+                            <action selector="closeOptionsWindowCheck:" target="Voe-Tx-rLC" id="80e-Gz-Nwn"/>
                             <binding destination="Voe-Tx-rLC" name="enabled" keyPath="closeOptionsWindowButton" id="oU6-gJ-cQd"/>
                         </connections>
                     </button>
                 </subviews>
             </view>
         </window>
-        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="7PY-gM-M3V" customClass="NSPanel">
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="7PY-gM-M3V" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <rect key="contentRect" x="272" y="172" width="517" height="100"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
@@ -2954,7 +3469,7 @@ DQ
                 </subviews>
             </view>
         </window>
-        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="O6j-Qi-9Zv" customClass="NSPanel">
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="O6j-Qi-9Zv" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
             <rect key="contentRect" x="120" y="65" width="450" height="90"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
@@ -3025,11 +3540,13 @@ DQ
     <resources>
         <image name="AlertStopIcon" width="512" height="512"/>
         <image name="AutoCasperNBI" width="512" height="512"/>
+        <image name="CDiskImage" width="128" height="128"/>
         <image name="Casper Imaging" width="128" height="128"/>
         <image name="CertStackLarge" width="76" height="65"/>
         <image name="Clock" width="512" height="512"/>
         <image name="DMGFormat" width="128" height="128"/>
-        <image name="Installer" width="512" height="512"/>
+        <image name="Finder" width="512" height="512"/>
+        <image name="Localization" width="512" height="512"/>
         <image name="Major Warning" width="13" height="14"/>
         <image name="NetBootVolume" width="512" height="512"/>
         <image name="Package" width="128" height="128"/>
