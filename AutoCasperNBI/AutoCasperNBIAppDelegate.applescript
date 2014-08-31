@@ -158,6 +158,7 @@ script AutoCasperNBIAppDelegate
     property buildButtonPreCheckPassed : true
     property closeButtonPreCheckPassed : true
     property simpleFinderEnabled : false
+    property servedFromNetSUS : false
 
     -- Others
     property requiredSpace : 20
@@ -236,6 +237,7 @@ script AutoCasperNBIAppDelegate
         customDesktopImagePath:customDesktopImagePath, ¬
         jssURL:jssURL, ¬
         netBootDescriptionEnabled:netBootDescriptionEnabled, ¬
+        servedFromNetSUS:servedFromNetSUS,  ¬
         netBootImageIndexLoadBalanced:netBootImageIndexLoadBalanced, ¬
         netBootImageExpandEnabled:netBootImageExpandEnabled, ¬
         netBootImageExpandValue:netBootImageExpandValue, ¬
@@ -261,6 +263,7 @@ script AutoCasperNBIAppDelegate
         tell defaults to set my customDesktopImagePath to objectForKey_("customDesktopImagePath")
         tell defaults to set my jssURL to objectForKey_("jssURL")
         tell defaults to set my netBootDescriptionEnabled to objectForKey_("netBootDescriptionEnabled") as boolean
+        tell defaults to set my servedFromNetSUS to objectForKey_("servedFromNetSUS") as boolean
         tell defaults to set my netBootImageIndexLoadBalanced to objectForKey_("netBootImageIndexLoadBalanced")
         tell defaults to set my netBootImageExpandEnabled to objectForKey_("netBootImageExpandEnabled")
         tell defaults to set my netBootImageExpandValue to objectForKey_("netBootImageExpandValue")
@@ -474,7 +477,7 @@ script AutoCasperNBIAppDelegate
     on logToFile_(sender)
         
         -- Comment out before release.. this will send log messages to Xcode's log
-        log logMe
+        --log logMe
         
         -- Get time & date of command execution
         set timeStamp to do shell script "/bin/date"
@@ -551,6 +554,12 @@ script AutoCasperNBIAppDelegate
         --  Try & mount dropped file
         set selectedOSdmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of selectedOSdmgPath & " -nobrowse -owners on | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' | head -1" as quoted form
         
+        -- Log that we're tryin to mount selected DMG
+        set logMe to "Mounted to: " & selectedOSdmgMountPath
+        
+        -- Log To file
+        logToFile_(me)
+        
         -- If selectedOSdmgMountPath, then we've failed to mount as it's not a dmg.
         if selectedOSdmgMountPath is equal to "" then
             
@@ -585,6 +594,9 @@ script AutoCasperNBIAppDelegate
                 
                 -- Set netBoot Name
                 set my netBootNameTextField to selectedOSdmgVersion & " AutoCasperNBI"
+                
+                -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
+                servedFromNetSUS_(me)
                 
                 -- Set Image Index
                 netBootImageIndex_(me)
@@ -1060,6 +1072,9 @@ script AutoCasperNBIAppDelegate
             
             -- Set netBoot Name
             set my netBootNameTextField to selectedOSdmgVersion & " AutoCasperNBI"
+            
+            -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
+            servedFromNetSUS_(me)
         
             -- Display error to user
             display dialog "Please select a Name for the NetBoot Image" with icon 0 buttons {"OK"}
@@ -1078,16 +1093,49 @@ script AutoCasperNBIAppDelegate
             
         else
         
+            -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
+            servedFromNetSUS_(me)
+            
+        end if
+        
+    end netBootName_
+
+    -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
+    on servedFromNetSUS_(sender)
+        
+        -- Set netBootImageIndexLoadBalanced to boolean of value
+        set servedFromNetSUS to servedFromNetSUS as boolean
+        
+        -- If true, remove spaces from NetBoot Name
+        if servedFromNetSUS is true then
+            
+            -- Set netBootNameTextField to text of value
+            set my netBootNameTextField to netBootNameTextField as text
+
+            -- Remove spaces from NetBoot Name
+            set my netBootNameTextField to words of netBootNameTextField as string
+            
             --Log Action
-            set logMe to "Name: " & netBootNameTextField
+            set logMe to "NetBoot Name: " & netBootNameTextField
+            
+            -- Log To file
+            logToFile_(me)
+
+        else
+        
+            --Log Action
+            set logMe to "NetBoot Name: " & netBootNameTextField
             
             -- Log To file
             logToFile_(me)
             
         end if
         
-    end netBootName_
-
+        -- Update plist with selection
+        tell defaults to setObject_forKey_(servedFromNetSUS, "servedFromNetSUS")
+        
+    end servedFromNetSUS
+            
     -- Bound to "Will be served from more than one server"
     on netBootImageIndex_(sender)
     
@@ -1802,23 +1850,6 @@ script AutoCasperNBIAppDelegate
 
     end checkcustomDesktopImagePath_
 
---    -- Bound to "Set time server & zone" checkbox, sets plist
---    on timeServerOptionsEnabled_(sender)
---
---        -- Set to variable to boolean
---        set timeServerOptionsEnabled to timeServerOptionsEnabled as boolean
---
---        -- Update plist with selection
---        tell defaults to setObject_forKey_(timeServerOptionsEnabled, "timeServerOptionsEnabled")
---
---        --Log Action
---        set logMe to "Enable Time Server options: " & timeServerOptionsEnabled
---
---        -- Log To file
---        logToFile_(me)
---
---    end timeServerOptionsEnabled_
-
     -- Bound to Time Server Text field
     on timeServerCheck_(sender)
         
@@ -2114,45 +2145,47 @@ script AutoCasperNBIAppDelegate
             -- Get total size of selectedOSdmg
             set selectedOSdmgTotalSize to do shell script "/usr/sbin/diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Total Size\" | awk '{ print $3 }'"
             
+            -- Round value, resolves issue with non full stop decimals used in some langauges
+            set selectedOSdmgTotalSize to (round selectedOSdmgTotalSize rounding up)
+            
             --Log Action
-            set logMe to "Total size of " & quoted form of selectedOSdmgMountPath & "is " & selectedOSdmgTotalSize & "GB"
+            set logMe to "Total size of " & quoted form of selectedOSdmgMountPath & " is " & selectedOSdmgTotalSize & "GB rounded up"
             
             -- Log To file
             logToFile_(me)
 
             -- Get the value of the free space available on selectedOSdmg
             set selectedOSdmgFreeSpace to do shell script "/usr/sbin/diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
+            
+            -- Round value, resolves issue with non full stop decimals used in some langauges
+            set selectedOSdmgFreeSpace to (round selectedOSdmgFreeSpace rounding down)
 
             --Log Action
-            set logMe to "There is " & selectedOSdmgFreeSpace & "GB space free on " & quoted form of selectedOSdmgMountPath
+            set logMe to "There is around " & selectedOSdmgFreeSpace & "GB space free on " & quoted form of selectedOSdmgMountPath
 
             -- Log To file
             logToFile_(me)
+                
+            -- Get the space used on selectedOSdmg
+            set selectedOSdmgUsedSpace to (selectedOSdmgTotalSize - selectedOSdmgFreeSpace)
             
-            considering numeric strings
-                
-                -- Get the space used on selectedOSdmg
-                set selectedOSdmgUsedSpace to (selectedOSdmgTotalSize - selectedOSdmgFreeSpace)
-                
-            end considering
-                
-                --Log Action
-                set logMe to "Used space on  " & quoted form of selectedOSdmgMountPath & "is " & selectedOSdmgUsedSpace & "GB"
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Set NetBoot.dmg's size to + 1GB of what is needed
-                set netBootDmgRequiredSize to selectedOSdmgUsedSpace + 1
-                
-                --Log Action
-                set logMe to "The NetBoot.dmg will need to be around " & netBootDmgRequiredSize & "GB"
-                
-                -- Log To file
-                logToFile_(me)
-                
-                -- Check that selected files exist
-                checkFiles_(me)
+            --Log Action
+            set logMe to "Used space on  " & quoted form of selectedOSdmgMountPath & " is " & selectedOSdmgUsedSpace & "GB rounded down"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Set NetBoot.dmg's size
+            set netBootDmgRequiredSize to selectedOSdmgUsedSpace
+            
+            --Log Action
+            set logMe to "The NetBoot.dmg will need to be around " & netBootDmgRequiredSize & "GB"
+            
+            -- Log To file
+            logToFile_(me)
+            
+            -- Check that selected files exist
+            checkFiles_(me)
         
         on error
         
