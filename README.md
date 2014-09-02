@@ -23,6 +23,10 @@ There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
+0.13<br>
+—Resolved an issue calculating space on non-English language Macs.<br>
+—Added checkbox for hosting on NetSUS, this removes spaces from the NetBoot’s Name.<br>
+<br>
 0.12<br>
 — Added OS & Input Language selection<br>
 — Added simple Finder selection<br>
