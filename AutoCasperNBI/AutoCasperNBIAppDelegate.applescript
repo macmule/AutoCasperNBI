@@ -1476,7 +1476,7 @@ script AutoCasperNBIAppDelegate
                 display dialog "Please enter a Username for the ARD user or deselect the ARD option" with icon 0 buttons {"OK"}
                 
                 --Log Action
-                log "Error: Please enter a Username for the ARD user or deselect the ARD option"
+                set logMe to "Error: Please enter a Username for the ARD user or deselect the ARD option"
                 
                 -- Log To file
                 logToFile_(me)
@@ -1490,7 +1490,7 @@ script AutoCasperNBIAppDelegate
                 tell defaults to setObject_forKey_(ardUsername, "ardUsername")
                 
                 --Log Action
-                log "ARD Username written to plist"
+                set logMe to "ARD Username written to plist"
                 
                 -- Log To file
                 logToFile_(me)
@@ -1520,7 +1520,7 @@ script AutoCasperNBIAppDelegate
                 display dialog "Please enter a password for the ARD user or deselect the ARD option" with icon 0 buttons {"OK"}
                 
                 --Log Action
-                log "Error: Please enter a password for the ARD user or deselect the ARD option"
+                set logMe to "Error: Please enter a password for the ARD user or deselect the ARD option"
                 
                 -- Log To file
                 logToFile_(me)
@@ -1534,7 +1534,7 @@ script AutoCasperNBIAppDelegate
                 tell defaults to setObject_forKey_(ardPassword, "ardPassword")
                 
                 --Log Action
-                log "ARD password written to plist"
+                set logMe to "ARD password written to plist"
                 
                 -- Log To file
                 logToFile_(me)
@@ -1588,7 +1588,7 @@ script AutoCasperNBIAppDelegate
                 display dialog "Please enter a VNC password, or deselect the VNC option" with icon 0 buttons {"OK"}
                 
                 --Log Action
-                log "Error: Please enter a VNC password, or deselect the VNC option"
+                set logMe to "Error: Please enter a VNC password, or deselect the VNC option"
                 
                 -- Log To file
                 logToFile_(me)
@@ -1611,7 +1611,7 @@ script AutoCasperNBIAppDelegate
                     display dialog "Please enter a VNC Password that is less than 8 characters" with icon 0 buttons {"OK"}
                     
                     --Log Action
-                    log "Error: Please enter a VNC Password that is less than 8 characters"
+                    set logMe to "Error: Please enter a VNC Password that is less than 8 characters"
                     
                     -- Log To file
                     logToFile_(me)
@@ -1625,7 +1625,7 @@ script AutoCasperNBIAppDelegate
                     tell defaults to setObject_forKey_(vncPassword, "vncPassword")
                     
                     --Log Action
-                    log "VNC password written to plist"
+                    set logMe to "VNC password written to plist"
                     
                     -- Log To file
                     logToFile_(me)
@@ -1831,7 +1831,7 @@ script AutoCasperNBIAppDelegate
                 display dialog "Please select a Desktop Image or deselect the Desktop Image option" with icon 0 buttons {"OK"}
                 
                 --Log Action
-                log "Error: Please select a Desktop Image or deselect the Desktop Image option"
+                set logMe to "Error: Please select a Desktop Image or deselect the Desktop Image option"
                 
                 -- Log To file
                 logToFile_(me)
@@ -4222,13 +4222,13 @@ script AutoCasperNBIAppDelegate
                 set my buildProccessProgressBar to 210
                 
                 --Log Action
-                log "Trying to install rc.netboot.pkg"
+                set logMe to "Trying to install rc.netboot.pkg"
                 
                 -- Install rc.netboot.pkg from rescources
                 do shell script "installer -pkg " & quoted form of pathToResources & "/rc.netboot.pkg -target " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
-                log "rc.netboot.pkg installed successfully"
+                set logMe to "rc.netboot.pkg installed successfully"
                 
                 -- Set Desktop Image to selected
                 copyDesktopImage_(me)
@@ -6280,9 +6280,18 @@ script AutoCasperNBIAppDelegate
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 394
             
+            -- Touch /System/Library/Extensions
+            do shell script "/usr/bin/touch " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
+
+            -- Log Action
+            set logMe to "Touching /System/Library/Extensions pre kernel cache update"
+            
+            -- Log To file
+            logToFile_(me)
+            
             --Log Action
             set logMe to "Updating kernel cache on: " & netBootDmgMountPath
-            
+
             -- Log To file
             logToFile_(me)
             
