@@ -23,6 +23,11 @@ There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
+0.14<br>
+— Added touching of /System/Library/Extensions/ to try & resolve hang
+on reboot<br>
+— Corrected some logging <br>
+<br>
 0.13<br>
 —Resolved an issue calculating space on non-English language Macs.<br>
 —Added checkbox for hosting on NetSUS, this removes spaces from the NetBoot’s Name.<br>
