@@ -159,6 +159,8 @@ script AutoCasperNBIAppDelegate
     property closeButtonPreCheckPassed : true
     property simpleFinderEnabled : false
     property servedFromNetSUS : false
+    property logNewLine : true
+    property isAdminUser : false
 
     -- Others
     property requiredSpace : 20
@@ -178,22 +180,11 @@ script AutoCasperNBIAppDelegate
     -- To be run at launch
     on startYourEngines_(sender)
         
-        -- Date for log file
-        set logDate to do shell script "/bin/date +%F"
-        
-        -- Log that we've launched
-        set logMe to "\\n"
-        
-        -- Log To file
-        logToFile_(me)
-        
         -- Get AutoCasperNBI version
         set versionOfAutoCasperNBI to get version of application "AutoCasperNBI"
         
         -- Log AutoCasperNBI version
         set logMe to  "AutoCasperNBI " & versionOfAutoCasperNBI
-        
-        -- Log To file
         logToFile_(me)
 
         -- Get OS of host mac to verify that we can create an .nbi from supplied OS.dmg
@@ -204,22 +195,16 @@ script AutoCasperNBIAppDelegate
         
         -- Log OS version & build of host mac
         set logMe to  "Running on OS " & hostMacOSVersion & " (" & hostMacOSBuildVersion & ")"
-        
-        -- Log To file
         logToFile_(me)
 
         -- Get username of user running AutoCasperNBI
         set userName to short user name of (system info)
         set logMe to "Launched by " & userName
-        
-        -- Log To file
         logToFile_(me)
         
         -- Get a UUID for folder path
         set tempUUID to do shell script "/usr/bin/uuidgen"
         set logMe to "UUID " & tempUUID
-        
-        -- Log To file
         logToFile_(me)
         
         -- Get path to resources folder
@@ -293,6 +278,7 @@ script AutoCasperNBIAppDelegate
         -- Error if incorrect value specified
         netBootImageIndexCheck_(me)
         
+        -- Set to boolean
         set optionsWindowPreCheckPassed to optionsWindowPreCheckPassed as boolean
         
         if optionsWindowPreCheckPassed is true then
@@ -319,8 +305,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Cancelling..."
-        
-        -- Log To file
         logToFile_(me)
         
         -- Detach mounted volumes
@@ -364,6 +348,9 @@ script AutoCasperNBIAppDelegate
     -- Insert code here to initialize your application before any files are opened
     on applicationWillFinishLaunching_(aNotification)
         
+        -- Date for log file
+        set logDate to do shell script "/bin/date +%F"
+        
         -- Get OS of host mac & user running the app
         startYourEngines_(me)
         
@@ -397,16 +384,12 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "User " & adminUserName & " is not a part of the Administrators group"
-                
-                -- Log To file
                 logToFile_(me)
                 
             else
                 
                 --Log Action
                 set logMe to "User " & adminUserName & " is part of the Administrators group"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Checking variable
@@ -421,6 +404,10 @@ script AutoCasperNBIAppDelegate
         
             -- Set Error message
             set my userNotifyError to "Authentication failed. Please retry the administrative credentials."
+            
+            --Log Action
+            set logMe to "Authentication failed for user: " & adminUserName
+            logToFile_(me)
    
             -- Notify of errors or success
             userNotify_(me)
@@ -450,8 +437,14 @@ script AutoCasperNBIAppDelegate
                 -- Set Error message
                 set my userNotifyError to "Authentication failed. Please retry the administrative credentials."
                 
+                set isAdminUser to false
+                
                 -- Notify of errors or success
                 userNotify_(me)
+                
+                --Log Action
+                set logMe to "Authentication failed for user: " & adminUserName
+                logToFile_(me)
             
             end try
             
@@ -479,8 +472,23 @@ script AutoCasperNBIAppDelegate
         -- Comment out before release.. this will send log messages to Xcode's log
         --log logMe
         
-        -- Get time & date of command execution
+        -- Get time & date of command execution for log file
         set timeStamp to do shell script "/bin/date"
+        
+        -- Set to boolean of value
+        set logNewLine to logNewLine as boolean
+        
+        -- If we're to create a newline ion the log
+        if logNewLine is true then
+            
+            try
+                
+                -- Create an empty new line for log if exists
+                do shell script "/bin/echo \"\" >> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+                
+            end try
+            
+        end if
         
         try
             
@@ -496,6 +504,9 @@ script AutoCasperNBIAppDelegate
             do shell script "/bin/echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
             
         end try
+        
+        -- Set to false so we don't create a newline until next time the app is run
+        set logNewLine to false
         
     end logToFile_
     
@@ -513,8 +524,6 @@ script AutoCasperNBIAppDelegate
             
             -- Log path of selected DMG
             set logMe to "Path: " & selectedOSdmgPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Reset OSDMG Icons & hide cog
@@ -535,8 +544,6 @@ script AutoCasperNBIAppDelegate
         
         -- Log that we're tryin to mount selected DMG
         set logMe to "Trying to mount: " & selectedOSdmgPath
-        
-        -- Log To file
         logToFile_(me)
         
         -- Update label to show we're doing stuff
@@ -556,8 +563,6 @@ script AutoCasperNBIAppDelegate
         
         -- Log that we're tryin to mount selected DMG
         set logMe to "Mounted to: " & selectedOSdmgMountPath
-        
-        -- Log To file
         logToFile_(me)
         
         -- If selectedOSdmgMountPath, then we've failed to mount as it's not a dmg.
@@ -606,8 +611,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "Cannot read OS Version"
-                
-                -- Log To file
                 logToFile_(me)
             
                 -- Error advising we cannot get the OS version from dmg
@@ -674,8 +677,6 @@ script AutoCasperNBIAppDelegate
             
             -- Log path of the selected app
             set logMe to "Selected App Path: " & selectedAppPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Reset Selected App Icons & cog
@@ -699,8 +700,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Pre-Reqs met, Options & Build enabled."
-            
-            -- Log To file
             logToFile_(me)
             
             -- Get the NetBoot Serve option
@@ -727,8 +726,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Bundle Name: " & selectedAppBundleName
-        
-        -- Log To file
         logToFile_(me)
 
         -- If Bundle Name is Casper Imaging, proceed to get version
@@ -741,8 +738,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Casper Imaging Version: " & selectedCasperImagingAppVersion
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set label to Casper Imaging version
@@ -785,8 +780,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Select Casper Imaging.app"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Reset Selected App Icons
@@ -831,8 +824,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to get JSS version"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Try & get URL using insecure method, this way it will work with or without a valid SSL cert
@@ -840,8 +831,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Received JSS version"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Run Handler
@@ -852,8 +841,6 @@ script AutoCasperNBIAppDelegate
             
                     --Log Action
                     set logMe to "Cannot get JSS Version"
-                    
-                    -- Log To file
                     logToFile_(me)
             
                     -- Reset JSS URL icons
@@ -861,8 +848,6 @@ script AutoCasperNBIAppDelegate
                     
                     -- Error if cannot get JSS Version
                     set logMe to "Cannot get JSS Version"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Set JSS exclaimation icon to show
@@ -893,8 +878,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Checking JSS Version from " & jssURL
-        
-        -- Log To file
         logToFile_(me)
         
         try
@@ -919,6 +902,7 @@ script AutoCasperNBIAppDelegate
             
             -- Return JSS Version
             set logMe to "JSS is: " & jssVersion
+            logToFile_(me)
             
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
@@ -934,21 +918,13 @@ script AutoCasperNBIAppDelegate
             
         -- Error if there is an issue
         on error
-        
-            --Log Action
-            set logMe to "Cannot get JSS Version"
-        
-            -- Log To file
-            logToFile_(me)
-        
-            -- Reset JSS URL icons
-            doResetJSSURLIcons_(me)
             
             -- Error if cannot get JSS Version
             set logMe to "Cannot get JSS Version"
-            
-            -- Log To file
             logToFile_(me)
+            
+            -- Reset JSS URL icons
+            doResetJSSURLIcons_(me)
             
             -- Set JSS exclaimation icon to show
             set my exclamationRedJSSURL to true
@@ -998,9 +974,8 @@ script AutoCasperNBIAppDelegate
         -- If major versions do not match, bad things can happen. But we'll not stop incase this nbi is being created before uprading JSS
         if selectedCasperImagingAppVersionMajor is not equal to jssVersionMajor then
             
+            -- Warn if major version diff
             set logMe to "Major Version Difference"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Reset Selected App Icons
@@ -1024,8 +999,6 @@ script AutoCasperNBIAppDelegate
                 
                 -- Log Minor Version Diff
                 set logMe to "Minor Version Difference"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Reset Selected App Icons
@@ -1081,8 +1054,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Name required for NetBoot Image"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false so we don't proceed showing options window
@@ -1117,16 +1088,12 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "NetBoot Name: " & netBootNameTextField
-            
-            -- Log To file
             logToFile_(me)
 
         else
         
             --Log Action
             set logMe to "NetBoot Name: " & netBootNameTextField
-            
-            -- Log To file
             logToFile_(me)
             
         end if
@@ -1147,8 +1114,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "NetBoot is to be hosted on multiple servers."
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set min & max values for Index
@@ -1159,8 +1124,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "NetBoot is to be hosted on a single server."
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set min & max values for Index
@@ -1221,8 +1184,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "NetBoot is to served over HTTP"
-        
-        -- Log To file
         logToFile_(me)
         
     end netbootServeOverHTTPSelected_
@@ -1238,8 +1199,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "NetBoot is to served over NFS"
-        
-        -- Log To file
         logToFile_(me)
         
     end netbootServeOverNFSSelected_
@@ -1268,16 +1227,12 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "NetBoot description not enabled"
-                
-                -- Log To file
                 logToFile_(me)
                 
             else
             
                 --Log Action
                 set logMe to "NetBoot description enabled"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Get Build date (should return localised).
@@ -1294,8 +1249,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "NetBoot description set to " & quoted form of netBootDescription
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                 else
@@ -1305,8 +1258,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "NetBoot description set to " & quoted form of netBootDescription
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                 end if
@@ -1357,16 +1308,12 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "NetBoot Reduce by enabled"
-            
-            -- Log To file
             logToFile_(me)
             
         else
         
             --Log Action
             set logMe to "NetBoot Reduce option unchecked"
-            
-            -- Log To file
             logToFile_(me)
             
         end if
@@ -1387,16 +1334,12 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "NetBoot expand enabled"
-            
-            -- Log To file
             logToFile_(me)
             
         else
             
             --Log Action
             set logMe to "NetBoot expand option unchecked"
-            
-            -- Log To file
             logToFile_(me)
             
         end if
@@ -1477,8 +1420,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Error: Please enter a Username for the ARD user or deselect the ARD option"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set to false so we don't proceed
@@ -1491,8 +1432,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "ARD Username written to plist"
-                
-                -- Log To file
                 logToFile_(me)
                 
             end if
@@ -1521,8 +1460,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Error: Please enter a password for the ARD user or deselect the ARD option"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set to false so we don't proceed
@@ -1535,8 +1472,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "ARD password written to plist"
-                
-                -- Log To file
                 logToFile_(me)
             
             end if
@@ -1589,8 +1524,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Error: Please enter a VNC password, or deselect the VNC option"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set to false so we don't proceed
@@ -1612,8 +1545,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Error: Please enter a VNC Password that is less than 8 characters"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Set to false so we don't proceed
@@ -1626,8 +1557,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "VNC password written to plist"
-                    
-                    -- Log To file
                     logToFile_(me)
 
                 end if
@@ -1832,8 +1761,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Error: Please select a Desktop Image or deselect the Desktop Image option"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set to false so we don't proceed
@@ -1864,8 +1791,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Please enter a Time Server"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Update plist with selection
@@ -1878,8 +1803,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Time Server: " & timeServerSelected
-            
-            -- Log To file
             logToFile_(me)
             
             -- Update plist with selection
@@ -1897,8 +1820,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Time Zone selected: " & timeZoneSelected
-        
-        -- Log To file
         logToFile_(me)
         
     end timeZone_
@@ -1911,8 +1832,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Language Selected: " & languageSelected
-        
-        -- Log To file
         logToFile_(me)
         
     end netBootLanguage_
@@ -1926,8 +1845,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Input Language Selected: " & inputLanguageSelected
-        
-        -- Log To file
         logToFile_(me)
         
     end inputLanguage_
@@ -1943,8 +1860,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Install rc.netboot set to: " & installRCNetBootSelected
-        
-        -- Log To file
         logToFile_(me)
         
     end installRCNetBootCheckBox_
@@ -1960,8 +1875,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Create a ReadOnly DMG set to: " & createReadOnlyDMG
-        
-        -- Log To file
         logToFile_(me)
         
     end createReadOnlyDMGCheckBox_
@@ -1977,8 +1890,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Enable Simple Finder set to : " & simpleFinderEnabled
-        
-        -- Log To file
         logToFile_(me)
         
     end simpleFinderCheckBox_
@@ -2084,8 +1995,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
-            
-            -- Log To file
             logToFile_(me)
             
             -- Check that we have enough space available to proceed
@@ -2101,8 +2010,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
-            
-            -- Log To file
             logToFile_(me)
             
             -- Check that we have enough space available to proceed
@@ -2122,10 +2029,6 @@ script AutoCasperNBIAppDelegate
 
             -- Update buildProcessLogTextField to show path to todays log
             set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
-
-            -- activate build process window
-            activate
-            showBuildProcessWindow's makeKeyAndOrderFront_(null)
             
             -- Set netBootCreationSuccessful value, for notifying later
             set my netBootCreationSuccessful to false
@@ -2133,13 +2036,30 @@ script AutoCasperNBIAppDelegate
             -- Reset required space
             set requiredSpace to 20
             
+            -- Set build Process ProgressBar to indeterminate & animated to false
+            set my buildProccessProgressBarIndeterminate to false
+            set my buildProccessProgressBarAniminate to false
+            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Calculating NetBoot.dmg size"
+            
+            delay 0.1
+            
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 0
+            
+            -- Close main window
+            mainWindow's orderOut_(null)
+            
+            -- activate build process window
+            activate
+            showBuildProcessWindow's makeKeyAndOrderFront_(null)
+            
             -- Show Cog on main window
             set my mainWindowCog to true
             
             --Log Action
             set logMe to "Trying to get the Total size of " & quoted form of selectedOSdmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Get total size of selectedOSdmg
@@ -2150,8 +2070,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Total size of " & quoted form of selectedOSdmgMountPath & " is " & selectedOSdmgTotalSize & "GB rounded up"
-            
-            -- Log To file
             logToFile_(me)
 
             -- Get the value of the free space available on selectedOSdmg
@@ -2161,27 +2079,21 @@ script AutoCasperNBIAppDelegate
             set selectedOSdmgFreeSpace to (round selectedOSdmgFreeSpace rounding down)
 
             --Log Action
-            set logMe to "There is around " & selectedOSdmgFreeSpace & "GB space free on " & quoted form of selectedOSdmgMountPath
-
-            -- Log To file
+            set logMe to "There is around " & selectedOSdmgFreeSpace & "GB space free on " & quoted form of selectedOSdmgMountPath & " rounded down"
             logToFile_(me)
                 
             -- Get the space used on selectedOSdmg
             set selectedOSdmgUsedSpace to (selectedOSdmgTotalSize - selectedOSdmgFreeSpace)
             
             --Log Action
-            set logMe to "Used space on  " & quoted form of selectedOSdmgMountPath & " is " & selectedOSdmgUsedSpace & "GB rounded down"
-            
-            -- Log To file
+            set logMe to "Used space on " & quoted form of selectedOSdmgMountPath & " is around " & selectedOSdmgUsedSpace & "GB"
             logToFile_(me)
             
             -- Set NetBoot.dmg's size
-            set netBootDmgRequiredSize to selectedOSdmgUsedSpace
+            set netBootDmgRequiredSize to selectedOSdmgUsedSpace + 1
             
             --Log Action
             set logMe to "The NetBoot.dmg will need to be around " & netBootDmgRequiredSize & "GB"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Check that selected files exist
@@ -2191,8 +2103,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Calculating space needed"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -2242,9 +2152,8 @@ script AutoCasperNBIAppDelegate
                     -- Update Build Process Window's Text Field
                     set my buildProcessTextField to "Checking that custom Desktop Image exists"
                     
+                    -- Log selected desktop image
                     set logMe to "Selected Desktop Image: " & customDesktopImagePath
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Check for file
@@ -2271,8 +2180,6 @@ script AutoCasperNBIAppDelegate
                         
                         --Log Action
                         set logMe to "User chose not to proceed as missing Desktop Image"
-                        
-                        -- Log To file
                         logToFile_(me)
                         
                         -- Detach mounted volumes
@@ -2282,8 +2189,6 @@ script AutoCasperNBIAppDelegate
 
                         --Log Action
                         set logMe to "User chose to proceed with a missing Desktop Image"
-                        
-                        -- Log To file
                         logToFile_(me)
                         
                         -- True if file exists
@@ -2331,8 +2236,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Trying to create .nbi folder " & netBootDirectory
-            
-            -- Log To file
             logToFile_(me)
             
             -- Create .nbi folder
@@ -2340,8 +2243,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Successfully created " & quoted form of netBootDirectory
-            
-            -- Log To file
             logToFile_(me)
             
             -- Create the NetBoot.dmg
@@ -2357,8 +2258,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log action
                 set logMe to "Trying to delete " & quoted form of netBootDirectory
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Delete existing folder
@@ -2366,8 +2265,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log action
                 set logMe to "Deleted " & quoted form of netBootDirectory
-
-                -- Log To file
                 logToFile_(me)
 
                 -- Create the .nbi folder
@@ -2377,8 +2274,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log action
                 set logMe to "Reselecting path to create .nbi"
-                
-                -- Log To file
                 logToFile_(me)
             
                 -- Prompt user for location to create the .nbi
@@ -2405,8 +2300,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Trying to create NetBoot.dmg in " & netBootDirectory
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to text value, to avoid an issue when name changed
@@ -2428,8 +2321,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Successfully created NetBoot.dmg in " & quoted form of netBootDirectory
-            
-            -- Log To file
             logToFile_(me)
             
             -- Mount the NetBoot.dmg
@@ -2439,8 +2330,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Failed to create NetBoot.dmg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -2471,8 +2360,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Trying to mount: " & quoted form of netBootDirectory
-            
-            -- Log To file
             logToFile_(me)
             
             -- Mount the NetBoot.dmg & get the mount path
@@ -2480,8 +2367,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Mounted to: " & netBootDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
 
             -- Copy OS.dmg's content to NetBoot.dmg
@@ -2491,8 +2376,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Cannot mount NetBoot.dmg"
-            
-            -- Log To file
             logToFile_(me)
 
             -- Set to false to display
@@ -2527,8 +2410,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Copying contents of " & quoted form of selectedOSdmgMountPath & " to " & quoted form of netBootDirectory & "/NetBoot.dmg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy contents of the SelectedOSdmg to NetBootdmg
@@ -2536,8 +2417,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Successfully copied " & quoted form of selectedOSdmgPath & " to " & quoted form of netBootDirectory & "/NetBoot.dmg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Reduce NetBoot Image if ticked
@@ -2547,8 +2426,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Cannot copy contents of " & selectedOSdmgMountPath & " to " & quoted form of netBootDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
 
             -- Set to false to display
@@ -2586,8 +2463,6 @@ script AutoCasperNBIAppDelegate
                 ---- Applications ----
                 --Log Action
                 set logMe to "Trying to delete Applications from: " & netBootDmgMountPath & "/Applications/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2600,15 +2475,11 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Deleted Applications from: " & netBootDmgMountPath & "/Applications/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- Utilities ----
                 --Log Action
                 set logMe to  "Deleting unwanted Utilities from: " & netBootDmgMountPath
-
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2624,15 +2495,11 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Deleted Utilities from: " & netBootDmgMountPath & "/Applications/Utilities/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- PreferencePanes ----
                 --Log Action
                 set logMe to "Deleting unwanted PreferencesPanes from: " & netBootDmgMountPath
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2648,16 +2515,12 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Deleted Preference Panes from: " & netBootDmgMountPath & "/System/Library/PreferencePanes/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- Directories ----
                 --- /Library/ ---
                 --Log Action
                 set logMe to "Trying to empty directories in " & netBootDmgMountPath & "/Library/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update build Process ProgressBar
@@ -2675,8 +2538,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Application Support/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2689,8 +2550,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Audio/"
-                
-                -- Log To file
                 logToFile_(me)
 
                 -- Update Build Process Window's Text Field
@@ -2703,8 +2562,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Caches/"
-                
-                -- Log To file
                 logToFile_(me)
 
                 -- Update Build Process Window's Text Field
@@ -2717,8 +2574,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Desktop Pictures/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2731,8 +2586,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Dictionaries/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2745,8 +2598,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Documentation/"
-                
-                -- Log To file
                 logToFile_(me)
 
                 -- Update Build Process Window's Text Field
@@ -2759,8 +2610,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Fonts/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2773,8 +2622,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Logs/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2787,8 +2634,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Modem Scripts/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2801,8 +2646,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Printers/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2815,8 +2658,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Receipts/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2829,8 +2670,6 @@ script AutoCasperNBIAppDelegate
     
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Screen Savers/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2843,8 +2682,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/Updates/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2857,8 +2694,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/User Pictures/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2871,14 +2706,10 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/Library/WebServer/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 --Log Action
                 set logMe to "Successfully emptied targeted directories in " & netBootDmgMountPath & "/Library/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 --- /System/Library/ ---
@@ -2904,8 +2735,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Address Book Plug-Ins/"
-                
-                -- Log To file
                 logToFile_(me)
 
                 -- Update Build Process Window's Text Field
@@ -2918,8 +2747,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Automator/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2932,8 +2759,6 @@ script AutoCasperNBIAppDelegate
    
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Caches/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2946,8 +2771,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Compositions/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2967,8 +2790,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2981,8 +2802,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/InternetAccounts/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2995,8 +2814,6 @@ script AutoCasperNBIAppDelegate
 				
 				--Log Action
                 set logMe to "Deleting unneeded folders from " & netBootDmgMountPath & "/System/Library/LinguisticData/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -3009,8 +2826,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Printers/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -3023,8 +2838,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Screen Savers/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -3037,8 +2850,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Speech/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -3051,14 +2862,10 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/User Templates/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 --Log Action
                 set logMe to "Successfully emptied targeted directories in " & netBootDmgMountPath & "/System/Library/"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Delete swap files from the NetBoot.dmg
@@ -3068,8 +2875,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "NetBoot reduction not enabled. Skipping..."
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Delete swap files from the NetBoot.dmg
@@ -3081,8 +2886,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Deleting files"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -3124,8 +2927,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Deleted swapfiles in " & netBootDmgMountPath & "/private/var/vm/"
-        
-        -- Log To file
         logToFile_(me)
         
         -- Delete sleepimage from the NetBoot.dmg
@@ -3146,8 +2947,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Deleting " & netBootDmgMountPath & "/private/var/vm/sleepimage"
-        
-        -- Log To file
         logToFile_(me)
 
         try
@@ -3181,8 +2980,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Emptying " & netBootDmgMountPath & "/private/tmp/*"
-        
-        -- Log To file
         logToFile_(me)
         
         try
@@ -3192,8 +2989,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/private/tmp/"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Empty /private/var/tmp from the NetBoot.dmg
@@ -3203,8 +2998,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Emptying /private/tmp"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -3233,8 +3026,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Emptying " & netBootDmgMountPath & "/private/var/tmp/*"
-        
-        -- Log To file
         logToFile_(me)
         
         try
@@ -3244,8 +3035,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/private/var/tmp/"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Empty /Volumes/ from the NetBoot.dmg
@@ -3255,8 +3044,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Emptying /private/var/tmp/"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -3285,8 +3072,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Emptying " & netBootDmgMountPath & "/Volumes/"
-        
-        -- Log To file
         logToFile_(me)
         
         try
@@ -3296,8 +3081,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/Volumes/"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Empty /dev/ from the NetBoot.dmg
@@ -3307,8 +3090,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Error: Emptying /Volumes/"
-
-            -- Log To file
             logToFile_(me)
 
             -- Set to false to display
@@ -3334,8 +3115,6 @@ script AutoCasperNBIAppDelegate
         
         -- Update build Process ProgressBar
         set my buildProccessProgressBar to 110
-        
-        --Log Action
         set logMe to "Emptying " & netBootDmgMountPath & "/dev/"
         
         -- Log To file
@@ -3348,8 +3127,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/dev/"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Empty /var/run/ from the NetBoot.dmg
@@ -3359,8 +3136,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Emptying /dev/"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -3389,8 +3164,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Emptying " & netBootDmgMountPath & "/var/run/"
-        
-        -- Log To file
         logToFile_(me)
         
         try
@@ -3400,8 +3173,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Emptied " & netBootDmgMountPath & "/var/run/"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Disable Software Update
@@ -3411,8 +3182,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Emptying /var/run/"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -3441,8 +3210,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Deleting " & netBootDmgMountPath & "/System/Library/CoreServices/Software Update.app"
-        
-        -- Log To file
         logToFile_(me)
         
         try
@@ -3452,14 +3219,10 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/Software Update.app"
-
-            -- Log To file
             logToFile_(me)
             
             --Log Action
             set logMe to "Deleting " & netBootDmgMountPath & "/System/Library/LaunchDaemons/com.apple.softwareupdate*"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Empty the below folder
@@ -3467,8 +3230,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/LaunchDaemons/com.apple.softwareupdate*"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Delete plists from SystemConfiguration to rebuild network interfaces
@@ -3478,8 +3239,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Disabling Software Update"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -3508,8 +3267,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Deleting " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/preferences.plist"
-        
-        -- Log To file
         logToFile_(me)
         
         try
@@ -3521,8 +3278,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Deleted " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/preferences.plist"
-        
-        -- Log To file
         logToFile_(me)
         
         -- Update Build Process Window's Text Field
@@ -3535,8 +3290,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Deleting " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
-        
-        -- Log To file
         logToFile_(me)
         
         try
@@ -3548,8 +3301,6 @@ script AutoCasperNBIAppDelegate
         
         --Log Action
         set logMe to "Deleted " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
-        
-        -- Log To file
         logToFile_(me)
         
         -- Bypass the various setup assistants so we're logging in uninterrupted
@@ -3576,8 +3327,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to ".AppleSetupDone written to " & netBootDmgMountPath & "/var/db/.AppleSetupDone"
-            
-            -- Log To file
             logToFile_(me)
             
             ---- .SetupRegComplete ----
@@ -3595,8 +3344,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to ".SetupRegComplete written to " & netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete"
-            
-            -- Log To file
             logToFile_(me)
             
             ---- com.apple.SetupAssistant----
@@ -3619,14 +3366,10 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "iCloud Bypass options written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
-            
-            -- Log To file
             logToFile_(me)
 
             --Log Action
             set logMe to "Deleting " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
-            
-            -- Log To file
             logToFile_(me)
             
             --Delete the MiniLauncher
@@ -3634,8 +3377,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Deleted " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
-            
-            -- Log To file
             logToFile_(me)
 
             -- Stop TimeMachine for prompting to use mounted disks for backup
@@ -3645,8 +3386,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Bypassing Setup Assistants"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -3682,8 +3421,6 @@ script AutoCasperNBIAppDelegate
             
             -- Log Action
             set logMe to "com.apple.TimeMachine.plist amended at " & netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Delete the file delete /Library/Preferences/com.apple.dockfixup.plist
@@ -3693,8 +3430,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Error: Writing to /Library/Preferences/com.apple.TimeMachine.plist"
-
-            -- Log To file
             logToFile_(me)
 
             -- Set to false to display
@@ -3725,8 +3460,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Deleting " & netBootDmgMountPath & "/Library/Preferences/com.apple.dockfixup.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             
@@ -3738,8 +3471,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/Dock.app/Contents/Resources/com.apple.dockfixup.plist"
-                
-                -- Log To file
                 logToFile_(me)
             
             else
@@ -3749,8 +3480,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Deleted " & netBootDmgMountPath & "/Library/Preferences/com.apple.dockfixup.plist"
-                
-                -- Log To file
                 logToFile_(me)
                 
             end if
@@ -3762,8 +3491,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Deleting /Library/Preferences/com.apple.dockfixup.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -3794,8 +3521,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Copying com.apple.PowerManagement.plist"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Copy the plist
@@ -3803,8 +3528,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Copied com.apple.PowerManagement.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Create the ARD user
@@ -3814,8 +3537,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Copying com.apple.PowerManagement.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -3855,8 +3576,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "ARD Username encoded"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Write encoded ARD Username to plist
@@ -3864,8 +3583,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Written ARD Username to " & variableVariable
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Encode ardPassword
@@ -3873,8 +3590,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "ARD Password encoded"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Write encoded ARD Password to plist
@@ -3882,8 +3597,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Written ARD Password to " & variableVariable
-                
-                -- Log To file
                 logToFile_(me)
 
                 -- Writes vncPassword to com.apple.VNCSettings.txt
@@ -3893,8 +3606,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "Error: Creating ARD User"
-                
-                -- Log To file
                 logToFile_(me)
             
                 -- Set to false to display
@@ -3913,8 +3624,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Skipping creation of ARD user as ARD not enabled"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Writes vncPassword to com.apple.VNCSettings.txt
@@ -3945,8 +3654,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to write VNC password to " & variableVariable
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Write hashed vncPassword to /Library/Preferences/com.apple.VNCSettings.txt on .nbi
@@ -3966,8 +3673,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "Error: Wrting VNC Settings"
-                
-                -- Log To file
                 logToFile_(me)
             
                 -- Set to false to display
@@ -3986,8 +3691,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Skipping writing VNC password as VNC option not enabled"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set Time Server & Zone if enabled
@@ -4021,8 +3724,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Written Time Server " & timeServerSelected & " to " & variableVariable
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Write encoded Time Zone to plist
@@ -4030,8 +3731,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Written Time Zone " & timeZoneSelected & " to " & variableVariable
-                
-                -- Log To file
                 logToFile_(me)
 
                 -- Install AutoCasperNBIStartup.pkg
@@ -4041,8 +3740,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "Error: Writing Time Server & Zone Settings"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set to false to display
@@ -4055,13 +3752,6 @@ script AutoCasperNBIAppDelegate
                 userNotify_(me)
             
             end try
-        
-        --else
-        
-            -- Install AutoCasperNBIStartup.pkg
-            --installAutoCasperNBIStartup_(me)
-        
-        --end if
         
     end setTimeServerAndZone_
 
@@ -4077,8 +3767,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Trying to install AutoCasperNBIStartup.pkg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Update build Process ProgressBar
@@ -4089,8 +3777,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "AutoCasperNBIStartup.pkg installed successfully"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Install RootUser.pkg
@@ -4100,8 +3786,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Installing AutoCasperNBI LaunchDaemon & required files"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -4124,8 +3808,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Trying to install Root user via pkg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Update Build Process Window's Text Field
@@ -4141,8 +3823,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Root user installed via pkg"
-            
-            -- Log To file
             logToFile_(me)
             
             considering numeric strings
@@ -4152,8 +3832,6 @@ script AutoCasperNBIAppDelegate
                  
                      --Log Action
                      set logMe to "Trying to copy Lion Root user plist"
-                     
-                     -- Log To file
                      logToFile_(me)
                      
                      -- Update Build Process Window's Text Field
@@ -4169,8 +3847,6 @@ script AutoCasperNBIAppDelegate
                      
                      --Log Action
                      set logMe to "Successfully copied Lion Root user plist"
-                     
-                     -- Log To file
                      logToFile_(me)
                  
                 end if
@@ -4185,9 +3861,7 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Error: Installing Root User"
-
-            -- Log To file
-            logToFile_(me)
+            
 
             -- Set to false to display
             set my userNotifyErrorHidden to false
@@ -4223,12 +3897,14 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to install rc.netboot.pkg"
+                logToFile_(me)
                 
                 -- Install rc.netboot.pkg from rescources
                 do shell script "installer -pkg " & quoted form of pathToResources & "/rc.netboot.pkg -target " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
                 set logMe to "rc.netboot.pkg installed successfully"
+                logToFile_(me)
                 
                 -- Set Desktop Image to selected
                 copyDesktopImage_(me)
@@ -4237,8 +3913,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "Error: Installing modified rc.netboot file"
-                
-                -- Log To file
                 logToFile_(me)
             
                 -- Set to false to display
@@ -4282,8 +3956,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Removing symbolic link on " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 try
@@ -4298,8 +3970,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to copy " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Copy selected image
@@ -4307,8 +3977,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Copied " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Copy Casper Imaging.app selected earlier
@@ -4318,8 +3986,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "Error: Copying Desktop Image"
-                
-                -- Log To file
                 logToFile_(me)
             
                 -- Set to false to display
@@ -4359,8 +4025,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Casper Imaging.app to copy resides " & selectedAppPathToCopy
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy location for Casper Imaging.app
@@ -4371,8 +4035,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Casper Imaging.app to be copied to " & copiedAppPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy Casper Imaging.app & log
@@ -4380,8 +4042,6 @@ script AutoCasperNBIAppDelegate
 
             --Log action
             set logMe to "Copied " & selectedAppPath & " to " & variableVariable
-            
-            -- Log To file
             logToFile_(me)
             
             -- Try as errors if not found (i think)
@@ -4392,8 +4052,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Quarantine flag removed from " & copiedAppPath
-                
-                -- Log To file
                 logToFile_(me)
             
             end try
@@ -4405,8 +4063,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: There was an issue copying  " & selectedAppPath & " to " & variableVariable
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -4443,8 +4099,6 @@ script AutoCasperNBIAppDelegate
             
             -- Log Action
             set logMe to "com.jamfsoftware.jss.plist created & allow invalid certificate set"
-            
-            -- Log To file
             logToFile_(me)
             
             -- If a JSS URL is specified
@@ -4455,8 +4109,6 @@ script AutoCasperNBIAppDelegate
       
                 --Log Action
                 set logMe to "plist updated with JSS url"
-                
-                -- Log To file
                 logToFile_(me)
             
             end if
@@ -4468,8 +4120,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Installing the Casper Imaging plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -4500,8 +4150,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Trying to install Casper Imaging LaunchAgent via pkg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Install CasperImagingLaunchAgent.pkg from rescources
@@ -4509,8 +4157,6 @@ script AutoCasperNBIAppDelegate
     
             --Log Action
             set logMe to "Casper Imaging LaunchAgent plist installed via pkg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Get JSS CA Cert if JSS URL given
@@ -4520,8 +4166,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Installing Casper Imaging LaunchAgent"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -4558,8 +4202,6 @@ script AutoCasperNBIAppDelegate
                 
                 -- Log Action
                 set logMe to "Downloading JSS CA Cert for " & jssURL
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Download CA Cert from JSS to /Library/Application Support/AutoCasperNBI/Certificates/UUID
@@ -4567,8 +4209,6 @@ script AutoCasperNBIAppDelegate
          
                 -- Log Action
                 set logMe to "Downloaded JSS CA Cert to " & quoted form of variableVariable
-                 
-                -- Log To file
                 logToFile_(me)
          
                 -- Enable Simple Finder if selected
@@ -4578,8 +4218,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "Error: Importing JSS CA Cert"
-                
-                -- Log To file
                 logToFile_(me)
             
                 -- Set to false to display
@@ -4622,8 +4260,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying enable Simple Finder"
-                
-                -- Log To file
                 logToFile_(me)
 
                 -- Enable Simple Finder
@@ -4631,8 +4267,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Simple Finder enabled"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set the language of the .nbi
@@ -4642,8 +4276,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "Error: Enabling Simple Finder"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set to false to display
@@ -4681,8 +4313,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Getting language code for selected language " & languageSelected
-            
-            -- Log To file
             logToFile_(me)
             
             -- Language codes taken from /System/Library/PrivateFrameworks/IntlPreferences.framework/Versions/A/Resources/Languages.strings
@@ -4695,14 +4325,10 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Language Code is: " & languageCode
-            
-            -- Log To file
             logToFile_(me)
             
             --Log Action
             set logMe to "Trying to set NetBoot's OS Language"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set Language
@@ -4710,8 +4336,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "NetBoot's OS Language set"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set the NetBoot's Input Language
@@ -4721,8 +4345,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Setting NetBoot's Language"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -4753,8 +4375,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to get input layout id for  " & inputLanguageSelected
-                
-                -- Log To file
                 logToFile_(me)
             
                 -- Set to text of value
@@ -5410,14 +5030,10 @@ script AutoCasperNBIAppDelegate
                 
             --Log Action
             set logMe to "Keyboard Layout ID set to " & inputLayoutID
-                
-            -- Log To file
             logToFile_(me)
 
             --Log Action
             set logMe to "Trying to set NetBoot's Input Language"
-
-            -- Log To file
             logToFile_(me)
             
             -- Set variableVariables's value
@@ -5440,8 +5056,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "NetBoot's Input Language set"
-
-            -- Log To file
             logToFile_(me)
             
             -- Get size of NetBoot.dmg
@@ -5451,8 +5065,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Error: Setting NetBoot's Input Language"
-
-            -- Log To file
             logToFile_(me)
 
             -- Set to false to display
@@ -5483,52 +5095,40 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Trying to get the Total size of " & quoted form of netBootDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Get total size of NetBoot.dmg
             set netBootDmgTotalSize to do shell script "/usr/sbin/diskutil info " & quoted form of netBootDmgMountPath & " | grep \"Total Size\" | awk '{ print $3 }'"
             
-            --Log Action
-            set logMe to "Total size of " & quoted form of netBootDmgMountPath & "is " & netBootDmgTotalSize & "GB"
+            -- Round value, resolves issue with non full stop decimals used in some langauges
+            set netBootDmgTotalSize to (round netBootDmgTotalSize rounding up)
             
-            -- Log To file
+            --Log Action
+            set logMe to "Total size of " & quoted form of netBootDmgMountPath & "is " & netBootDmgTotalSize & "GB, rounded up"
             logToFile_(me)
             
             -- Get the value of the free space available on NetBoot.dmg
             set netBootDmgFreeSpace to do shell script "/usr/sbin/diskutil info " & quoted form of netBootDmgMountPath & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
             
-            --Log Action
-            set logMe to "There is " & netBootDmgFreeSpace & "GB space free on " & quoted form of netBootDmgMountPath
-            
-            -- Log To file
-            logToFile_(me)
-            
-            considering numeric strings
-                
-                -- Get the space used on NetBoot.dmg
-                set netBootDmgUsedSpace to (netBootDmgTotalSize - netBootDmgFreeSpace)
-                
-            end considering
+            -- Round value, resolves issue with non full stop decimals used in some langauges
+            set netBootDmgFreeSpace to (round netBootDmgFreeSpace rounding down)
             
             --Log Action
-            set logMe to "Used space on  " & quoted form of netBootDmgMountPath & "is " & netBootDmgUsedSpace & "GB"
-            
-            -- Log To file
+            set logMe to "There is " & netBootDmgFreeSpace & "GB space free on " & quoted form of netBootDmgMountPath & " rounded down"
             logToFile_(me)
             
-            considering numeric strings
-                
-                -- Set NetBoot.dmg's size to + 1GB of what is needed
-                set netBootDmgResize to netBootDmgUsedSpace + 1
-                
-            end considering
+            -- Get the space used on NetBoot.dmg
+            set netBootDmgUsedSpace to (netBootDmgTotalSize - netBootDmgFreeSpace)
+            
+            --Log Action
+            set logMe to "Used space on " & quoted form of netBootDmgMountPath & "is around " & netBootDmgUsedSpace & "GB"
+            logToFile_(me)
+            
+            -- Set NetBoot.dmg's size to + 1GB of what is needed
+            set netBootDmgResize to netBootDmgUsedSpace + 1
             
             --Log Action
             set logMe to "If we're reducing the .nbi, NetBoot.reduced.dmg will need to be around " & netBootDmgResize & "GB"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to boolean of value
@@ -5557,8 +5157,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Calculating space needed"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -5587,8 +5185,6 @@ script AutoCasperNBIAppDelegate
         
         --Log action
         set logMe to "Trying to create NetBoot.reduced.dmg in " & netBootDirectory
-        
-        -- Log To file
         logToFile_(me)
         
         -- Set to text value, to avoid an issue when name changed
@@ -5611,8 +5207,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Successfully created NetBoot.reduced.dmg in " & quoted form of netBootDirectory
-            
-            -- Log To file
             logToFile_(me)
             
             -- Mount the NetBoot.dmg
@@ -5622,8 +5216,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Failed to create NetBoot.reduced.dmg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -5654,8 +5246,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Trying to mount: " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Mount the NetBoot.dmg & get the mount path
@@ -5663,8 +5253,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Mounted to: " & netBootReducedDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy NetBoot.dmg's content to NetBoot.reduced.dmg
@@ -5674,8 +5262,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Cannot mount NetBoot.reduced.dmg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -5705,8 +5291,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Copying contents of " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy contents of the SelectedOSdmg to NetBootdmg
@@ -5714,12 +5298,7 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Successfully copied " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
-            
-            -- Updates NBImageInfo.plist post reduction
-            --postReduceupdateNBImageInfoPlist_(me)
             
             --Delete NetBoot.dmg
             deleteNetBootDmg_(me)
@@ -5728,8 +5307,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Cannot copy contents of " & quoted form of netBootDmgMountPath & " to " & quoted form of netBootReducedDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -5763,8 +5340,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to detach " & netBootDmgMountPath
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Detach Volume
@@ -5782,8 +5357,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Deleting " & quoted form of netBootDirectory & "/NetBoot.dmg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Delete NetBoot.dmg
@@ -5791,8 +5364,6 @@ script AutoCasperNBIAppDelegate
             
             --Log action
             set logMe to "Deleted " & quoted form of netBootDirectory & "/NetBoot.dmg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Change variables value
@@ -5805,8 +5376,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Failed to delete NetBoot.dmg"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -5841,24 +5410,32 @@ script AutoCasperNBIAppDelegate
                     -- Update build Process ProgressBar
                     set my buildProccessProgressBar to 350
                     
-                    considering numeric strings
-                        
-                        -- Set Netboot.reduced.dmg to required space + selected expansion value
-                        set netBootExpandedTotalSize to netBootDmgUsedSpace + netBootImageExpandValue
-                        
-                    end considering
+                    -- Set to string
+                    set netBootDmgUsedSpace to netBootDmgUsedSpace as string
+                    set netBootImageExpandValue to netBootImageExpandValue as string
+                    
+                    -- Set NetBoot.dmg to required space + selected expansion value
+                    set netBootExpandedTotalSize to (netBootDmgUsedSpace + netBootImageExpandValue)
+                    
+                    --Log Action
+                    set logMe to "NetBoot.reduced.dmg will be expanded to around " & netBootExpandedTotalSize & "GB"
+                    
+                    -- Log To file
+                    logToFile_(me)
                     
                     ---- Unmount NetBoot.reduced.dmg ----
                     try
                         
                         --Log Action
                         set logMe to "Trying to detach " & netBootReducedDmgMountPath
-                        
-                        -- Log To file
                         logToFile_(me)
                         
                         -- Detach Volume
                         do shell script "/usr/bin/hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
+                        
+                        --Log Action
+                        set logMe to "Successfully detached " & netBootDmgMountPath
+                        logToFile_(me)
                         
                     end try
                     
@@ -5868,8 +5445,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Trying to expand " & netBootDirectory & "/NetBoot.reduced.dmg to " & netBootExpandedTotalSize & "GB"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Expand NetBoot.reduced.dmg by the value given before
@@ -5885,8 +5460,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Trying to mount: " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Mount the NetBoot.dmg & get the mount path
@@ -5894,8 +5467,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Mounted to: " & netBootReducedDmgMountPath
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Disable Spotlight Indexing on NetBoot.dmg
@@ -5905,8 +5476,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Error: Expanding NetBoot.reduced.dmg"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Set to false to display
@@ -5932,24 +5501,30 @@ script AutoCasperNBIAppDelegate
                     -- Update build Process ProgressBar
                     set my buildProccessProgressBar to 350
                     
-                    considering numeric strings
+                    -- Set to string
+                    set netBootDmgUsedSpace to netBootDmgUsedSpace as string
+                    set netBootImageExpandValue to netBootImageExpandValue as string
                         
-                        -- Set NetBoot.dmg to required space + selected expansion value
-                        set netBootExpandedTotalSize to netBootDmgUsedSpace + netBootImageExpandValue
-                        
-                    end considering
+                    -- Set NetBoot.dmg to required space + selected expansion value
+                    set netBootExpandedTotalSize to (netBootDmgUsedSpace + netBootImageExpandValue)
+                    
+                    --Log Action
+                    set logMe to "NetBoot.dmg will be expanded to around " & netBootExpandedTotalSize & "GB"
+                    logToFile_(me)
                     
                     ---- Unmount NetBoot.dmg ----
                     try
                         
                         --Log Action
                         set logMe to "Trying to detach " & netBootDmgMountPath
-                        
-                        -- Log To file
                         logToFile_(me)
                         
                         -- Detach Volume
                         do shell script "/usr/bin/hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+                        
+                        --Log Action
+                        set logMe to "Successfully detached " & netBootDmgMountPath
+                        logToFile_(me)
                         
                     end try
                     
@@ -5959,8 +5534,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Trying to expand " & netBootDirectory & "/NetBoot.dmg to " & netBootExpandedTotalSize & "GB"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Expand NetBoot.dmg by the value given before
@@ -5976,8 +5549,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Trying to mount: " & quoted form of netBootDirectory & "/NetBoot.dmg"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Mount the NetBoot.dmg & get the mount path
@@ -5985,8 +5556,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Mounted to: " & netBootReducedDmgMountPath
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Disable Spotlight Indexing on NetBoot.dmg
@@ -5996,8 +5565,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Error: Expanding NetBoot.dmg"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Set to false to display
@@ -6037,8 +5604,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Trying to disable Spotlight Indexing on " & netBootDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Disable Spotlight Indexing
@@ -6046,8 +5611,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Disabled Spotlight Indexing on " & netBootDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             -- Create dlyd shared cache files
@@ -6057,8 +5620,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Disabling Spolight Indexing"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -6089,16 +5650,12 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Creating dyld shared cache files on: " & netBootDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             do shell script "/usr/bin/update_dyld_shared_cache -root " & quoted form of netBootDmgMountPath & " -universal_boot -force" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Successfully created dyld caches"
-            
-            -- Log To file
             logToFile_(me)
             
             -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
@@ -6108,8 +5665,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Creating dyld shared cache files"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -6135,8 +5690,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "We're on not on 10.9.+ so need to manually reduce kernel cache"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Reduce Kernel cache if we're on 10.9.0 - .3
@@ -6146,8 +5699,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Skipping extension deletion as not needed on this OS"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Generate the Kernel cache
@@ -6175,8 +5726,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Delete extensions
@@ -6184,14 +5733,10 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
-            
-            -- Log To file
             logToFile_(me)
             
             --Log Action
             set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/ATI*"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Delete extesntions
@@ -6199,14 +5744,10 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATI*"
-            
-            -- Log To file
             logToFile_(me)
             
             --Log Action
             set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Delete extesntions
@@ -6214,8 +5755,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Generate the Kernel cache
@@ -6225,8 +5764,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Deleting extensions"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -6258,8 +5795,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Trying to create folder " & netBootDirectory & "/i386/x86_64"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Create the x86_64 folder
@@ -6267,8 +5802,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Created folder " & netBootDirectory & "/i386/x86_64"
-            
-            -- Log To file
             logToFile_(me)
             
             ---- UPDATE KERNEL CACHE ----
@@ -6285,14 +5818,10 @@ script AutoCasperNBIAppDelegate
 
             -- Log Action
             set logMe to "Touching /System/Library/Extensions pre kernel cache update"
-            
-            -- Log To file
             logToFile_(me)
             
             --Log Action
             set logMe to "Updating kernel cache on: " & netBootDmgMountPath
-
-            -- Log To file
             logToFile_(me)
             
             -- Update
@@ -6300,8 +5829,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Updated kernel cache on: " & netBootDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             ---- GENERATE KERNEL CACHE ----
@@ -6315,8 +5842,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Generating kernel cache"
-            
-            -- Log To file
             logToFile_(me)
             
             try
@@ -6338,8 +5863,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Generated kernel cache on: " & netBootDmgMountPath
-            
-            -- Log To file
             logToFile_(me)
             
             considering numeric strings
@@ -6351,8 +5874,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Copied kernel cache on as NetBoot is older than 10.8"
-                
-                -- Log To file
                 logToFile_(me)
             
             end if
@@ -6366,8 +5887,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Generating kernel cache"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -6398,8 +5917,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy the plist
@@ -6407,14 +5924,10 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Copied " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
-            
-            -- Log To file
             logToFile_(me)
             
             --Log Action
             set logMe to "Unlocking " & quoted form of netBootDirectory & "/i386/booter"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Unlock booter
@@ -6422,14 +5935,13 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Unlocked " & quoted form of netBootDirectory & "/i386/booter"
+            logToFile_(me)
             
             -- Correct ownership
             do shell script "/usr/sbin/chown -R root:admin " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Set ownership to root:admin on " & netBootDirectory & "/i386/booter"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy PlatformSupport.plist
@@ -6439,8 +5951,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Copying booter.efi"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -6471,8 +5981,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy the plist
@@ -6480,8 +5988,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Copied " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy NBImageInfo.plist
@@ -6491,8 +5997,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Copying PlatformSupport.plist"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -6523,8 +6027,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Copying NBImageInfo.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Copy the plist
@@ -6532,8 +6034,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Copied NBImageInfo.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Updates NBImageInfo.plist
@@ -6543,8 +6043,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "Error: Copying NBImageInfo.plist"
-            
-            -- Log To file
             logToFile_(me)
         
             -- Set to false to display
@@ -6576,8 +6074,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to change permissions on " & netBootDirectory & "/NBImageInfo.plist"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Making NBImageInfo.plist writable
@@ -6585,8 +6081,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Set permissions on " & netBootDirectory & "/NBImageInfo.plist to 777"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- Description----
@@ -6603,8 +6097,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Trying to set .nbi description to " & netBootDescription
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Set NetBoot to Description
@@ -6612,8 +6104,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Set .nbi Description"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                 end if
@@ -6629,8 +6119,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to set .nbi Index"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
@@ -6638,8 +6126,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Set .nbi Index"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- IsInstall ----
@@ -6653,8 +6139,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to set .nbi IsInstall value"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set IsInstall value
@@ -6662,8 +6146,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Set .nbi IsInstall value"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- Name ----
@@ -6677,8 +6159,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to set .nbi Name to " & netBootNameTextField
-
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
@@ -6686,8 +6166,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Set .nbi Name to " & netBootNameTextField
-                
-                -- Log To file
                 logToFile_(me)
             
                 ---- Diskless ----
@@ -6701,8 +6179,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Trying to set .nbi to Diskless"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
@@ -6710,8 +6186,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Set .nbi to Diskless"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- RootPath ----
@@ -6725,8 +6199,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to set .nbi to RootPath"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
@@ -6734,15 +6206,11 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Set .nbi to RootPath"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- Serve Over ---
                 --Log Action
                 set logMe to "Setting NBImageInfo.plist's serve over option"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- ImageType ----
@@ -6756,8 +6224,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to set .nbi to ImageType"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
@@ -6765,8 +6231,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Set .nbi to ImageType"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- osVersion ----
@@ -6780,8 +6244,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Trying to set .nbi to osVersion"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set NetBoot to Diskless
@@ -6789,15 +6251,11 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "Set .nbi to osVersion"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 ---- Serve Over ---
                 --Log Action
                 set logMe to "Setting NBImageInfo.plist's serve over option"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set to boolean of value
@@ -6814,11 +6272,8 @@ script AutoCasperNBIAppDelegate
                     -- Update build Process ProgressBar
                     set my buildProccessProgressBar to 451
 
-
                     --Log Action
                     set logMe to "Trying to set .nbi to being served over NFS"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Set NetBoot Serve over NFS
@@ -6826,8 +6281,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Set .nbi to being served over NFS"
-                    
-                    -- Log To file
                     logToFile_(me)
                 
                 else
@@ -6840,11 +6293,8 @@ script AutoCasperNBIAppDelegate
                     -- Update build Process ProgressBar
                     set my buildProccessProgressBar to 451
 
-
                     --Log Action
                     set logMe to "Trying to set .nbi to being served over HTTP"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Set NetBoot Serve over HTTP
@@ -6852,8 +6302,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Set .nbi to being served over NFS"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                 end if
@@ -6869,8 +6317,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Trying to set .nbi to Enabled"
-
-            -- Log To file
             logToFile_(me)
 
             -- Set NetBoot to Diskless
@@ -6878,8 +6324,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Set .nbi to Enabled"
-
-            -- Log To file
             logToFile_(me)
 
             ---- RootPath ----
@@ -6896,8 +6340,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Trying to set .nbi to RootPath"
-
-                -- Log To file
                 logToFile_(me)
 
                 -- Set NetBoot to Diskless
@@ -6905,8 +6347,6 @@ script AutoCasperNBIAppDelegate
 
                 --Log Action
                 set logMe to "Set .nbi to RootPath"
-
-                -- Log To file
                 logToFile_(me)
 
             end if
@@ -6917,8 +6357,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Set ownership to root:wheel on " & netBootDirectory & "/NBImageInfo.plist"
-
-            -- Log To file
             logToFile_(me)
 
             ---- Revert NBImageInfo.plist permissionchanges ----
@@ -6932,8 +6370,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Trying to correct permissions on " & netBootDirectory & "/NBImageInfo.plist"
-
-            -- Log To file
             logToFile_(me)
 
             -- Making NBImageInfo.plist writable
@@ -6941,8 +6377,6 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Set permissons on " & netBootDirectory & "/NBImageInfo.plist to 644"
-
-            -- Log To file
             logToFile_(me)
 
             -- Create Read Only DMG
@@ -6952,8 +6386,6 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Error: Writing NBImageInfo.plist"
-            
-            -- Log To file
             logToFile_(me)
             
             -- Set to false to display
@@ -6993,8 +6425,6 @@ script AutoCasperNBIAppDelegate
                         
                         --Log Action
                         set logMe to "Trying to detach " & netBootReducedDmgMountPath
-                        
-                        -- Log To file
                         logToFile_(me)
                         
                         -- Detach Volume
@@ -7004,8 +6434,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Trying create Read-Only DMG of " & netBootDirectory & "/NetBoot.reduced.dmg"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Make a Read-Only copy of NetBoot.reduced.dmg
@@ -7013,8 +6441,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Created " & netBootDirectory & "/NetBoot.readonly.dmg"
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Set netBootCreationSuccessful value, for notifying later
@@ -7030,8 +6456,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Trying to detach " & netBootDmgMountPath
-                    
-                    -- Log To file
                     logToFile_(me)
                     
                     -- Detach Volume
@@ -7041,8 +6465,6 @@ script AutoCasperNBIAppDelegate
                 
                     --Log Action
                     set logMe to "Trying create Read-Only DMG of " & netBootDirectory & "/NetBoot.dmg"
-                    
-                    -- Log To file
                     logToFile_(me)
                 
                     -- Make a Read-Only copy of NetBoot.dmg
@@ -7050,8 +6472,6 @@ script AutoCasperNBIAppDelegate
                     
                     --Log Action
                     set logMe to "Created " & netBootDirectory & "/NetBoot.readonly.dmg"
-                    
-                    -- Log To file
                     logToFile_(me)
                 
                 end if
@@ -7066,8 +6486,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "ASR scanning " & netBootDirectory & "/NetBoot.readonly.dmg"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- ASR scan NetBoot.readonly.dmg
@@ -7075,8 +6493,6 @@ script AutoCasperNBIAppDelegate
                 
                 --Log Action
                 set logMe to "ASR scanned " & netBootDirectory & "/NetBoot.readonly.dmg"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set netBootCreationSuccessful value, for notifying later
@@ -7089,8 +6505,6 @@ script AutoCasperNBIAppDelegate
             
                 --Log Action
                 set logMe to "Error: Creating Read-Only DMG"
-                
-                -- Log To file
                 logToFile_(me)
                 
                 -- Set to false to display
@@ -7127,6 +6541,10 @@ script AutoCasperNBIAppDelegate
         
         -- Re-enable main windows buttons
         set my optionWindowEnabled to true
+    
+        -- activate main window
+        activate
+        mainWindow's makeKeyAndOrderFront_(null)
         
         -- Reset build Process ProgressBar
         set my buildProccessProgressBar to 0
@@ -7144,8 +6562,6 @@ script AutoCasperNBIAppDelegate
         
             --Log Action
             set logMe to "NetBoot successfully created at the following location " & netBootDirectory
-            
-            -- Log To file
             logToFile_(me)
             
             -- Play complete.aif
@@ -7159,7 +6575,7 @@ script AutoCasperNBIAppDelegate
             
             -- Notify of errors or success
             userNotify_(me)
-
+            
         end if
         
     end weDidIt_
@@ -7186,8 +6602,13 @@ script AutoCasperNBIAppDelegate
         set my userNotifySuccess to missing value
         set my userNotifySuccessHidden to true
         
-        -- Reset build process variables
-        tidyUpTimeKids_(me)
+        -- Proceed if we've passed the admin credentials check
+        if isAdminUser is true then
+        
+            -- Reset build process variables
+            tidyUpTimeKids_(me)
+        
+        end if
         
     end userNotifyClose_
     
@@ -7197,12 +6618,11 @@ script AutoCasperNBIAppDelegate
         -- Disable main windows buttons
         set my optionWindowEnabled to false
         
+        -- close main window
+        mainWindow's orderOut_(null)
+        
         -- Update buildProcessLogTextField to show path to todays log
         set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
-        
-        -- activate build process window
-        activate
-        showBuildProcessWindow's makeKeyAndOrderFront_(null)
         
         -- Update Build Process Window's Text Field
         set my buildProcessTextField to "Detaching any Volumes we mounted"
@@ -7213,50 +6633,59 @@ script AutoCasperNBIAppDelegate
         
         delay 0.1
         
-        ---- Unmount NetBoot.dmg ----
-        try
-            
-            --Log Action
-            set logMe to "Trying to detach " & netBootDmgMountPath
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Detach Volume
-            do shell script "/usr/bin/hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
-            
-        end try
+        -- activate build process window
+        activate
+        showBuildProcessWindow's makeKeyAndOrderFront_(null)
         
-        ---- Unmount NetBoot.reduced.dmg ----
-        try
-            
-            --Log Action
-            set logMe to "Trying to detach " & netBootReducedDmgMountPath
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Detach Volume
-            do shell script "/usr/bin/hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
-            
-        end try
+        ---- Unmount NetBoot.dmg if mounted
+        if netBootDmgMountPath is  not equal to missing value then
+
+            try
+                
+                --Log Action
+                set logMe to "Trying to detach " & netBootDmgMountPath
+                logToFile_(me)
+                
+                -- Detach Volume
+                do shell script "/usr/bin/hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
+                
+            end try
         
-        ---- Unmount OS.dmg ----
-        try
-            
-            --Log Action
-            set logMe to "Trying to detach " & selectedOSdmgMountPath
-            
-            -- Log To file
-            logToFile_(me)
-            
-            -- Detach Volume
-            do shell script "/usr/bin/hdiutil detach " & quoted form of selectedOSdmgMountPath & " -force"
-            
-        end try
+        end if
         
-        -- close build process window
-        showBuildProcessWindow's orderOut_(null)
+        ---- Unmount NetBoot.reduced.dmg if mounted
+        if netBootReducedDmgMountPath is  not equal to missing value then
+            try
+                
+                --Log Action
+                set logMe to "Trying to detach " & netBootReducedDmgMountPath
+                logToFile_(me)
+                
+                -- Detach Volume
+                do shell script "/usr/bin/hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
+                
+            end try
+        end if
+        
+        ---- Unmount OS.dmg if mounted
+        if selectedOSdmgMountPath is  not equal to missing value then
+
+            try
+                
+                --Log Action
+                set logMe to "Trying to detach " & selectedOSdmgMountPath
+                logToFile_(me)
+                
+                -- Detach Volume
+                do shell script "/usr/bin/hdiutil detach " & quoted form of selectedOSdmgMountPath & " -force"
+                
+            end try
+        
+        end if
+        
+        --Log Action
+        set logMe to "Goodbye for now!"
+        logToFile_(me)
         
         -- Terminate App
 		return current application's NSTerminateNow
