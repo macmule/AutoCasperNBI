@@ -23,6 +23,16 @@ There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
+0.15<br>
+— Round all the sizing! (yep i missed some, should work on non-english
+macs)<br>
+— Corrected Admin check behaviour<br>
+— Removed a few hundred lines to get over the stack error.<br>
+— Changed behaviour so only build process window is shown during build.<br>
+— Correct the logging so shouldn’t rollover when writing past 00:00 on
+a day, & will start a new line on launch<br>
+— Corrected an issue when expanding the NetBoot.dmg<br>
+<br>
 0.14<br>
 — Added touching of /System/Library/Extensions/ to try & resolve hang
 on reboot<br>
