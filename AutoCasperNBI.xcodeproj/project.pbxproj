@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7C06F40719DA19680057D6ED /* 10.8+root.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C06F40619DA19680057D6ED /* 10.8+root.plist */; };
 		7C13057F193FC0B60060F343 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C13057E193FC0B60060F343 /* Cocoa.framework */; };
 		7C130581193FC0B60060F343 /* AppleScriptObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C130580193FC0B60060F343 /* AppleScriptObjC.framework */; };
 		7C13058B193FC0B60060F343 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7C130589193FC0B60060F343 /* InfoPlist.strings */; };
@@ -22,15 +23,12 @@
 		7C1305AD193FC10A0060F343 /* RemoteDesktop.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C1305A6193FC10A0060F343 /* RemoteDesktop.icns */; };
 		7C1305AE193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C1305A7193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns */; };
 		7C19700A198058F00092062D /* Scripts.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C197009198058F00092062D /* Scripts.icns */; };
-		7C1F557319ACED7D00AF5FC4 /* RootUser.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C1F557219ACED7D00AF5FC4 /* RootUser.pkg */; };
 		7C23C474195A3AEB00FAC70A /* Screensharing.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C23C473195A3AEB00FAC70A /* Screensharing.icns */; };
 		7C27FA26198C357900BD5A07 /* AlertStopIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C27FA25198C357900BD5A07 /* AlertStopIcon.icns */; };
 		7C27FA28198C3D9500BD5A07 /* complete.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7C27FA27198C3D9500BD5A07 /* complete.aif */; };
-		7C2B34EF19ABFEED004823CD /* AutoCasperNBIStartup.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C2B34EE19ABFEED004823CD /* AutoCasperNBIStartup.pkg */; };
 		7C39447E1960C57D00BF371B /* Package.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447D1960C57D00BF371B /* Package.icns */; };
 		7C3944801960C7DA00BF371B /* CertStackLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */; };
-		7C47FE0C196C8B1D00E1DAD9 /* rc.netboot.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C47FE0B196C8B1D00E1DAD9 /* rc.netboot.pkg */; };
-		7C6D0A011969F27F006D7759 /* CasperImagingLaunchAgent.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7C6D0A001969F27F006D7759 /* CasperImagingLaunchAgent.pkg */; };
+		7C55D7EF19DA299000AC599D /* com.apple.dock.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C55D7EE19DA299000AC599D /* com.apple.dock.plist */; };
 		7C801962196EA9AE0079952B /* AutoCasperNBI.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C801961196EA9AE0079952B /* AutoCasperNBI.png */; };
 		7C83B56E19A3931600E9572E /* Finder.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C83B56D19A3931600E9572E /* Finder.icns */; };
 		7C83B57019A3959600E9572E /* happy-mac-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C83B56F19A3959600E9572E /* happy-mac-icon.png */; };
@@ -43,13 +41,18 @@
 		7CBE0401194F14020068CA84 /* Major Warning.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CBE03FD194F14020068CA84 /* Major Warning.png */; };
 		7CBE0402194F14020068CA84 /* Succeeded.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CBE03FE194F14020068CA84 /* Succeeded.png */; };
 		7CBE0403194F14020068CA84 /* Warning.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CBE03FF194F14020068CA84 /* Warning.png */; };
+		7CC26BD819DA1C0D002A093B /* kcpassword in Resources */ = {isa = PBXBuildFile; fileRef = 7CC26BD719DA1C0D002A093B /* kcpassword */; };
+		7CC26BDA19DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CC26BD919DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist */; };
+		7CC26BDC19DA1DF8002A093B /* rc.netboot in Resources */ = {isa = PBXBuildFile; fileRef = 7CC26BDB19DA1DF8002A093B /* rc.netboot */; };
 		7CC636E6197D444E008473CE /* NBImageInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CC636E5197D444E008473CE /* NBImageInfo.plist */; };
-		7CDC96EE196AEDBA00C359A1 /* RootUser.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 7CDC96ED196AEDBA00C359A1 /* RootUser.pkg */; };
+		7CCA40B519D9EE9800C7114F /* Boot.sh in Resources */ = {isa = PBXBuildFile; fileRef = 7CCA40B419D9EE9800C7114F /* Boot.sh */; };
+		7CCA40B719D9F22600C7114F /* com.AutoCasperNBI.boot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CCA40B619D9F22600C7114F /* com.AutoCasperNBI.boot.plist */; };
 		7CDCE26C1985A2B8005CE10C /* Clock.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CDCE26B1985A2B8005CE10C /* Clock.png */; };
 		7CEDD051195B8243009DA982 /* Installer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CEDD050195B8243009DA982 /* Installer.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7C06F40619DA19680057D6ED /* 10.8+root.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = "10.8+root.plist"; sourceTree = "<group>"; };
 		7C13057B193FC0B60060F343 /* AutoCasperNBI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoCasperNBI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C13057E193FC0B60060F343 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		7C130580193FC0B60060F343 /* AppleScriptObjC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppleScriptObjC.framework; path = System/Library/Frameworks/AppleScriptObjC.framework; sourceTree = SDKROOT; };
@@ -71,15 +74,12 @@
 		7C1305A6193FC10A0060F343 /* RemoteDesktop.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = RemoteDesktop.icns; sourceTree = "<group>"; };
 		7C1305A7193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ToolbarDesktopFolderIcon.icns; sourceTree = "<group>"; };
 		7C197009198058F00092062D /* Scripts.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Scripts.icns; sourceTree = "<group>"; };
-		7C1F557219ACED7D00AF5FC4 /* RootUser.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = RootUser.pkg; sourceTree = "<group>"; };
 		7C23C473195A3AEB00FAC70A /* Screensharing.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Screensharing.icns; sourceTree = "<group>"; };
 		7C27FA25198C357900BD5A07 /* AlertStopIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AlertStopIcon.icns; sourceTree = "<group>"; };
 		7C27FA27198C3D9500BD5A07 /* complete.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = complete.aif; sourceTree = "<group>"; };
-		7C2B34EE19ABFEED004823CD /* AutoCasperNBIStartup.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = AutoCasperNBIStartup.pkg; sourceTree = "<group>"; };
 		7C39447D1960C57D00BF371B /* Package.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Package.icns; sourceTree = "<group>"; };
 		7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CertStackLarge@2x.png"; sourceTree = "<group>"; };
-		7C47FE0B196C8B1D00E1DAD9 /* rc.netboot.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = rc.netboot.pkg; sourceTree = "<group>"; };
-		7C6D0A001969F27F006D7759 /* CasperImagingLaunchAgent.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = CasperImagingLaunchAgent.pkg; sourceTree = "<group>"; };
+		7C55D7EE19DA299000AC599D /* com.apple.dock.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = com.apple.dock.plist; sourceTree = "<group>"; };
 		7C801961196EA9AE0079952B /* AutoCasperNBI.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AutoCasperNBI.png; sourceTree = "<group>"; };
 		7C83B56D19A3931600E9572E /* Finder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Finder.icns; sourceTree = "<group>"; };
 		7C83B56F19A3959600E9572E /* happy-mac-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "happy-mac-icon.png"; sourceTree = "<group>"; };
@@ -92,8 +92,12 @@
 		7CBE03FD194F14020068CA84 /* Major Warning.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Major Warning.png"; sourceTree = "<group>"; };
 		7CBE03FE194F14020068CA84 /* Succeeded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Succeeded.png; sourceTree = "<group>"; };
 		7CBE03FF194F14020068CA84 /* Warning.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Warning.png; sourceTree = "<group>"; };
+		7CC26BD719DA1C0D002A093B /* kcpassword */ = {isa = PBXFileReference; lastKnownFileType = file; path = kcpassword; sourceTree = "<group>"; };
+		7CC26BD919DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.AutoCasperNBI.CasperImaging.plist; sourceTree = "<group>"; };
+		7CC26BDB19DA1DF8002A093B /* rc.netboot */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = rc.netboot; sourceTree = "<group>"; };
 		7CC636E5197D444E008473CE /* NBImageInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NBImageInfo.plist; sourceTree = "<group>"; };
-		7CDC96ED196AEDBA00C359A1 /* RootUser.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = RootUser.pkg; sourceTree = "<group>"; };
+		7CCA40B419D9EE9800C7114F /* Boot.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = Boot.sh; sourceTree = "<group>"; };
+		7CCA40B619D9F22600C7114F /* com.AutoCasperNBI.boot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.AutoCasperNBI.boot.plist; sourceTree = "<group>"; };
 		7CDCE26B1985A2B8005CE10C /* Clock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Clock.png; sourceTree = "<group>"; };
 		7CEDD050195B8243009DA982 /* Installer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Installer.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -151,14 +155,16 @@
 		7C130586193FC0B60060F343 /* AutoCasperNBI */ = {
 			isa = PBXGroup;
 			children = (
-				7C1F557219ACED7D00AF5FC4 /* RootUser.pkg */,
-				7C2B34EE19ABFEED004823CD /* AutoCasperNBIStartup.pkg */,
 				7CB60993199189E20068574D /* root.plist */,
+				7CC26BD719DA1C0D002A093B /* kcpassword */,
+				7CCA40B619D9F22600C7114F /* com.AutoCasperNBI.boot.plist */,
+				7C06F40619DA19680057D6ED /* 10.8+root.plist */,
+				7CC26BD919DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist */,
 				7CC636E5197D444E008473CE /* NBImageInfo.plist */,
+				7CC26BDB19DA1DF8002A093B /* rc.netboot */,
+				7C55D7EE19DA299000AC599D /* com.apple.dock.plist */,
 				7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */,
-				7CDC96ED196AEDBA00C359A1 /* RootUser.pkg */,
-				7C47FE0B196C8B1D00E1DAD9 /* rc.netboot.pkg */,
-				7C6D0A001969F27F006D7759 /* CasperImagingLaunchAgent.pkg */,
+				7CCA40B419D9EE9800C7114F /* Boot.sh */,
 				7C13059E193FC0CE0060F343 /* MainMenu.xib */,
 				7C130592193FC0B60060F343 /* AutoCasperNBIAppDelegate.applescript */,
 				7C130597193FC0B60060F343 /* Images.xcassets */,
@@ -265,36 +271,38 @@
 			files = (
 				7CBBEC33197CFEB000250F49 /* com.apple.PowerManagement.plist in Resources */,
 				7C1305AB193FC10A0060F343 /* NetBootVolume.icns in Resources */,
+				7C55D7EF19DA299000AC599D /* com.apple.dock.plist in Resources */,
 				7C83B57419A3B39A00E9572E /* diskcopy.icns in Resources */,
+				7C06F40719DA19680057D6ED /* 10.8+root.plist in Resources */,
 				7C1305AC193FC10A0060F343 /* osx-jss-login.png in Resources */,
 				7CBE0401194F14020068CA84 /* Major Warning.png in Resources */,
 				7C27FA26198C357900BD5A07 /* AlertStopIcon.icns in Resources */,
 				7C23C474195A3AEB00FAC70A /* Screensharing.icns in Resources */,
 				7CEDD051195B8243009DA982 /* Installer.icns in Resources */,
 				7C3944801960C7DA00BF371B /* CertStackLarge@2x.png in Resources */,
-				7C47FE0C196C8B1D00E1DAD9 /* rc.netboot.pkg in Resources */,
 				7C83B57619A3B41700E9572E /* CDiskImage.icns in Resources */,
 				7C1305AE193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns in Resources */,
 				7C27FA28198C3D9500BD5A07 /* complete.aif in Resources */,
 				7C13058B193FC0B60060F343 /* InfoPlist.strings in Resources */,
+				7CC26BDC19DA1DF8002A093B /* rc.netboot in Resources */,
 				7C19700A198058F00092062D /* Scripts.icns in Resources */,
-				7C2B34EF19ABFEED004823CD /* AutoCasperNBIStartup.pkg in Resources */,
 				7CBE0402194F14020068CA84 /* Succeeded.png in Resources */,
 				7CC636E6197D444E008473CE /* NBImageInfo.plist in Resources */,
+				7CCA40B519D9EE9800C7114F /* Boot.sh in Resources */,
+				7CC26BD819DA1C0D002A093B /* kcpassword in Resources */,
 				7C83B56E19A3931600E9572E /* Finder.icns in Resources */,
 				7CBE0400194F14020068CA84 /* Error.png in Resources */,
-				7C6D0A011969F27F006D7759 /* CasperImagingLaunchAgent.pkg in Resources */,
 				7CDCE26C1985A2B8005CE10C /* Clock.png in Resources */,
 				7C13059F193FC0CE0060F343 /* MainMenu.xib in Resources */,
+				7CC26BDA19DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist in Resources */,
 				7C130598193FC0B60060F343 /* Images.xcassets in Resources */,
+				7CCA40B719D9F22600C7114F /* com.AutoCasperNBI.boot.plist in Resources */,
 				7C1305AA193FC10A0060F343 /* DMGFormat.icns in Resources */,
 				7CBE0403194F14020068CA84 /* Warning.png in Resources */,
 				7CB60994199189E20068574D /* root.plist in Resources */,
 				7C1305A8193FC10A0060F343 /* Casper Imaging.tiff in Resources */,
 				7C130591193FC0B60060F343 /* Credits.rtf in Resources */,
 				7C83B57019A3959600E9572E /* happy-mac-icon.png in Resources */,
-				7CDC96EE196AEDBA00C359A1 /* RootUser.pkg in Resources */,
-				7C1F557319ACED7D00AF5FC4 /* RootUser.pkg in Resources */,
 				7C801962196EA9AE0079952B /* AutoCasperNBI.png in Resources */,
 				7C83B57219A3AF3E00E9572E /* Localization.icns in Resources */,
 				7C1305AD193FC10A0060F343 /* RemoteDesktop.icns in Resources */,
