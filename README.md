@@ -27,6 +27,7 @@ VERSIONS<br>
 — Enabled adding additional pkgs & certs.<br>
 — Amended kernel cache generation to see try & stop the hang on restart.<br>
 — Changed root user environment back to Apple defaultsish. (Dock is stripped to Finder, Casper Imaging & Trash). Use PKGs to customise<br>
+<br>
 0.15<br>
 — Round all the sizing! (yep i missed some, should work on non-english
 macs)<br>
