@@ -47,7 +47,6 @@ AutoCasperNBI.<br>
 -- Removed check OS version as no longer needed & may have caused false positives erroring as not being able to mount dmg. (@smith.kyle, @boberito)<br>
 -- Populates NBIImageInfo.plist's EnabledSystemIdentifiers array, to allow model filtering (@evanmellichampe)<br>
 <br>
-<br>
 0.16<br>
 — Enabled adding additional pkgs & certs.<br>
 — Amended kernel cache generation to see try & stop the hang on restart.<br>
