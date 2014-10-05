@@ -18,15 +18,15 @@
 			<key>Automatic Restart On Power Loss</key>
 			<integer>0</integer>
 			<key>Disk Sleep Timer</key>
-			<integer>10</integer>
+			<integer>0</integer>
 			<key>Display Sleep Timer</key>
-			<integer>10</integer>
+			<integer>180</integer>
 			<key>Dynamic Power Step</key>
-			<integer>1</integer>
+			<integer>0</integer>
 			<key>Reduce Processor Speed</key>
 			<integer>0</integer>
 			<key>Sleep On Power Button</key>
-			<integer>1</integer>
+			<integer>0</integer>
 			<key>System Sleep Timer</key>
 			<integer>0</integer>
 			<key>Wake On AC Change</key>
@@ -41,15 +41,15 @@
 			<key>Automatic Restart On Power Loss</key>
 			<integer>0</integer>
 			<key>Disk Sleep Timer</key>
-			<integer>10</integer>
+			<integer>0</integer>
 			<key>Display Sleep Timer</key>
-			<integer>10</integer>
+			<integer>180</integer>
 			<key>Dynamic Power Step</key>
-			<integer>1</integer>
+			<integer>0</integer>
 			<key>Reduce Processor Speed</key>
 			<integer>0</integer>
 			<key>Sleep On Power Button</key>
-			<integer>1</integer>
+			<integer>0</integer>
 			<key>System Sleep Timer</key>
 			<integer>0</integer>
 			<key>Wake On AC Change</key>
@@ -64,15 +64,15 @@
 			<key>Automatic Restart On Power Loss</key>
 			<integer>0</integer>
 			<key>Disk Sleep Timer</key>
-			<integer>10</integer>
+			<integer>0</integer>
 			<key>Display Sleep Timer</key>
-			<integer>10</integer>
+			<integer>180</integer>
 			<key>Dynamic Power Step</key>
-			<integer>1</integer>
+			<integer>0</integer>
 			<key>Reduce Processor Speed</key>
 			<integer>0</integer>
 			<key>Sleep On Power Button</key>
-			<integer>1</integer>
+			<integer>0</integer>
 			<key>System Sleep Timer</key>
 			<integer>0</integer>
 			<key>Wake On AC Change</key>
