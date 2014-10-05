@@ -23,6 +23,31 @@ There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
+0.18<br>
+-- Corrected size calculation, sorry about that.<br>
+<br>
+0.17<br>
+-- New App Icon.<br>
+-- Changed status icons to OSX's in built.<br>
+-- Now approximately calculates there is enough space needed to create the NBI (including if we're expanding & creating readonly or reduced) errors if not.<br>
+-- Serve over options now hidden until OS.dmg & Casper Imaging.app successfully added.<br>
+-- Changed order of additional items check, to avoid hang on launching<br>
+AutoCasperNBI.<br>
+-- Resized tableviews, so can scroll to see long paths of additional certs & pkgs.<br>
+-- Added pre-check, to alert if any additional certs or pkgs are missing.<br>
+-- Moved from installing PKGs for launchagent etc to flat file copy.<br>
+-- Amended powermanagement.plist to displaysleep after 3 hours, removed from boot.sh<br>
+-- Corrected setting input source for selections with spaces in names. Such as, Swiss German for example. (@fritz.schlapbach)<br>
+-- Enabled copy & paste. (@RHammen)<br>
+-- Disables screen saver. (@neil.martin83)<br>
+-- Disables app nap. (@neil.martin83)<br>
+-- On successful build, volumes are now unmounted. (@neil.martin83, @mfcfadmin, @Harsdorff)<br>
+-- Always reducing cache now, to help with hang on restart (I hope! 1 more thing to try if not). (@neil.martin83, @mfcfadmin, @smith.kyle & @Zvordauk)<br>
+-- Set attaching of OS.dmg to --noverify, to see if this helps in those cases where it's failed. (@smith.kyle, @boberito)<br>
+-- Removed check OS version as no longer needed & may have caused false positives erroring as not being able to mount dmg. (@smith.kyle, @boberito)<br>
+-- Populates NBIImageInfo.plist's EnabledSystemIdentifiers array, to allow model filtering (@evanmellichampe)<br>
+<br>
+<br>
 0.16<br>
 — Enabled adding additional pkgs & certs.<br>
 — Amended kernel cache generation to see try & stop the hang on restart.<br>
