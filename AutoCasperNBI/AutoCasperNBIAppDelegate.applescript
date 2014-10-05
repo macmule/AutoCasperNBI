@@ -2013,126 +2013,85 @@ script AutoCasperNBIAppDelegate
 
     -- Add PKG selected by user
     on selectPKG_(sender)
-        
         -- Reset text colour
         set selectedPKGsColour to current application's NSColor's blackColor()
-        
         try
-            
             -- Prompt user to select
             choose file of type {"com.apple.installer-package-archive"} with prompt "Select a .pkg to add:" default location (path to desktop folder)
-            
             -- Get path of the item selected
             set my selectedPKGsPath to POSIX path of result
-            
-            
             -- Do not add if a duplicate, also make sure we have a value or we'll error
             if additionalPKGs is equal to missing value
-                
                 -- If we're missing value
                 set pkgList to selectedPKGsPath
-                
             else
-                
                 -- Set variable to list
                 set pkgList to additionalPKGs as list
-                
                 -- Verify that we're not adding a duplicate
                 if pkgList does not contain selectedPKGsPath then
-                    
                     -- Add to end of list
                     set end of pkgList to selectedPKGsPath
-                    
                 else
-                
                     display dialog "The .pkg " & selectedPKGsPath & " has already been added." with icon 2 buttons {"OK"}
-                
                 end if
-                
             end if
-            
             -- Add to array
             (additionalPKGsArray's addObject:{pkgPath:selectedPKGsPath})
-            
             -- Update plist with selection
             tell defaults to setObject_forKey_(pkgList, "additionalPKGs")
-            
             -- Update variable
             tell defaults to set my additionalPKGs to objectForKey_("additionalPKGs") as list
-            
             -- Check additional Certs array, & amend accordingly
             checkAdditionalPKGs_(me)
-        
         end try
 
     end selectPKG_
 
     -- Remove Selected PKG
     on deletePKG_(sender)
-        
         -- Get selected object
         tell additionalPKGsArray to set my selectedObjects to selectedObjects()
-        
         -- Remove from array
         tell additionalPKGsArray to removeObjects:selectedObjects
-        
         -- Set variable
         set pkgList to (thePKGs's valueForKey:"pkgPath") as list
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(pkgList, "additionalPKGs") as list
-        
         -- Get value from plist
         tell defaults to set my additionalPKGs to objectForKey_("additionalPKGs")
-        
     end deletePKG_
 
 ----- CLOSE OPTIONS WINDOW CHECK -----
 
     -- Make sure all variables are set if enabled, if passed close options window
     on closeOptionsWindowCheck_(sender)
-        
         -- reset value
         set closeButtonPreCheckPassed to true
-        
         -- Verify that the description field has a value & reset & prompt if not
         netBootDescriptionCheck_(me)
-        
         -- Bound to NetBoot Image Resize value
         netBootImageExpandEnteredValue_(me)
-        
         -- Check the value entered in the ARD Username textfield
         checkardUsername_(me)
-               
         -- Check the value entered in the ARD Password textfield
         checkardPassword_(me)
-            
         -- Check the value entered in the vnc Password textfield
         checkvncPassword_(me)
-        
         -- Check that a custom desktop image has been selected
         checkcustomDesktopImagePath_(me)
-        
         -- Bound to Time Server Text field
         timeServerCheck_(me)
-
         -- Set to boolean of value
         set closeButtonPreCheckPassed to closeButtonPreCheckPassed as boolean
-
         -- Proceed if we've passed precheck
         if closeButtonPreCheckPassed is true then
-            
             -- reload options from plist
             retrieveDefaults_(me)
-        
             -- close options window
             optionsWindow's orderOut_(null)
-
             -- enable options
             set my optionWindowEnabled to true
-                
         end if
-
     end closeOptionsWindowCheck_
 
 ----- BUILD PRE-CHECK -----
@@ -2145,7 +2104,6 @@ script AutoCasperNBIAppDelegate
         
         -- Make sure a name is specified for the NetBoot Image, error if not.
         netBootName_(me)
-        
         -- Error if incorrect value specified
         netBootImageIndexCheck_(me)
         
@@ -2157,25 +2115,19 @@ script AutoCasperNBIAppDelegate
             
             -- Disable main windows buttons
             set my optionWindowEnabled to false
-            
+        
             -- reload options from plist
             retrieveDefaults_(me)
-            
             -- Check the JSS URL details & try & get version of the JSS
             checkJSSURL_(me)
-            
             -- Set NetBoot Description
             enablenetBootDescription_(me)
-            
             -- Check that image selected for desktop exists
             checkDesktopImage_(me)
-            
             -- Check additional pkgs array, & amend accordingly
             checkAdditionalPKGs_(me)
-            
             -- Check additional Certs array, & amend accordingly
             checkAdditionalCerts_(me)
-
             -- Prompt user for location to create the .nbi
             netBootLocation_(me)
 
@@ -2299,21 +2251,34 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             ----- SIZE OF VOLUME ON WHICH WE'RE CREATING THE NBI ----
-            -- Get Volume Name for where we're creating the nbi
-            set variableVariable to first word of netBootSelectedLocation
-            
+            -- Set netBootSelectedLocation to path of location given
+            set variableVariable to netBootSelectedLocation
+            tell application
+                set variableVariable to ((POSIX file variableVariable) as alias)
+            end tell
+            set variableVariable to variableVariable as text
+
+            -- Store delimiters for resetting later
+            set applescriptsDelims to AppleScript's text item delimiters
+            -- Set delimiters to colon
+            set AppleScript's text item delimiters to ":"
+            -- Get Volume
+            set selectedVolume to text item 1 of variableVariable
+            -- Reset delimiters
+            set AppleScript's text item delimiters to applescriptsDelims
+        
             --Log Action
             set logMe to "Checking for free space on /" & variableVariable
             logToFile_(me)
             
             -- Get free space
-            set freeSpaceOnVolume to do shell script "/usr/sbin/diskutil info /" & quoted form of variableVariable & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
+            set freeSpaceOnVolume to do shell script "/usr/sbin/diskutil info " & quoted form of selectedVolume & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
             
             -- Round value, resolves issue with non full stop decimals used in some langauges
             set freeSpaceOnVolume to (round freeSpaceOnVolume rounding down)
             
             --Log Action
-            set logMe to "The Volume /" & variableVariable & " has " & freeSpaceOnVolume & "GB free, rounding down"
+            set logMe to "The volume /" & selectedVolume & " has " & freeSpaceOnVolume & "GB free, rounding down"
             logToFile_(me)
             
             -- Get the space needed
@@ -2507,7 +2472,7 @@ script AutoCasperNBIAppDelegate
             createNetbootDmg_(me)
             
         on error number 1
-        
+            
             -- Error to user prompting for what to do next
             display dialog "There is already a folder called: " & quoted form of netBootNameTextField & " in " & quoted form of netBootSelectedLocation & return & return & "Do you want to select another folder or delete the existing?" with icon 2 buttons {"Delete Existing", "New Folder"}
             
@@ -2520,27 +2485,25 @@ script AutoCasperNBIAppDelegate
                 
                 -- Delete existing folder
                 do shell script "/bin/rm -rf " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
-
+                
                 --Log action
                 set logMe to "Deleted " & quoted form of netBootDirectory
                 logToFile_(me)
-
+                
                 -- Create the .nbi folder
                 netBootLocationCreate_(me)
                 
             else
-            
+                
                 --Log action
                 set logMe to "Reselecting path to create .nbi"
                 logToFile_(me)
-            
+                
                 -- Prompt user for location to create the .nbi
                 netBootLocation_(me)
                 
             end if
-            
         end try
-        
     end netBootLocationCreate_
 
     -- Create the NetBoot.dmg
