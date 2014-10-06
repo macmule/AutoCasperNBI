@@ -114,6 +114,10 @@ script AutoCasperNBIAppDelegate
     property letters : missing value
     property freeSpaceOnVolume : ""
     property spaceNeeded : ""
+    property fullPath : ""
+    property volname : ""
+    property freeSpaceOnVolumeUnit : ""
+    property selectedVolume : ""
     
     --- Booleans
     property selectedOSDMGTextFieldEnabled : false
@@ -190,37 +194,28 @@ script AutoCasperNBIAppDelegate
 
     -- To be run at launch
     on startYourEngines_(sender)
-        
         -- Get AutoCasperNBI version
         set versionOfAutoCasperNBI to get version of application "AutoCasperNBI"
-        
         -- Log AutoCasperNBI version
         set logMe to  "AutoCasperNBI " & versionOfAutoCasperNBI
         logToFile_(me)
-
         -- Get OS of host mac to verify that we can create an .nbi from supplied OS.dmg
         set my hostMacOSVersion to (do shell script "/usr/bin/sw_vers -productVersion")
-    
         -- Get host macs Build version for logging/debugging
         set my hostMacOSBuildVersion to (do shell script "/usr/bin/sw_vers -buildVersion")
-        
         -- Log OS version & build of host mac
         set logMe to  "Running on OS " & hostMacOSVersion & " (" & hostMacOSBuildVersion & ")"
         logToFile_(me)
-
         -- Get username of user running AutoCasperNBI
         set userName to short user name of (system info)
         set logMe to "Launched by " & userName
         logToFile_(me)
-        
         -- Get a UUID for folder path
         set tempUUID to do shell script "/usr/bin/uuidgen"
         set logMe to "UUID " & tempUUID
         logToFile_(me)
-        
         -- Get path to resources folder
         set pathToResources to (current application's class "NSBundle"'s mainBundle()'s resourcePath()) as string
-        
     end startYourEngines_
 
     -- Register plist default settings
@@ -283,56 +278,40 @@ script AutoCasperNBIAppDelegate
     ----- BUTTON HANDLERS ----
     -- Open Options window
     on showOptionsWindow_(sender)
-        
         -- reset value
         set optionsWindowPreCheckPassed to true
-        
         -- Make sure a name is specified for the NetBoot Image, error if not.
         netBootName_(me)
-        
         -- Error if incorrect value specified
         netBootImageIndexCheck_(me)
-        
         -- Set to boolean
         set optionsWindowPreCheckPassed to optionsWindowPreCheckPassed as boolean
-        
         if optionsWindowPreCheckPassed is true then
             -- Disable main windows buttons
             set my optionWindowEnabled to false
-            
              -- reload options from plist
             retrieveDefaults_(me)
-            
             -- Set NetBoot Description
             enablenetBootDescription_(me)
-            
             -- Check that image selected for desktop exists
             checkDesktopImage_(me)
-            
             -- Check additional pkgs array, & amend accordingly
             checkAdditionalPKGs_(me)
-            
             -- Check additional Certs array, & amend accordingly
             checkAdditionalCerts_(me)
-            
             -- activate options window
             activate
             optionsWindow's makeKeyAndOrderFront_(null)
-            
         end if
-        
     end showOptionsWindow_
     
     -- Cancel & tidy up
     on cancelBuildProcess_(sender)
-        
         --Log Action
         set logMe to "Cancelling..."
         logToFile_(me)
-        
         -- Detach mounted volumes
         tidyUpTimeKids_(me)
-        
     end cancelBuildProcess_
     
     ----- TIDY ICONS ----
@@ -370,22 +349,16 @@ script AutoCasperNBIAppDelegate
 
     -- Insert code here to initialize your application before any files are opened
     on applicationWillFinishLaunching_(aNotification)
-        
         -- Date for log file
         set logDate to do shell script "/bin/date +%F"
-        
         -- Get OS of host mac & user running the app
         startYourEngines_(me)
-        
         -- populate plist file with defaults (will not overwrite non-default settings))
         regDefaults_(me)
-        
         -- retrieve plist values
         retrieveDefaults_(me)
-        
         -- check for passwords, enable check boxes if found in plist
         checkPasswords_(me)
-        
     end applicationWillFinishLaunching_
     
     -- On launch as for administrative credentials & validate
@@ -550,7 +523,7 @@ script AutoCasperNBIAppDelegate
         -- Set to front window
         tell application "System Events" to set frontmost of process "AutoCasperNBI" to true
         --  Try & mount dropped file
-        set selectedOSdmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of selectedOSdmgPath & " -nobrowse -owners on -noverify| grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' | head -1" as quoted form
+        set selectedOSdmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of selectedOSdmgPath & " -nobrowse -owners on | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' | head -1" as quoted form
         set logMe to "Mounted to: " & selectedOSdmgMountPath
         -- If selectedOSdmgMountPath, then we've failed to mount as it's not a dmg.
         if selectedOSdmgMountPath is equal to missing value then
@@ -1830,54 +1803,39 @@ script AutoCasperNBIAppDelegate
 
     -- Check additional Certs array, & amend accordingly
     on checkAdditionalCerts_(sender)
-        
         -- For prompting later
         set certsMissing to false
-        
-        -- Set variable to list
-        set additionalCerts to additionalCerts as list
-            
+        -- Check if set before
+        if additionalCerts is not equal to missing value then
+            -- Set variable to list
+            set additionalCerts to additionalCerts as list
+        end if
         try
-            
             -- Empty array
             (additionalCertsArray's removeObjects:(additionalCertsArray's arrangedObjects()))
-            
             -- For each item in array
             repeat with selectedCertsPath in additionalCerts
-                
                 try
                     -- Check for file
                     do shell script "ls " & quoted form of selectedCertsPath
-                    
                     -- Set text to black
                     set selectedCertsColour to current application's NSColor's blackColor()
-                    
                     -- Add to array
                     (additionalCertsArray's addObject:{certPath:selectedCertsPath, certPathColour:selectedCertsColour})
-                    
                 on error
-                    
                     -- Get array's value of missing item
                     set certList to {certPathColour:selectedCertsColour, certPath:selectedCertsPath}
-                    
                     -- Remove from Array
                     (additionalCertsArray's removeObject:certList)
-                    
                     -- Set Text to red
                     set my selectedCertsColour to current application's NSColor's redColor()
-                    
                     -- Add to array
                     (additionalCertsArray's addObject:{certPath:selectedCertsPath, certPathColour:selectedCertsColour})
-                    
                     -- For prompting later
                     set certsMissing to true
-                    
                 end try
-                
             end repeat
-            
         end try
-        
     end checkAdditionalCerts_
 
     -- Add Cert selected by user
@@ -2114,7 +2072,7 @@ script AutoCasperNBIAppDelegate
         if buildButtonPreCheckPassed is true then
             
             -- Disable main windows buttons
-            set my optionWindowEnabled to false
+            --set my optionWindowEnabled to false
         
             -- reload options from plist
             retrieveDefaults_(me)
@@ -2137,77 +2095,53 @@ script AutoCasperNBIAppDelegate
 
     -- Prompt user for location to create the .nbi
     on netBootLocation_(sender)
-
         try
-            
             --If /Library/NetBoot/NetBootSPO/ exists
             choose folder with prompt "Choose a location to create the .nbi in:" default location "/Library/NetBoot/NetBootSP0/"
-            
             -- Set netBootSelectedLocation to path of location given
             set netBootSelectedLocation to POSIX path of the result
-            
             --Log Action
             set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
             logToFile_(me)
-            
             -- Check that we have enough space available to proceed
             getNetBootDmgRequiredSize_(me)
-            
         on error
-            
             --Else open pointing to the desktop folder
             choose folder with prompt "Choose a location to create the .nbi in:" default location (path to desktop folder)
-            
             -- Set netBootSelectedLocation to path of location given
             set netBootSelectedLocation to POSIX path of the result
-            
             --Log Action
             set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
             logToFile_(me)
-            
             -- Check that we have enough space available to proceed
             getNetBootDmgRequiredSize_(me)
-            
         end try
-
     end netBootLocation_
 
     -- Get the space needed for the NetBoot.dmg
     on getNetBootDmgRequiredSize_(sender)
-        
         try
-            
             -- Disable main windows buttons
             set my optionWindowEnabled to false
-
             -- Update buildProcessLogTextField to show path to todays log
             set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
-            
             -- Set netBootCreationSuccessful value, for notifying later
             set my netBootCreationSuccessful to false
-            
             -- Reset required space
             set requiredSpace to 20
-            
             -- Set build Process ProgressBar to indeterminate & animated to false
             set my buildProccessProgressBarIndeterminate to false
             set my buildProccessProgressBarAniminate to false
-            
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Calculating NetBoot.dmg size"
-            
             delay 0.1
-            
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 0
-            
             -- Close main window
             mainWindow's orderOut_(null)
-            
             -- activate build process window
             activate
             showBuildProcessWindow's makeKeyAndOrderFront_(null)
-            
             -- Show Cog on main window
             set my mainWindowCog to true
             
@@ -2215,37 +2149,27 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Trying to get the Total size of " & quoted form of selectedOSdmgMountPath
             logToFile_(me)
-            
             -- Get total size of selectedOSdmg
             set selectedOSdmgTotalSize to do shell script "/usr/sbin/diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Total Size\" | awk '{ print $3 }'"
-            
             -- Round value, resolves issue with non full stop decimals used in some langauges
             set selectedOSdmgTotalSize to (round selectedOSdmgTotalSize rounding up)
-            
             --Log Action
             set logMe to "Total size of " & quoted form of selectedOSdmgMountPath & " is " & selectedOSdmgTotalSize & "GB rounded up"
             logToFile_(me)
-
             -- Get the value of the free space available on selectedOSdmg
             set selectedOSdmgFreeSpace to do shell script "/usr/sbin/diskutil info " & quoted form of selectedOSdmgMountPath & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
-            
             -- Round value, resolves issue with non full stop decimals used in some langauges
             set selectedOSdmgFreeSpace to (round selectedOSdmgFreeSpace rounding down)
-
             --Log Action
             set logMe to "There is around " & selectedOSdmgFreeSpace & "GB space free on " & quoted form of selectedOSdmgMountPath & " rounded down"
             logToFile_(me)
-                
             -- Get the space used on selectedOSdmg
             set selectedOSdmgUsedSpace to (selectedOSdmgTotalSize - selectedOSdmgFreeSpace)
-            
             --Log Action
             set logMe to "Used space on " & quoted form of selectedOSdmgMountPath & " is around " & selectedOSdmgUsedSpace & "GB"
             logToFile_(me)
-            
             -- Set NetBoot.dmg's size
             set netBootDmgRequiredSize to selectedOSdmgUsedSpace + 1
-            
             --Log Action
             set logMe to "The NetBoot.dmg will need to be around " & netBootDmgRequiredSize & "GB"
             logToFile_(me)
@@ -2253,48 +2177,67 @@ script AutoCasperNBIAppDelegate
             ----- SIZE OF VOLUME ON WHICH WE'RE CREATING THE NBI ----
             -- Set netBootSelectedLocation to path of location given
             set variableVariable to netBootSelectedLocation
-            tell application
-                set variableVariable to ((POSIX file variableVariable) as alias)
+            tell application "Finder"
+                set my variableVariable to variableVariable as text
             end tell
-            set variableVariable to variableVariable as text
-
-            -- Store delimiters for resetting later
-            set applescriptsDelims to AppleScript's text item delimiters
-            -- Set delimiters to colon
-            set AppleScript's text item delimiters to ":"
-            -- Get Volume
-            set selectedVolume to text item 1 of variableVariable
-            -- Reset delimiters
-            set AppleScript's text item delimiters to applescriptsDelims
-        
+            -- If it's an external volume
+            if variableVariable begins with "/Volumes/" then
+                -- Store delimiters for resetting later
+                set applescriptsDelims to AppleScript's text item delimiters
+                -- Set delimiters to forwardslash
+                set AppleScript's text item delimiters to "/"
+                -- Get Volume
+                set my selectedVolume to text item 3 of variableVariable
+                -- Reset delimiters
+                set AppleScript's text item delimiters to applescriptsDelims
+                set selectedVolume to "/Volumes/" & selectedVolume
+            else
+                -- Get volume name of startup disk
+                tell application "Finder" to set my volname to name of startup disk
+                -- If an internal volume, check
+                set my fullPath to variableVariable as POSIX file
+                set my fullPath to fullPath as text
+                -- If location is on the startup disk
+                if my fullPath begins with volname then
+                    set my selectedVolume to "/"
+                else
+                    -- Store delimiters for resetting later
+                    set applescriptsDelims to AppleScript's text item delimiters
+                    -- Set delimiters to colon
+                    set AppleScript's text item delimiters to ":"
+                    -- Get Volume
+                    set my selectedVolume to text item 1 of fullPath
+                    -- Reset delimiters
+                    set AppleScript's text item delimiters to applescriptsDelims
+                end if
+            end if
             --Log Action
-            set logMe to "Checking for free space on /" & variableVariable
+            set logMe to "Checking for free space on " & selectedVolume
             logToFile_(me)
-            
-            -- Get free space
+            -- Get free space of destination volume
             set freeSpaceOnVolume to do shell script "/usr/sbin/diskutil info " & quoted form of selectedVolume & " | grep \"Volume Free Space\" | awk '{ print $4 }'"
-            
             -- Round value, resolves issue with non full stop decimals used in some langauges
             set freeSpaceOnVolume to (round freeSpaceOnVolume rounding down)
-            
+            -- Get unit of free space
+            set freeSpaceOnVolumeUnit to do shell script "/usr/sbin/diskutil info " & quoted form of selectedVolume & " | grep \"Volume Free Space\" | awk '{ print $5 }'"
+            -- If destination volume is has a TB or more free space
+            if freeSpaceOnVolumeUnit is equal to "TB" then
+                set freeSpaceOnVolume to freeSpaceOnVolume * 1000
+            end if
             --Log Action
             set logMe to "The volume /" & selectedVolume & " has " & freeSpaceOnVolume & "GB free, rounding down"
             logToFile_(me)
-            
             -- Get the space needed
             set spaceNeeded to netBootDmgRequiredSize
-            
             -- Set to boolean of values
             set netBootImageReduceEnabled to netBootImageReduceEnabled as boolean
             set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
             set createReadOnlyDMG to createReadOnlyDMG as boolean
-            
             -- If we're resizing the NetBoot Image
             if netBootImageReduceEnabled is true or createReadOnlyDMG is true then
                 -- Set the space needed
                 set spaceNeeded to spaceNeeded + netBootDmgRequiredSize
             end if
-
             -- If we're expanding the NetBoot Image
             if netBootImageExpandEnabled is true
                 -- Set to string
@@ -2302,27 +2245,24 @@ script AutoCasperNBIAppDelegate
                 -- Set the space needed
                 set spaceNeeded to spaceNeeded + netBootImageExpandValue
             end if
-
             --Log Action
             set logMe to "We need around " & spaceNeeded & "GB free to create the NBI."
             logToFile_(me)
-
             -- Check that we have enough space needed to proceed, error if not
             if spaceNeeded is greater than freeSpaceOnVolume or spaceNeeded is equal to freeSpaceOnVolume then
                 --Log Action
-                set logMe to "Error: About " & spaceNeeded & "GB needed to create NBI. Only " & freeSpaceOnVolume & "GB free on /" & variableVariable
+                set logMe to "Error: About " & spaceNeeded & "GB needed to create NBI. Only " & freeSpaceOnVolume & "GB free on " & variableVariable
                 logToFile_(me)
                 -- Set to false to display
                 set my userNotifyErrorHidden to false
                 -- Set Error message
-                set my userNotifyError to "Error: About " & spaceNeeded & "GB needed to create NBI. Only " & freeSpaceOnVolume & "GB free on /" & variableVariable
+                set my userNotifyError to "Error: About " & spaceNeeded & "GB needed to create NBI. Only " & freeSpaceOnVolume & "GB free on " & variableVariable
                 -- Notify of errors or success
                 userNotify_(me)
             else
                 -- Check that selected files exist
                 checkFiles_(me)
             end if
-        
         on error
             --Log Action
             set logMe to "Error: Calculating space needed"
@@ -2334,7 +2274,6 @@ script AutoCasperNBIAppDelegate
             -- Notify of errors or success
             userNotify_(me)
         end try
-
     end getNetBootDmgRequiredSize_
 
     -- Check that selected files exist
@@ -2352,7 +2291,6 @@ script AutoCasperNBIAppDelegate
                 -- True if file exists
                 set desktopImageExists to false
             else
-            
                 try
                     -- Set customDesktopImagePath to value as text
                     set customDesktopImagePath to customDesktopImagePath as text
@@ -2397,7 +2335,6 @@ script AutoCasperNBIAppDelegate
         checkAdditionalPKGs_(me)
         -- Check additional Certs array, & amend accordingly
         checkAdditionalCerts_(me)
-
         -- Check that we're not missing any additional certs or pkgs
         if certsMissing is true and pkgsMissing is true then
             --Log Action
@@ -2508,9 +2445,7 @@ script AutoCasperNBIAppDelegate
 
     -- Create the NetBoot.dmg
     on createNetbootDmg_(sender)
-                
         try
-            
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Creating NetBoot.dmg"
             
@@ -2584,7 +2519,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Mount the NetBoot.dmg & get the mount path
-            set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.dmg -owners on -nobrowse -noverify | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+            set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Mounted to: " & netBootDmgMountPath
@@ -3074,16 +3009,16 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying /System/Library/User Templates/"
+                --set my buildProcessTextField to "Emptying /System/Library/User Templates/"
                 
-                delay 0.1
+                --delay 0.1
                 
                 -- Empty the below folder
-                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/User\\ Templates/*" user name adminUserName password adminUsersPassword with administrator privileges
+               -- do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/User\\ Templates/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
-                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/User Templates/"
-                logToFile_(me)
+               -- set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/User Templates/"
+               --logToFile_(me)
                 
                 --Log Action
                 set logMe to "Successfully emptied targeted directories in " & netBootDmgMountPath & "/System/Library/"
@@ -4156,9 +4091,9 @@ script AutoCasperNBIAppDelegate
             set logMe to "Trying to set ownership to root on " & quoted form of variableVariable
             logToFile_(me)
             -- Correct ownership
-            do shell script "/usr/sbin/chown root " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/sbin/chown root:wheel " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
-            set logMe to "Set ownership to root on " & quoted form of variableVariable
+            set logMe to "Set ownership to root:wheel on " & quoted form of variableVariable
             logToFile_(me)
             --Log Action
             set logMe to "Trying to set permissions to 600 on "  & quoted form of variableVariable
@@ -4190,17 +4125,17 @@ script AutoCasperNBIAppDelegate
             set logMe to "Trying to set ownership to root on " & quoted form of netBootDmgMountPath & "/etc/kcpassword"
             logToFile_(me)
             -- Correct ownership
-            do shell script "/usr/sbin/chown root " & quoted form of netBootDmgMountPath & "/etc/kcpassword" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/sbin/chown root:wheel " & quoted form of netBootDmgMountPath & "/etc/kcpassword" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
-            set logMe to "Set ownership to root on " & quoted form of netBootDmgMountPath & "/etc/kcpassword"
+            set logMe to "Set ownership to root:wheel on " & quoted form of netBootDmgMountPath & "/etc/kcpassword"
             logToFile_(me)
             --Log Action
-            set logMe to "Trying to set permissions to 600 on "  & quoted form of netBootDmgMountPath & "/etc/kcpassword"
+            set logMe to "Trying to set permissions to 600 on " & quoted form of netBootDmgMountPath & "/etc/kcpassword"
             logToFile_(me)
             -- Making writable
-            do shell script "/bin/chmod 600 "  & quoted form of netBootDmgMountPath & "/etc/kcpassword" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/chmod 600 " & quoted form of netBootDmgMountPath & "/etc/kcpassword" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
-            set logMe to "Set permissions to 600 on "  & quoted form of netBootDmgMountPath & "/etc/kcpassword"
+            set logMe to "Set permissions to 600 on " & quoted form of netBootDmgMountPath & "/etc/kcpassword"
             logToFile_(me)
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Setting Root User auto login"
@@ -4211,7 +4146,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Trying to set Root User auto login"
             logToFile_(me)
             -- Write JSS URL to plist,
-            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.loginwindow.plist autoLoginUser -string root"user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.loginwindow.plist autoLoginUser -string root" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Successfully set Root User auto login"
             logToFile_(me)
@@ -4229,7 +4164,7 @@ script AutoCasperNBIAppDelegate
             -- Making writable
             do shell script "/bin/chmod 644 " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.loginwindow.plist" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
-            set logMe to "Set permissions to 644 on "  & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.loginwindow.plist"
+            set logMe to "Set permissions to 644 on " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.loginwindow.plist"
             logToFile_(me)
             --Log Action
             set logMe to "Trying to copy Root user dock.plist"
@@ -5338,7 +5273,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- Mount the NetBoot.dmg & get the mount path
-            set netBootReducedDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg -owners on -nobrowse -noverify | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+            set netBootReducedDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
             set logMe to "Mounted to: " & netBootReducedDmgMountPath
@@ -5552,7 +5487,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Mount the NetBoot.dmg & get the mount path
-                    set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg -owners on -nobrowse -noverify | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+                    set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.reduced.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
                     
                     --Log Action
                     set logMe to "Mounted to: " & netBootReducedDmgMountPath
@@ -5641,7 +5576,7 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     
                     -- Mount the NetBoot.dmg & get the mount path
-                    set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.dmg -owners on -nobrowse -noverify | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
+                    set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.dmg -owners on -nobrowse | grep \"Volumes\" | awk '{print substr($0, index($0,$3))}' " as quoted form user name adminUserName password adminUsersPassword with administrator privileges
                     
                     --Log Action
                     set logMe to "Mounted to: " & netBootReducedDmgMountPath
@@ -5778,10 +5713,11 @@ script AutoCasperNBIAppDelegate
         considering numeric strings
             
             -- If we're running on 10.9.0 - .3 then reduce kernel cache
-            if hostMacOSVersion is greater than "10.8.9" and hostMacOSVersion is less than "10.9.4" then
+            --if hostMacOSVersion is greater than "10.8.9" and hostMacOSVersion is less than "10.9.4" then
+            if selectedOSdmgVersion starts with "10.9" then
                 
                 --Log Action
-                set logMe to "We're on not on 10.9.+ so need to manually reduce kernel cache"
+                set logMe to "Manually reducing kernel cache as on 10.9"
                 logToFile_(me)
                 
                 -- Reduce Kernel cache if we're on 10.9.0 - .3
@@ -6553,7 +6489,7 @@ script AutoCasperNBIAppDelegate
                     set my netBootCreationSuccessful to true
                     
                     -- Detach mounted volumes
-                    unMountDMGs_(me)
+                    --unMountDMGs_(me)
                     
             else
             

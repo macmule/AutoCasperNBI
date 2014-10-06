@@ -370,16 +370,16 @@
                         </buttonCell>
                         <connections>
                             <action selector="buildPreCheck:" target="Voe-Tx-rLC" id="5Ob-iY-31c"/>
-                            <binding destination="Voe-Tx-rLC" name="enabled" keyPath="disableOptionsAndBuild" id="UkT-ks-Ju3">
+                            <binding destination="Voe-Tx-rLC" name="enabled2" keyPath="disableOptionsAndBuild" previousBinding="XNC-qR-cJY" id="jpp-g5-bLe">
                                 <dictionary key="options">
-                                    <integer key="NSNoSelectionPlaceholder" value="0"/>
-                                    <integer key="NSNotApplicablePlaceholder" value="0"/>
-                                    <integer key="NSNullPlaceholder" value="0"/>
-                                    <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
+                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                    <integer key="NSNullPlaceholder" value="-1"/>
                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                 </dictionary>
                             </binding>
-                            <binding destination="Voe-Tx-rLC" name="enabled2" keyPath="optionWindowEnabled" previousBinding="UkT-ks-Ju3" id="0JY-Ft-akW">
+                            <binding destination="Voe-Tx-rLC" name="enabled" keyPath="optionWindowEnabled" id="XNC-qR-cJY">
                                 <dictionary key="options">
                                     <integer key="NSMultipleValuesPlaceholder" value="-1"/>
                                     <integer key="NSNoSelectionPlaceholder" value="-1"/>
@@ -3280,7 +3280,7 @@ CA
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" headerView="JpU-gt-xVS" id="ySq-n2-KeV">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="372" height="19"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="1003" height="19"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -3399,7 +3399,7 @@ CA
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" headerView="aeA-qN-O5D" id="0QT-lV-Ymf">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="372" height="19"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="1003" height="19"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
