@@ -28,11 +28,11 @@ VERSIONS<br>
 -- hdiutil commands verify the volumes being mounted again.<br>
 -- kernelcache reduction always happens on 10.9 NBI's.<br>
 -- Fixed an issue with creating read-only 10.8.x NBI's & auto login. (The User Templates folder is no longer emptied).<br>
--- Should no longer try to re-run on completion (@neil.martin83 & @willpolley)<br>
--- Size calculations should now correctly get the volume selected to create the NBI on, including FSTAB mounted paths (@neil.martin83)<br>
--- Size calculations now reads terabytes, not just gigabytes (@neil.martin83)<br>
--- Fixed issue with a blank cert value added to the additional certs array (@neil.martin83, @smith.kyle, @MikeF, @mfcfadmin, @boberito)<br>
--- Fixed an issue with ARD not correctly being enabled (@neil.martin83, @Jimmymac641)<br>
+-- Should no longer try to re-run on completion.<br>
+-- Size calculations should now correctly get the volume selected to create the NBI on, including FSTAB mounted paths.<br>
+-- Size calculations now reads terabytes, not just gigabytes.<br>
+-- Fixed issue with a blank cert value added to the additional certs array.<br>
+-- Fixed an issue with ARD not correctly being enabled.<br>
 <br>
 0.18<br>
 -- Corrected size calculation, sorry about that.<br>
