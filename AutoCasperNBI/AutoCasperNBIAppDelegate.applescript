@@ -2070,10 +2070,6 @@ script AutoCasperNBIAppDelegate
         
         -- Proceed if we've passed precheck
         if buildButtonPreCheckPassed is true then
-            
-            -- Disable main windows buttons
-            --set my optionWindowEnabled to false
-        
             -- reload options from plist
             retrieveDefaults_(me)
             -- Check the JSS URL details & try & get version of the JSS
@@ -2330,7 +2326,6 @@ script AutoCasperNBIAppDelegate
                 end try
             end if
         end if
-
         -- Check additional pkgs array, & amend accordingly
         checkAdditionalPKGs_(me)
         -- Check additional Certs array, & amend accordingly
@@ -2376,71 +2371,73 @@ script AutoCasperNBIAppDelegate
 
     -- Create the .nbi folder
     on netBootLocationCreate_(sender)
-
-        try
-            
-            -- Set build Process ProgressBar to indeterminate & animated to false
-            set my buildProccessProgressBarIndeterminate to false
-            set my buildProccessProgressBarAniminate to false
-            
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Creating .nbi folder"
-            
-            delay 0.1
-            
-            -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 10
-            
-            -- Set to path of NetBoot directory
-            set netBootDirectory to netBootSelectedLocation & netBootNameTextField & ".nbi"
-            
-            --Log action
-            set logMe to "Trying to create .nbi folder " & netBootDirectory
-            logToFile_(me)
-            
-            -- Create .nbi folder
-            do shell script "/bin/mkdir " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log action
-            set logMe to "Successfully created " & quoted form of netBootDirectory
-            logToFile_(me)
-            
-            -- Create the NetBoot.dmg
-            createNetbootDmg_(me)
-            
-        on error number 1
-            
-            -- Error to user prompting for what to do next
-            display dialog "There is already a folder called: " & quoted form of netBootNameTextField & " in " & quoted form of netBootSelectedLocation & return & return & "Do you want to select another folder or delete the existing?" with icon 2 buttons {"Delete Existing", "New Folder"}
-            
-            -- If user selected "Delete Existing"
-            if button returned of the result is "Delete Existing" then
+        -- To stop looping
+        if netBootCreationSuccessful is not equal to true
+            try
+                
+                -- Set build Process ProgressBar to indeterminate & animated to false
+                set my buildProccessProgressBarIndeterminate to false
+                set my buildProccessProgressBarAniminate to false
+                
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Creating .nbi folder"
+                
+                delay 0.1
+                
+                -- Update build Process ProgressBar
+                set my buildProccessProgressBar to 10
+                
+                -- Set to path of NetBoot directory
+                set netBootDirectory to netBootSelectedLocation & netBootNameTextField & ".nbi"
                 
                 --Log action
-                set logMe to "Trying to delete " & quoted form of netBootDirectory
+                set logMe to "Trying to create .nbi folder " & netBootDirectory
                 logToFile_(me)
                 
-                -- Delete existing folder
-                do shell script "/bin/rm -rf " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+                -- Create .nbi folder
+                do shell script "/bin/mkdir " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log action
-                set logMe to "Deleted " & quoted form of netBootDirectory
+                set logMe to "Successfully created " & quoted form of netBootDirectory
                 logToFile_(me)
                 
-                -- Create the .nbi folder
-                netBootLocationCreate_(me)
+                -- Create the NetBoot.dmg
+                createNetbootDmg_(me)
                 
-            else
+            on error number 1
                 
-                --Log action
-                set logMe to "Reselecting path to create .nbi"
-                logToFile_(me)
+                -- Error to user prompting for what to do next
+                display dialog "There is already a folder called: " & quoted form of netBootNameTextField & " in " & quoted form of netBootSelectedLocation & return & return & "Do you want to select another folder or delete the existing?" with icon 2 buttons {"Delete Existing", "New Folder"}
                 
-                -- Prompt user for location to create the .nbi
-                netBootLocation_(me)
-                
-            end if
-        end try
+                -- If user selected "Delete Existing"
+                if button returned of the result is "Delete Existing" then
+                    
+                    --Log action
+                    set logMe to "Trying to delete " & quoted form of netBootDirectory
+                    logToFile_(me)
+                    
+                    -- Delete existing folder
+                    do shell script "/bin/rm -rf " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+                    
+                    --Log action
+                    set logMe to "Deleted " & quoted form of netBootDirectory
+                    logToFile_(me)
+                    
+                    -- Create the .nbi folder
+                    netBootLocationCreate_(me)
+                    
+                else
+                    
+                    --Log action
+                    set logMe to "Reselecting path to create .nbi"
+                    logToFile_(me)
+                    
+                    -- Prompt user for location to create the .nbi
+                    netBootLocation_(me)
+                    
+                end if
+            end try
+        end if
     end netBootLocationCreate_
 
     -- Create the NetBoot.dmg
@@ -2762,11 +2759,11 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
 
                 -- Empty the below folder
-                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Fonts/*" user name adminUserName password adminUsersPassword with administrator privileges
+                --do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Fonts/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Fonts/"
-                logToFile_(me)
+               -- set logMe to "Emptied " & netBootDmgMountPath & "/Library/Fonts/"
+                --logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying /Library/Logs/"
@@ -2858,11 +2855,11 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/WebServer/*" user name adminUserName password adminUsersPassword with administrator privileges
+                --do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/WebServer/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
-                set logMe to "Emptied " & netBootDmgMountPath & "/Library/WebServer/"
-                logToFile_(me)
+                --set logMe to "Emptied " & netBootDmgMountPath & "/Library/WebServer/"
+                --logToFile_(me)
                 
                 --Log Action
                 set logMe to "Successfully emptied targeted directories in " & netBootDmgMountPath & "/Library/"
@@ -2966,11 +2963,11 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
 				
 				-- Delete all in the location except those that are given below
-                do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/LinguisticData/* -maxdepth 0 -not -path \"*en*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
+                --do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/LinguisticData/* -maxdepth 0 -not -path \"*en*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
 				
 				--Log Action
-                set logMe to "Deleting unneeded folders from " & netBootDmgMountPath & "/System/Library/LinguisticData/"
-                logToFile_(me)
+                --set logMe to "Deleting unneeded folders from " & netBootDmgMountPath & "/System/Library/LinguisticData/"
+                --logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying /System/Library/Printers/"
@@ -3727,15 +3724,15 @@ script AutoCasperNBIAppDelegate
         try
             
             --Log Action
-            set logMe to "Copying com.apple.PowerManagement.plist"
-            logToFile_(me)
+           -- set logMe to "Copying com.apple.PowerManagement.plist"
+            --logToFile_(me)
         
             -- Copy the plist
-            do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/com.apple.PowerManagement.plist " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/" user name adminUserName password adminUsersPassword with administrator privileges
+            --do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/com.apple.PowerManagement.plist " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/" user name adminUserName password adminUsersPassword with administrator privileges
             
             --Log Action
-            set logMe to "Copied com.apple.PowerManagement.plist"
-            logToFile_(me)
+            --set logMe to "Copied com.apple.PowerManagement.plist"
+            --logToFile_(me)
            
             --Log Action
             set logMe to "Disabling screensaver"
@@ -3747,7 +3744,7 @@ script AutoCasperNBIAppDelegate
             do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " idleTime -int 0"  user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
-            set logMe to "screensaver disabled"
+            set logMe to "Screensaver disabled"
             logToFile_(me)
 
             -- Create the ARD user
@@ -3756,14 +3753,14 @@ script AutoCasperNBIAppDelegate
         on error
         
             --Log Action
-            set logMe to "Error: Copying com.apple.PowerManagement.plist"
+            set logMe to "Error: Disabling Screensaver"
             logToFile_(me)
             
             -- Set to false to display
             set my userNotifyErrorHidden to false
             
             -- Set Error message
-            set my userNotifyError to "Error: Copying com.apple.PowerManagement.plist"
+            set my userNotifyError to "Error: Disabling Screensaver"
             
             -- Notify of errors or success
             userNotify_(me)
@@ -4568,7 +4565,7 @@ script AutoCasperNBIAppDelegate
 
     -- Add any additional certs if specified
     on importAdditionalCerts_(sender)
-        
+        -- If we're importing certs
         if additionalCerts is not missing value then
                 try
                     -- Update Build Process Window's Text Field
@@ -4578,7 +4575,6 @@ script AutoCasperNBIAppDelegate
                     set my buildProccessProgressBar to 265
                     -- Set variable to list
                     set additionalCerts to additionalCerts as list
-
                     -- For each item in array
                     repeat with selectedCertsPath in additionalCerts
                         -- Application Support location on TempOSdmg for installing at boot
@@ -4589,7 +4585,6 @@ script AutoCasperNBIAppDelegate
                         set logMe to "Copied additional Cert " & quoted form of selectedCertsPath  & " to " & quoted form of variableVariable
                         logToFile_(me)
                     end repeat
-                    
                     -- Enable Simple Finder if selected
                     enableSimpleFinder_(me)
                 on error
@@ -4614,10 +4609,8 @@ script AutoCasperNBIAppDelegate
 
     -- Enable Simple Finder if selected
     on enableSimpleFinder_(sender)
-        
         -- Set to boolean of value
         set simpleFinderEnabled to simpleFinderEnabled as boolean
-        
         -- If we're enabling simple Finder
         if simpleFinderEnabled is true
             try
@@ -5065,6 +5058,7 @@ script AutoCasperNBIAppDelegate
 
     -- Add any additional pkgs if specified
     on installAdditionalPKGs_(sender)
+        -- If we're installing additional PKGs
         if additionalPKGs is not missing value then
             try
                 -- Update Build Process Window's Text Field
@@ -5683,10 +5677,10 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             
             -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
-            --manualKernelCacheReductionCheck_(me)
+            manualKernelCacheReductionCheck_(me)
             
             -- Reduce Kernel cache if we're on 10.9.0 - .3
-            reduceKernelCache_(me)
+            --reduceKernelCache_(me)
             
         on error
         
@@ -6561,23 +6555,17 @@ script AutoCasperNBIAppDelegate
 
     -- Detach mounted volumes
     on unMountDMGs_(sender)
-        
         -- Update Build Process Window's Text Field
         set my buildProcessTextField to "Detaching any Volumes we mounted"
-
         -- Reset build Process ProgressBar
         set my buildProccessProgressBar to 0
-
         delay 0.1
-        
         -- Set build Process ProgressBar to indeterminate & animated
         set my buildProccessProgressBarIndeterminate to true
         set my buildProccessProgressBarAniminate to true
-
         -- activate build process window
         activate
         showBuildProcessWindow's makeKeyAndOrderFront_(null)
-
         ---- Unmount NetBoot.dmg if mounted
         if netBootDmgMountPath is  not equal to missing value then
             try
@@ -6588,7 +6576,6 @@ script AutoCasperNBIAppDelegate
                 do shell script "/usr/bin/hdiutil detach " & quoted form of netBootDmgMountPath & " -force"
             end try
         end if
-
         ---- Unmount NetBoot.reduced.dmg if mounted
         if netBootReducedDmgMountPath is  not equal to missing value then
             try
@@ -6599,7 +6586,6 @@ script AutoCasperNBIAppDelegate
                 do shell script "/usr/bin/hdiutil detach " & quoted form of netBootReducedDmgMountPath & " -force"
             end try
         end if
-
         -- If we've created the NetBoot successfully
         if netBootCreationSuccessful is true
             -- Reset build process variables
