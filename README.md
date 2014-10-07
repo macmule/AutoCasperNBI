@@ -23,6 +23,9 @@ There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
+0.20<br>
+-- Correct an issue where AutoCasperNBI would try re-run (@fritz.schlapbach, @neil.martin83, @willpolley & @mfcfadmin)<br>
+-- Changed what's deleted to try & stop the hang when creating a reduced NBI (@neil.martin83)<br>
 <br>
 0.19<br>
 -- Build & Options buttons are no longer disabled after clicking "Build"<br>
