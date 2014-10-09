@@ -181,4 +181,12 @@ echo "GateKeeper disabled..."
 #
 ########
 
-#sudo pmset -a displaysleep 0 disksleep 0 sleep 0 womp 1 autorestart 1x
+pmset -a displaysleep 180 disksleep 0 sleep 0 hibernatemode 0 womp 1 autopoweroffdelay 0 standbydelay 0 ttyskeepawake 0 autopoweroff 0
+
+########
+#
+# Energy Saver Preferences
+#
+########
+
+###launchctl unload -w /System/Library/LaunchDaemons/com.apple.kextd.plist

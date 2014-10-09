@@ -2099,8 +2099,6 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
             logToFile_(me)
-            -- Check that we have enough space available to proceed
-            getNetBootDmgRequiredSize_(me)
         on error
             --Else open pointing to the desktop folder
             choose folder with prompt "Choose a location to create the .nbi in:" default location (path to desktop folder)
@@ -2109,9 +2107,11 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
             logToFile_(me)
+        end try
+        if netBootSelectedLocation is not missing value then
             -- Check that we have enough space available to proceed
             getNetBootDmgRequiredSize_(me)
-        end try
+        end if
     end netBootLocation_
 
     -- Get the space needed for the NetBoot.dmg
@@ -2663,8 +2663,8 @@ script AutoCasperNBIAppDelegate
                 
                 delay 0.1
                 
-                -- Delete all in the location except those that are given below
-                do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/PreferencePanes/* -maxdepth 0 -not -path \"*DateAndTime.prefPane*\" -not -path \"*Displays.prefPane*\" -not -path \"*Network.prefPane*\" -not -path \"*SharingPref.prefPane*\" -not -path \"*StartupDisk.prefPane*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
+                -- Delete all in the location except those that are given below \"*DateAndTime.prefPane*\" -not -path
+                do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/PreferencePanes/* -maxdepth 0 -not -path  \"*Displays.prefPane*\" -not -path \"*Network.prefPane*\" -not -path \"*SharingPref.prefPane*\" -not -path \"*StartupDisk.prefPane*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
                 set logMe to "Deleted Preference Panes from: " & netBootDmgMountPath & "/System/Library/PreferencePanes/"
@@ -2759,10 +2759,10 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
 
                 -- Empty the below folder
-                --do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Fonts/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/Fonts/*" user name adminUserName password adminUsersPassword with administrator privileges
 
                 --Log Action
-               -- set logMe to "Emptied " & netBootDmgMountPath & "/Library/Fonts/"
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/Fonts/"
                 --logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
@@ -2855,11 +2855,11 @@ script AutoCasperNBIAppDelegate
                 delay 0.1
                 
                 -- Empty the below folder
-                --do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/WebServer/*" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/Library/WebServer/*" user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
-                --set logMe to "Emptied " & netBootDmgMountPath & "/Library/WebServer/"
-                --logToFile_(me)
+                set logMe to "Emptied " & netBootDmgMountPath & "/Library/WebServer/"
+                logToFile_(me)
                 
                 --Log Action
                 set logMe to "Successfully emptied targeted directories in " & netBootDmgMountPath & "/Library/"
@@ -2946,28 +2946,16 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Emptying /System/Library/InternetAccounts/"
+                set my buildProcessTextField to "Emptying /System/Library/LinguisticData/"
                 
                 delay 0.1
-                
+				      
                 -- Empty the below folder
-                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/InternetAccounts/*" user name adminUserName password adminUsersPassword with administrator privileges
-                
-                --Log Action
-                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/InternetAccounts/"
-                logToFile_(me)
-                
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Deleting unneeded folders from /System/Library/LinguisticData/"
-                
-                delay 0.1
-				
-				-- Delete all in the location except those that are given below
-                --do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/LinguisticData/* -maxdepth 0 -not -path \"*en*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/LinguisticData/*" user name adminUserName password adminUsersPassword with administrator privileges
 				
 				--Log Action
-                --set logMe to "Deleting unneeded folders from " & netBootDmgMountPath & "/System/Library/LinguisticData/"
-                --logToFile_(me)
+                set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/LinguisticData/"
+                logToFile_(me)
                 
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying /System/Library/Printers/"
@@ -3004,18 +2992,6 @@ script AutoCasperNBIAppDelegate
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Speech/"
                 logToFile_(me)
-                
-                -- Update Build Process Window's Text Field
-                --set my buildProcessTextField to "Emptying /System/Library/User Templates/"
-                
-                --delay 0.1
-                
-                -- Empty the below folder
-               -- do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/User\\ Templates/*" user name adminUserName password adminUsersPassword with administrator privileges
-                
-                --Log Action
-               -- set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/User Templates/"
-               --logToFile_(me)
                 
                 --Log Action
                 set logMe to "Successfully emptied targeted directories in " & netBootDmgMountPath & "/System/Library/"
@@ -3467,95 +3443,66 @@ script AutoCasperNBIAppDelegate
 
     -- Bypass the various setup assistants so we're logging in uninterrupted
     on bypassSetupAssistants_(sender)
-        
         try
-            
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Bypassing Apple Setup Assistant"
-            
             delay 0.1
-            
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 133
-            
             ---- .AppleSetupDone ----
             -- Write .AppleSetupDone file
             do shell script "touch " & quoted form of netBootDmgMountPath & "/var/db/.AppleSetupDone" user name adminUserName password adminUsersPassword with administrator privileges
-            
             --Log Action
             set logMe to ".AppleSetupDone written to " & netBootDmgMountPath & "/var/db/.AppleSetupDone"
             logToFile_(me)
-            
             ---- .SetupRegComplete ----
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Bypassing Registration"
-            
             delay 0.1
-            
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 136
-            
             ---- .SetupRegComplete ----
             -- Write .SetupRegComplete file
             do shell script "touch " & quoted form of netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete" user name adminUserName password adminUsersPassword with administrator privileges
-            
             --Log Action
             set logMe to ".SetupRegComplete written to " & netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete"
             logToFile_(me)
-            
             ---- com.apple.SetupAssistant----
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Bypassing iCloud Setup Assistant"
-            
             delay 0.1
-            
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 140
-            
             -- Write DidSeeCloudSetup to com.apple.SetupAssistant
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist DidSeeCloudSetup -bool true" user name adminUserName password adminUsersPassword with administrator privileges
-            
             -- Write GestureMovieSeen to com.apple.SetupAssistant
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist GestureMovieSeen none" user name adminUserName password adminUsersPassword with administrator privileges
-            
             -- Write LastSeenCloudProductVersion to com.apple.SetupAssistant
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist LastSeenCloudProductVersion " & quoted form of selectedOSdmgVersion user name adminUserName password adminUsersPassword with administrator privileges
-            
             --Log Action
             set logMe to "iCloud Bypass options written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
             logToFile_(me)
-
             --Log Action
             set logMe to "Deleting " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
             logToFile_(me)
-            
             --Delete the MiniLauncher
             do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup\\ Assistant.app/Contents/SharedSupport/MiniLauncher" user name adminUserName password adminUsersPassword with administrator privileges
-            
             --Log Action
             set logMe to "Deleted " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup Assistant.app/Contents/SharedSupport/MiniLauncher"
             logToFile_(me)
-
             -- Stop TimeMachine for prompting to use mounted disks for backup
             disableTimeMachinePrompt_(me)
-            
         on error
-        
             --Log Action
             set logMe to "Error: Bypassing Setup Assistants"
             logToFile_(me)
-        
             -- Set to false to display
             set my userNotifyErrorHidden to false
-            
             -- Set Error message
             set my userNotifyError to "Error: Bypassing Setup Assistants"
-            
             -- Notify of errors or success
             userNotify_(me)
-        
         end try
-        
     end bypassSetupAssistants_
     
     -- Stop TimeMachine for prompting to use mounted disks for backup
@@ -5142,8 +5089,8 @@ script AutoCasperNBIAppDelegate
             set logMe to "Used space on " & quoted form of netBootDmgMountPath & "is around " & netBootDmgUsedSpace & "GB"
             logToFile_(me)
             
-            -- Set NetBoot.dmg's size to + 1GB of what is needed
-            set netBootDmgResize to netBootDmgUsedSpace + 1
+            -- Set NetBoot.dmg's size to + 2GB of what is needed
+            set netBootDmgResize to netBootDmgUsedSpace + 2
             
             --Log Action
             set logMe to "If we're reducing the .nbi, NetBoot.reduced.dmg will need to be around " & netBootDmgResize & "GB"
@@ -5703,34 +5650,22 @@ script AutoCasperNBIAppDelegate
 
     -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
     on manualKernelCacheReductionCheck_(sender)
-        
         considering numeric strings
-            
-            -- If we're running on 10.9.0 - .3 then reduce kernel cache
-            --if hostMacOSVersion is greater than "10.8.9" and hostMacOSVersion is less than "10.9.4" then
+            -- If we're creating a 10.9.x netboot
             if selectedOSdmgVersion starts with "10.9" then
-                
                 --Log Action
                 set logMe to "Manually reducing kernel cache as on 10.9"
                 logToFile_(me)
-                
-                -- Reduce Kernel cache if we're on 10.9.0 - .3
+                -- Reduce Kernel cache
                 reduceKernelCache_(me)
-                
             else
-                
                 --Log Action
                 set logMe to "Skipping extension deletion as not needed on this OS"
                 logToFile_(me)
-                
                 -- Generate the Kernel cache
                 generateKernelCache_(me)
-                
-                
             end if
-            
         end considering
-        
     end manualKernelCacheReductionCheck_
 
     -- Reduce Kernel cache if we're on 10.9.0 - .3
@@ -5777,6 +5712,17 @@ script AutoCasperNBIAppDelegate
             
             --Log Action
             set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
+            logToFile_(me)
+            
+            --Log Action
+            set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/JMicronATA.kext"
+            logToFile_(me)
+            
+            -- Delete extesntions
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/JMicronATA.kext" user name adminUserName password adminUsersPassword with administrator privileges
+            
+            --Log Action
+            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/JMicronATA.kext"
             logToFile_(me)
             
             -- Generate the Kernel cache
@@ -5858,61 +5804,68 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Generating kernel cache"
             logToFile_(me)
-            
             try
-                
                 -- If we're building an OS newer than 10.9
                 if selectedOSdmgVersionMajor is greater than 9
-
                     -- Generate kernel cache, silently error as this will error when on 10.9.4 when skipping extensions. Different location used in 10.10.
                     do shell script "/usr/sbin/kextcache -arch x86_64 -l -n -K " & quoted form of netBootDmgMountPath & "/System/Library/Kernels/kernel -c " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
-
                 else
-
                     -- Generate kernel cache, silently error as this will error when on 10.9.4 when skipping extensions. Location used pre 10.10
                     do shell script "/usr/sbin/kextcache -arch x86_64 -l -n -K " & quoted form of netBootDmgMountPath & "/mach_kernel -c " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
-                
                 end if
-
             end try
-            
+        
             --Log Action
             set logMe to "Generated kernel cache on: " & netBootDmgMountPath
             logToFile_(me)
-            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Copying updated kernel cache"
+            delay 0.1
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 401
+            --Log Action
+            set logMe to "Copying updated kernel cache to: " & netBootDmgMountPath & "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache"
+            logToFile_(me)
+            -- Copy the plist
+            do shell script "/usr/bin/ditto " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache " user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "Copied updated kernel cache to: " & netBootDmgMountPath & "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache"
+            logToFile_(me)
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Deleting bootcaches.plist"
+            delay 0.1
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 404
+            --Log Action
+            set logMe to "Deleting bootcaches.plist from: " & netBootDmgMountPath & "/usr/standalone/bootcaches.plist"
+            logToFile_(me)
+            -- Copy the plist
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/usr/standalone/bootcaches.plist"  user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "Deleting bootcaches.plist from: " & netBootDmgMountPath & "/usr/standalone/bootcaches.plist"
+            logToFile_(me)
             considering numeric strings
-                
-            if selectedOSdmgVersionMajor is less than 8
-            
-                -- If we're creating a 10.7 .nbi, you the kernelcache to a second location
-                do shell script "/usr/bin/ditto " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDirectory & "/i386/" user name adminUserName password adminUsersPassword with administrator privileges
-                
-                --Log Action
-                set logMe to "Copied kernel cache on as NetBoot is older than 10.8"
-                logToFile_(me)
-            
+                if selectedOSdmgVersionMajor is less than 8
+                    -- If we're creating a 10.7 .nbi, you the kernelcache to a second location
+                    do shell script "/usr/bin/ditto " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDirectory & "/i386/" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "Copied kernel cache on as NetBoot is older than 10.8"
+                    logToFile_(me)
             end if
-            
             end considering
-            
             -- Copy the boot.efi to the booter shell
             copyBootEfi_(me)
             
         on error
-        
             --Log Action
             set logMe to "Error: Generating kernel cache"
             logToFile_(me)
-        
             -- Set to false to display
             set my userNotifyErrorHidden to false
-            
             -- Set Error message
             set my userNotifyError to "Error: Generating kernel cache"
-            
             -- Notify of errors or success
             userNotify_(me)
-            
         end try
         
     end generateKernelCache_
@@ -6383,7 +6336,7 @@ script AutoCasperNBIAppDelegate
             set variableVariable to do shell script "/usr/bin/defaults read " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist SupportedModelProperties"
 
             -- Set EnabledSystemIdentifiers
-            do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist EnabledSystemIdentifiers " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist DisabledSystemIdentifiers " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
 
             --Log Action
             set logMe to "Set .nbi's EnabledSystemIdentifiers"
