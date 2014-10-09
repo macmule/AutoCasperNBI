@@ -23,6 +23,11 @@ There will be some i'm sure<br>
 <br>
 VERSIONS<br>
 <br>
+0.21<br>
+-- Corrected logic when cancelling folder creation<br>
+-- Added deletion of /usr/standalone/bootcaches.plist to resolve hang on reboot (@neil.martin83)<br>
+-- Corrected NBImageInfo.plist, so it's not restricted by default (@mfcfadmin)<br>
+<br>
 0.20<br>
 -- Correct an issue where AutoCasperNBI would try re-run (@fritz.schlapbach, @neil.martin83, @willpolley & @mfcfadmin)<br>
 -- Changed what's deleted to try & stop the hang when creating a reduced NBI (@neil.martin83)<br>
