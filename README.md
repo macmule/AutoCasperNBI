@@ -1,25 +1,4 @@
-The idea of this app is to take an OS.dmg either from AutoDMG or an OS.dmg captured from a never booted Mac (use case is forked builds).<br>
-<br>
-Then select a copy of Casper Imaging.app<br>
-Once you have an OS.dmg & Casper Imaging app selected, you should be able to build an .nbi.<br>
-<br>
-The JSS URL & options under the options tab, are optional.<br>
-<br>
-The additionals tabs functions are to come when I figure out how to tie the GUI elements in<br>
-<br>
-Any options you set, should be written to a plist ~/Library/Preferences/com.macmule.AutoCasperNBI.plist.<br>
-<br>
-GitHub repo is here: https://github.com/macmule/AutoCasperNBI<br>
-<br>
-Latest built beta can be downloaded from:  https://pentland-brands.box.com/shared/static/mppkb45edd5fxp1s8sv4.dmg<br>
-<br>
-Please post questions or issues in the following thread: https://jamfnation.jamfsoftware.com/discussion.html?id=11356<br>
-<br>
-If you wish to contact me direct, please use: http://macmule.com/contact/<br>
-<br>
-ISSUES<br>
-<br>
-There will be some i'm sure<br>
+
 <br>
 VERSIONS<br>
 <br>
