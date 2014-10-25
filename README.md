@@ -1,6 +1,24 @@
-
 <br>
-VERSIONS<br>
+<b>MORE INFORMATION</b><br>
+<br>
+<url>https://macmule.com/AutoCasperNBI</url><br>
+<br>
+<b>KNOWN ISSUES</b><br>
+-- Ampersand characters do not seem to correctly write to NBI for ARD User creation.<br>
+-- Yosemite DMGs are around 1GB larger than 10.7-10.9<br>
+<br>
+<b>VERSIONS</b><br>
+<br>
+1.0<br>
+-- Full Yosemite support.<br>
+-- Sparkle Updater added.<br>
+-- Help menubar item added.<br>
+-- Changed all DMG layouts to GPTSPUD.<br>
+-- Added checking of JSS URL when opening options window, to stop it being forgot.<br>
+-- Icons change if 10.10 DMG selected or run on 10.10.<br>
+<br>
+0.22-0.24<br>
+-- Internal test releases, additions/changes have been included in v1.0's notes.<br>
 <br>
 0.21<br>
 -- Corrected logic when cancelling folder creation<br>
