@@ -7,7 +7,19 @@
 -- Ampersand characters do not seem to correctly write to NBI for ARD User creation.<br>
 -- Yosemite DMGs are around 1GB larger than 10.7-10.9<br>
 <br>
-<b>VERSIONS</b><br>
+<b>VERSIONS</b>
+<br>
+1.0.1<br>
+<br>
+— Fixes an issue with a blank value added to the additionalPKGs array.<br>
+https://github.com/macmule/AutoCasperNBI/issues/1<br>
+— Fixes the invalid declaration of the additionalCerts array<br>
+https://github.com/macmule/AutoCasperNBI/issues/5<br>
+— Fixes an issue where ARD password would not be written correctly if<br>
+some characters are used<br>
+https://github.com/macmule/AutoCasperNBI/issues/2<br>
+— NBImageInfo.plist is now converted to xml for use on non-OSX NetBoot<br>
+servers https://github.com/macmule/AutoCasperNBI/issues/3<br>
 <br>
 1.0<br>
 -- Full Yosemite support.<br>
