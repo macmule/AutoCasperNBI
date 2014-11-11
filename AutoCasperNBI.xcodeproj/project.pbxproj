@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		7C06F40719DA19680057D6ED /* 10.8+root.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C06F40619DA19680057D6ED /* 10.8+root.plist */; };
+		7C07F19319F10B5E00314193 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C07F19219F10B5E00314193 /* Sparkle.framework */; };
+		7C07F19519F10BA600314193 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7C07F19219F10B5E00314193 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7C07F19719F10C8B00314193 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7C07F19619F10C8B00314193 /* dsa_pub.pem */; };
 		7C13057F193FC0B60060F343 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C13057E193FC0B60060F343 /* Cocoa.framework */; };
 		7C130581193FC0B60060F343 /* AppleScriptObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C130580193FC0B60060F343 /* AppleScriptObjC.framework */; };
 		7C13058B193FC0B60060F343 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7C130589193FC0B60060F343 /* InfoPlist.strings */; };
@@ -34,20 +37,42 @@
 		7C83B57219A3AF3E00E9572E /* Localization.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C83B57119A3AF3E00E9572E /* Localization.icns */; };
 		7C83B57419A3B39A00E9572E /* diskcopy.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C83B57319A3B39A00E9572E /* diskcopy.icns */; };
 		7C83B57619A3B41700E9572E /* CDiskImage.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C83B57519A3B41700E9572E /* CDiskImage.icns */; };
+		7C9BC9E519EC7D0500C4FDDD /* YoYo-Localization.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C9BC9E419EC7D0500C4FDDD /* YoYo-Localization.icns */; };
+		7C9BC9E719EC7EE800C4FDDD /* YoYo-package.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C9BC9E619EC7EE800C4FDDD /* YoYo-package.icns */; };
 		7CB60994199189E20068574D /* root.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CB60993199189E20068574D /* root.plist */; };
-		7CBBEC33197CFEB000250F49 /* com.apple.PowerManagement.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */; };
 		7CC26BD819DA1C0D002A093B /* kcpassword in Resources */ = {isa = PBXBuildFile; fileRef = 7CC26BD719DA1C0D002A093B /* kcpassword */; };
 		7CC26BDA19DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CC26BD919DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist */; };
 		7CC26BDC19DA1DF8002A093B /* rc.netboot in Resources */ = {isa = PBXBuildFile; fileRef = 7CC26BDB19DA1DF8002A093B /* rc.netboot */; };
 		7CC636E6197D444E008473CE /* NBImageInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CC636E5197D444E008473CE /* NBImageInfo.plist */; };
 		7CCA40B519D9EE9800C7114F /* Boot.sh in Resources */ = {isa = PBXBuildFile; fileRef = 7CCA40B419D9EE9800C7114F /* Boot.sh */; };
 		7CCA40B719D9F22600C7114F /* com.AutoCasperNBI.boot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CCA40B619D9F22600C7114F /* com.AutoCasperNBI.boot.plist */; };
+		7CD1B87B19EC76EB00C70449 /* YoYo-diskcopy-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CD1B87A19EC76EB00C70449 /* YoYo-diskcopy-doc.icns */; };
 		7CDCE26C1985A2B8005CE10C /* Clock.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CDCE26B1985A2B8005CE10C /* Clock.png */; };
+		7CDD2BBD19EC7BAA008D370F /* YoYo-icn_desktop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 7CDD2BB819EC7BAA008D370F /* YoYo-icn_desktop.tiff */; };
+		7CDD2BBE19EC7BAA008D370F /* YoYo-FinderIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CDD2BB919EC7BAA008D370F /* YoYo-FinderIcon.icns */; };
+		7CDD2BBF19EC7BAA008D370F /* YoYo-ExecutableBinaryIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CDD2BBA19EC7BAA008D370F /* YoYo-ExecutableBinaryIcon.icns */; };
+		7CDD2BC019EC7BAA008D370F /* YoYo-Clock.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CDD2BBB19EC7BAA008D370F /* YoYo-Clock.icns */; };
+		7CDD2BC119EC7BAA008D370F /* YoYo-AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CDD2BBC19EC7BAA008D370F /* YoYo-AppIcon.icns */; };
 		7CEDD051195B8243009DA982 /* Installer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CEDD050195B8243009DA982 /* Installer.icns */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		7C07F19419F10B9C00314193 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				7C07F19519F10BA600314193 /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		7C06F40619DA19680057D6ED /* 10.8+root.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = "10.8+root.plist"; sourceTree = "<group>"; };
+		7C07F19219F10B5E00314193 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		7C07F19619F10C8B00314193 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		7C13057B193FC0B60060F343 /* AutoCasperNBI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoCasperNBI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C13057E193FC0B60060F343 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		7C130580193FC0B60060F343 /* AppleScriptObjC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppleScriptObjC.framework; path = System/Library/Frameworks/AppleScriptObjC.framework; sourceTree = SDKROOT; };
@@ -80,15 +105,22 @@
 		7C83B57119A3AF3E00E9572E /* Localization.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Localization.icns; sourceTree = "<group>"; };
 		7C83B57319A3B39A00E9572E /* diskcopy.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = diskcopy.icns; sourceTree = "<group>"; };
 		7C83B57519A3B41700E9572E /* CDiskImage.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = CDiskImage.icns; sourceTree = "<group>"; };
+		7C9BC9E419EC7D0500C4FDDD /* YoYo-Localization.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-Localization.icns"; sourceTree = "<group>"; };
+		7C9BC9E619EC7EE800C4FDDD /* YoYo-package.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-package.icns"; sourceTree = "<group>"; };
 		7CB60993199189E20068574D /* root.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = root.plist; sourceTree = "<group>"; };
-		7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.apple.PowerManagement.plist; sourceTree = "<group>"; };
 		7CC26BD719DA1C0D002A093B /* kcpassword */ = {isa = PBXFileReference; lastKnownFileType = file; path = kcpassword; sourceTree = "<group>"; };
 		7CC26BD919DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.AutoCasperNBI.CasperImaging.plist; sourceTree = "<group>"; };
 		7CC26BDB19DA1DF8002A093B /* rc.netboot */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = rc.netboot; sourceTree = "<group>"; };
 		7CC636E5197D444E008473CE /* NBImageInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NBImageInfo.plist; sourceTree = "<group>"; };
 		7CCA40B419D9EE9800C7114F /* Boot.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = Boot.sh; sourceTree = "<group>"; };
 		7CCA40B619D9F22600C7114F /* com.AutoCasperNBI.boot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.AutoCasperNBI.boot.plist; sourceTree = "<group>"; };
+		7CD1B87A19EC76EB00C70449 /* YoYo-diskcopy-doc.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-diskcopy-doc.icns"; sourceTree = "<group>"; };
 		7CDCE26B1985A2B8005CE10C /* Clock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Clock.png; sourceTree = "<group>"; };
+		7CDD2BB819EC7BAA008D370F /* YoYo-icn_desktop.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "YoYo-icn_desktop.tiff"; sourceTree = "<group>"; };
+		7CDD2BB919EC7BAA008D370F /* YoYo-FinderIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-FinderIcon.icns"; sourceTree = "<group>"; };
+		7CDD2BBA19EC7BAA008D370F /* YoYo-ExecutableBinaryIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-ExecutableBinaryIcon.icns"; sourceTree = "<group>"; };
+		7CDD2BBB19EC7BAA008D370F /* YoYo-Clock.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-Clock.icns"; sourceTree = "<group>"; };
+		7CDD2BBC19EC7BAA008D370F /* YoYo-AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-AppIcon.icns"; sourceTree = "<group>"; };
 		7CEDD050195B8243009DA982 /* Installer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Installer.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -98,6 +130,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C130581193FC0B60060F343 /* AppleScriptObjC.framework in Frameworks */,
+				7C07F19319F10B5E00314193 /* Sparkle.framework in Frameworks */,
 				7C13057F193FC0B60060F343 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -125,6 +158,7 @@
 		7C13057D193FC0B60060F343 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7C07F19219F10B5E00314193 /* Sparkle.framework */,
 				7C13057E193FC0B60060F343 /* Cocoa.framework */,
 				7C130580193FC0B60060F343 /* AppleScriptObjC.framework */,
 				7C130582193FC0B60060F343 /* Other Frameworks */,
@@ -146,6 +180,7 @@
 			isa = PBXGroup;
 			children = (
 				7CB60993199189E20068574D /* root.plist */,
+				7C07F19619F10C8B00314193 /* dsa_pub.pem */,
 				7CC26BD719DA1C0D002A093B /* kcpassword */,
 				7CCA40B619D9F22600C7114F /* com.AutoCasperNBI.boot.plist */,
 				7C06F40619DA19680057D6ED /* 10.8+root.plist */,
@@ -153,7 +188,6 @@
 				7CC636E5197D444E008473CE /* NBImageInfo.plist */,
 				7CC26BDB19DA1DF8002A093B /* rc.netboot */,
 				7C55D7EE19DA299000AC599D /* com.apple.dock.plist */,
-				7CBBEC31197CFEB000250F49 /* com.apple.PowerManagement.plist */,
 				7CCA40B419D9EE9800C7114F /* Boot.sh */,
 				7C13059E193FC0CE0060F343 /* MainMenu.xib */,
 				7C130592193FC0B60060F343 /* AutoCasperNBIAppDelegate.applescript */,
@@ -183,9 +217,17 @@
 				7C83B57519A3B41700E9572E /* CDiskImage.icns */,
 				7C83B57319A3B39A00E9572E /* diskcopy.icns */,
 				7C83B57119A3AF3E00E9572E /* Localization.icns */,
+				7CD1B87A19EC76EB00C70449 /* YoYo-diskcopy-doc.icns */,
 				7C83B56D19A3931600E9572E /* Finder.icns */,
 				7C27FA25198C357900BD5A07 /* AlertStopIcon.icns */,
+				7C9BC9E619EC7EE800C4FDDD /* YoYo-package.icns */,
+				7C9BC9E419EC7D0500C4FDDD /* YoYo-Localization.icns */,
 				7CDCE26B1985A2B8005CE10C /* Clock.png */,
+				7CDD2BB819EC7BAA008D370F /* YoYo-icn_desktop.tiff */,
+				7CDD2BB919EC7BAA008D370F /* YoYo-FinderIcon.icns */,
+				7CDD2BBA19EC7BAA008D370F /* YoYo-ExecutableBinaryIcon.icns */,
+				7CDD2BBB19EC7BAA008D370F /* YoYo-Clock.icns */,
+				7CDD2BBC19EC7BAA008D370F /* YoYo-AppIcon.icns */,
 				7C197009198058F00092062D /* Scripts.icns */,
 				7C801961196EA9AE0079952B /* AutoCasperNBI.png */,
 				7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */,
@@ -212,6 +254,7 @@
 				7C130577193FC0B60060F343 /* Sources */,
 				7C130578193FC0B60060F343 /* Frameworks */,
 				7C130579193FC0B60060F343 /* Resources */,
+				7C07F19419F10B9C00314193 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -228,7 +271,7 @@
 		7C130573193FC0B60060F343 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = macmule;
 			};
 			buildConfigurationList = 7C130576193FC0B60060F343 /* Build configuration list for PBXProject "AutoCasperNBI" */;
@@ -254,12 +297,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7CBBEC33197CFEB000250F49 /* com.apple.PowerManagement.plist in Resources */,
 				7C1305AB193FC10A0060F343 /* NetBootVolume.icns in Resources */,
 				7C55D7EF19DA299000AC599D /* com.apple.dock.plist in Resources */,
 				7C83B57419A3B39A00E9572E /* diskcopy.icns in Resources */,
 				7C06F40719DA19680057D6ED /* 10.8+root.plist in Resources */,
+				7CDD2BBD19EC7BAA008D370F /* YoYo-icn_desktop.tiff in Resources */,
 				7C1305AC193FC10A0060F343 /* osx-jss-login.png in Resources */,
+				7C07F19719F10C8B00314193 /* dsa_pub.pem in Resources */,
 				7C27FA26198C357900BD5A07 /* AlertStopIcon.icns in Resources */,
 				7C23C474195A3AEB00FAC70A /* Screensharing.icns in Resources */,
 				7CEDD051195B8243009DA982 /* Installer.icns in Resources */,
@@ -267,14 +311,20 @@
 				7C83B57619A3B41700E9572E /* CDiskImage.icns in Resources */,
 				7C1305AE193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns in Resources */,
 				7C27FA28198C3D9500BD5A07 /* complete.aif in Resources */,
+				7CD1B87B19EC76EB00C70449 /* YoYo-diskcopy-doc.icns in Resources */,
+				7C9BC9E519EC7D0500C4FDDD /* YoYo-Localization.icns in Resources */,
 				7C13058B193FC0B60060F343 /* InfoPlist.strings in Resources */,
+				7CDD2BC119EC7BAA008D370F /* YoYo-AppIcon.icns in Resources */,
 				7CC26BDC19DA1DF8002A093B /* rc.netboot in Resources */,
 				7C19700A198058F00092062D /* Scripts.icns in Resources */,
+				7C9BC9E719EC7EE800C4FDDD /* YoYo-package.icns in Resources */,
 				7CC636E6197D444E008473CE /* NBImageInfo.plist in Resources */,
+				7CDD2BC019EC7BAA008D370F /* YoYo-Clock.icns in Resources */,
 				7CCA40B519D9EE9800C7114F /* Boot.sh in Resources */,
 				7CC26BD819DA1C0D002A093B /* kcpassword in Resources */,
 				7C83B56E19A3931600E9572E /* Finder.icns in Resources */,
 				7CDCE26C1985A2B8005CE10C /* Clock.png in Resources */,
+				7CDD2BBF19EC7BAA008D370F /* YoYo-ExecutableBinaryIcon.icns in Resources */,
 				7C13059F193FC0CE0060F343 /* MainMenu.xib in Resources */,
 				7CC26BDA19DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist in Resources */,
 				7C130598193FC0B60060F343 /* Images.xcassets in Resources */,
@@ -285,6 +335,7 @@
 				7C130591193FC0B60060F343 /* Credits.rtf in Resources */,
 				7C801962196EA9AE0079952B /* AutoCasperNBI.png in Resources */,
 				7C83B57219A3AF3E00E9572E /* Localization.icns in Resources */,
+				7CDD2BBE19EC7BAA008D370F /* YoYo-FinderIcon.icns in Resources */,
 				7C1305AD193FC10A0060F343 /* RemoteDesktop.icns in Resources */,
 				7C39447E1960C57D00BF371B /* Package.icns in Resources */,
 			);
@@ -399,6 +450,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AutoCasperNBI/AutoCasperNBI-Prefix.pch";
 				INFOPLIST_FILE = "AutoCasperNBI/AutoCasperNBI-Info.plist";
@@ -412,6 +467,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AutoCasperNBI/AutoCasperNBI-Prefix.pch";
 				INFOPLIST_FILE = "AutoCasperNBI/AutoCasperNBI-Info.plist";

@@ -9,13 +9,13 @@
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "AutoCasperNBI_32-1.png",
+      "filename" : "AutoCasperNBI_32.png",
       "scale" : "2x"
     },
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "AutoCasperNBI_32.png",
+      "filename" : "AutoCasperNBI_32-1.png",
       "scale" : "1x"
     },
     {
@@ -33,25 +33,25 @@
     {
       "size" : "128x128",
       "idiom" : "mac",
-      "filename" : "AutoCasperNBI_256-1.png",
+      "filename" : "AutoCasperNBI_256.png",
       "scale" : "2x"
     },
     {
       "size" : "256x256",
       "idiom" : "mac",
-      "filename" : "AutoCasperNBI_256.png",
+      "filename" : "AutoCasperNBI_256-1.png",
       "scale" : "1x"
     },
     {
       "size" : "256x256",
       "idiom" : "mac",
-      "filename" : "AutoCasperNBI_512-1.png",
+      "filename" : "AutoCasperNBI_512.png",
       "scale" : "2x"
     },
     {
       "size" : "512x512",
       "idiom" : "mac",
-      "filename" : "AutoCasperNBI_512.png",
+      "filename" : "AutoCasperNBI_512-1.png",
       "scale" : "1x"
     },
     {

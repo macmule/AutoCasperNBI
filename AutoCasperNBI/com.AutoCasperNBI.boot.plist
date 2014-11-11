@@ -6,7 +6,7 @@
 	<string>com.AutoCasperNBI.boot</string>
 	<key>ProgramArguments</key>
 	<array>
-	<string>sh</string>
+		<string>sh</string>
 		<string>/Library/Application Support/AutoCasperNBI/Scripts/Boot.sh</string>
 	</array>
 	<key>RunAtLoad</key>

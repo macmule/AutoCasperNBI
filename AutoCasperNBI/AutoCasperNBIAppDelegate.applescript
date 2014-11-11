@@ -14,104 +14,99 @@ script AutoCasperNBIAppDelegate
 	property parent : class "NSObject"
     
 --- Objects
-
-	-- IBOutlets
-    property defaults : missing value
-    property hostMacOSVersion : missing value
-    property hostMacOSBuildVersion : missing value
-    property mainWindow : missing value
-    property optionsWindow : missing value
-    property showBuildProcessWindow : missing value
-    property selectedOSdmgPath : missing value
-    property selectedOSdmgMountPath : missing value
-    property selectedOSdmgVersion : missing value
-    property selectedAppPath : missing value
-    property selectedAppTextField : missing value
-    property selectedAppBundleName : missing value
-    property selectedCasperImagingAppVersion : missing value
-    property jssURL : missing value
-    property checkJSSURL : missing value
-    property enteredJSSURLTextField : missing value
-    property jssURLHtml : missing value
-    property jssVersion : missing value
-    property jssVersionCut : missing value
-    property selectOSDMG : missing value
-    property selectedOSDMGTextField : missing value
-    property netBootNameTextField : missing value
-    property netBootImageIndexTextField : missing value
-    property netBootImageIndexLabel : missing value
-    property netBootDescription : missing value
-    property applescriptsDelims : missing value
-    property startTag : missing value
-    property endTag : missing value
-    property hostMacOSVersionToDelim : missing value
-    property hostMacOSVersionMajor : missing value
-    property selectedOSdmgVersionToDelim : missing value
-    property selectedOSdmgVersionMajor : missing value
-    property jssAndCasperImagingVersionCheckTextfield : missing value
-    property netBootImageIndexMinValue : missing value
-    property netBootImageIndexMaxValue : missing value
-    property netBootImageIndex : missing value
-    property ardUsername : missing value
-    property ardPassword : missing value
-    property vncPassword : missing value
-    property userName : missing value
-    property longUserName : missing value
-    property netBootServeOptionSelected : missing value
-    property netBootServeOver : missing value
-    property customDesktopImagePath : missing value
-    property customDesktopImageLabel : missing value
-    property pathToResources : missing value
-    property buildProcessTextField : missing value
-    property tempUUID : missing value
-    property netBootDmgMountPath : missing value
-    property selectedAppPathToCopy : missing value
-    property downloadedJSSCACert : missing value
-    property variableVariable : missing value
-    property buildDate : missing value
-    property ardPasswordEncoded : missing value
-    property ardUsernameEncoded : missing value
-    property netBootCreatedPath : missing value
-    property desktopImageExists : missing value
-    property netBootImageExpandValue : missing value
-    property selectedCasperImagingAppVersionToDelim : missing value
-    property selectedCasperImagingAppVersionMajor : missing value
-    property selectedCasperImagingAppVersionMinor : missing value
-    property jssVersionToDelim : missing value
-    property jssVersionMajor : missing value
-    property jssVersionMinor : missing value
-    property myLogFile : missing value
-    property timeStamp : missing value
-    property logMe : missing value
-    property netBootSelectedLocation : missing value
-    property logDate : missing value
-    property buildProcessLogTextField : missing value
-    property versionOfAutoCasperNBI : missing value
-    property netBootDirectory : missing value
-    property adminUserName : missing value
-    property adminUsersPassword : missing value
-    property adminUserWindow : missing value
-    property netBootDmgTotalSize : missing value
-    property netBootDmgFreeSpace : missing value
-    property netBootDmgUsedSpace : missing value
-    property netBootReducedDmgMountPath : missing value
-    property netBootExpandedTotalSize : missing value
-    property userNotifyWindow : missing value
-    property userNotifyError : missing value
-    property userNotifySuccess : missing value
-    property inputLayoutID : missing value
-    property languageCode : missing value
-    property additionalPKGsArray : missing value
-    property selectedPKGsPath : missing value
-    property selectedObjects : missing value
-    property selectedPKGsColour : missing value
-    property additionalPKGs : missing value
-    property additionalCertsArray : missing value
-    property selectedCertsPath : missing value
-    property selectedCertsColour : missing value
-    property additionalCerts : missing value
+    property defaults : ""
+    property hostMacOSVersion : ""
+    property hostMacOSBuildVersion : ""
+    property mainWindow : ""
+    property optionsWindow : ""
+    property showBuildProcessWindow : ""
+    property selectedOSdmgPath : ""
+    property selectedOSdmgMountPath : ""
+    property selectedOSdmgVersion : ""
+    property selectedAppPath : ""
+    property selectedAppTextField : ""
+    property selectedAppBundleName : ""
+    property selectedCasperImagingAppVersion : ""
+    property jssURL : ""
+    property enteredJSSURLTextField : ""
+    property jssURLHtml : ""
+    property jssVersion : ""
+    property jssVersionCut : ""
+    property selectOSDMG : ""
+    property selectedOSDMGTextField : ""
+    property netBootNameTextField : ""
+    property netBootImageIndexTextField : ""
+    property netBootImageIndexLabel : ""
+    property netBootDescription : ""
+    property applescriptsDelims : ""
+    property startTag : ""
+    property endTag : ""
+    property hostMacOSVersionToDelim : ""
+    property hostMacOSVersionMajor : ""
+    property selectedOSdmgVersionToDelim : ""
+    property selectedOSdmgVersionMajor : ""
+    property jssAndCasperImagingVersionCheckTextfield : ""
+    property netBootImageIndexMinValue : ""
+    property netBootImageIndexMaxValue : ""
+    property netBootImageIndex : ""
+    property ardUsername : ""
+    property ardPassword : ""
+    property vncPassword : ""
+    property userName : ""
+    property longUserName : ""
+    property netBootServeOptionSelected : ""
+    property netBootServeOver : ""
+    property customDesktopImagePath : ""
+    property customDesktopImageLabel : ""
+    property pathToResources : ""
+    property buildProcessTextField : ""
+    property tempUUID : ""
+    property netBootDmgMountPath : ""
+    property selectedAppPathToCopy : ""
+    property downloadedJSSCACert : ""
+    property variableVariable : ""
+    property buildDate : ""
+    property ardPasswordEncoded : ""
+    property ardUsernameEncoded : ""
+    property netBootCreatedPath : ""
+    property desktopImageExists : ""
+    property netBootImageExpandValue : ""
+    property selectedCasperImagingAppVersionToDelim : ""
+    property selectedCasperImagingAppVersionMajor : ""
+    property selectedCasperImagingAppVersionMinor : ""
+    property jssVersionToDelim : ""
+    property jssVersionMajor : ""
+    property jssVersionMinor : ""
+    property myLogFile : ""
+    property timeStamp : ""
+    property logMe : ""
+    property netBootSelectedLocation : ""
+    property logDate : ""
+    property buildProcessLogTextField : ""
+    property versionOfAutoCasperNBI : ""
+    property netBootDirectory : ""
+    property adminUserName : ""
+    property adminUsersPassword : ""
+    property adminUserWindow : ""
+    property netBootDmgTotalSize : ""
+    property netBootDmgFreeSpace : ""
+    property netBootDmgUsedSpace : ""
+    property netBootReducedDmgMountPath : ""
+    property netBootExpandedTotalSize : ""
+    property userNotifyWindow : ""
+    property userNotifyError : ""
+    property userNotifySuccess : ""
+    property inputLayoutID : ""
+    property languageCode : ""
+    property additionalPKGsArray : ""
+    property selectedPKGsPath : ""
+    property selectedObjects : ""
+    property selectedPKGsColour : ""
+    property additionalCertsArray : ""
+    property selectedCertsPath : ""
+    property selectedCertsColour : ""
     property keyboardLayoutInputSourceID : ""
-    property letters : missing value
+    property letters : ""
     property freeSpaceOnVolume : ""
     property spaceNeeded : ""
     property fullPath : ""
@@ -171,6 +166,8 @@ script AutoCasperNBIAppDelegate
     property isAdminUser : false
     property pkgsMissing : false
     property certsMissing : false
+    property yosemiteOS : false
+    property buildPreCheckPassed : false
     
     -- Others
     property requiredSpace : 20
@@ -189,6 +186,8 @@ script AutoCasperNBIAppDelegate
     property thePKGs : {}
     property certList : {}
     property theCerts : {}
+    property additionalCerts : {}
+    property additionalPKGs : {}
     
 --- HANDLERS ---
 
@@ -206,6 +205,12 @@ script AutoCasperNBIAppDelegate
         -- Log OS version & build of host mac
         set logMe to  "Running on OS " & hostMacOSVersion & " (" & hostMacOSBuildVersion & ")"
         logToFile_(me)
+        -- If we're running on 10.10, enable Yosemite icons
+        if my hostMacOSVersion begins with "10.10" then
+            set my yosemiteOS to true
+        else
+            set my yosemiteOS to false
+        end if
         -- Get username of user running AutoCasperNBI
         set userName to short user name of (system info)
         set logMe to "Launched by " & userName
@@ -250,34 +255,36 @@ script AutoCasperNBIAppDelegate
     -- Get values from plist
 	on retrieveDefaults_(sender)
         tell defaults to set my ardEnabled to objectForKey_("ardEnabled") as boolean
-        tell defaults to set my ardUsername to objectForKey_("ardUsername")
-        tell defaults to set my ardPassword to objectForKey_("ardPassword")
+        tell defaults to set my ardUsername to objectForKey_("ardUsername") as string
+        tell defaults to set my ardPassword to objectForKey_("ardPassword") as string
         tell defaults to set my customDesktopImageEnabled to objectForKey_("customDesktopImageEnabled") as boolean
-        tell defaults to set my customDesktopImagePath to objectForKey_("customDesktopImagePath")
-        tell defaults to set my jssURL to objectForKey_("jssURL")
+        tell defaults to set my customDesktopImagePath to objectForKey_("customDesktopImagePath") as string
+        tell defaults to set my jssURL to objectForKey_("jssURL") as string
         tell defaults to set my netBootDescriptionEnabled to objectForKey_("netBootDescriptionEnabled") as boolean
         tell defaults to set my servedFromNetSUS to objectForKey_("servedFromNetSUS") as boolean
-        tell defaults to set my netBootImageIndexLoadBalanced to objectForKey_("netBootImageIndexLoadBalanced")
-        tell defaults to set my netBootImageExpandEnabled to objectForKey_("netBootImageExpandEnabled")
-        tell defaults to set my netBootImageExpandValue to objectForKey_("netBootImageExpandValue")
-        tell defaults to set my netBootImageReduceEnabled to objectForKey_("netBootImageReduceEnabled")
-        tell defaults to set my netBootServeOverNFS to objectForKey_("netBootServeOverNFS")
+        tell defaults to set my netBootImageIndexLoadBalanced to objectForKey_("netBootImageIndexLoadBalanced") as boolean
+        tell defaults to set my netBootImageExpandEnabled to objectForKey_("netBootImageExpandEnabled") as boolean
+        tell defaults to set my netBootImageExpandValue to objectForKey_("netBootImageExpandValue") as string
+        tell defaults to set my netBootImageReduceEnabled to objectForKey_("netBootImageReduceEnabled") as boolean
+        tell defaults to set my netBootServeOverNFS to objectForKey_("netBootServeOverNFS") as boolean
         tell defaults to set my vncEnabled to objectForKey_("vncEnabled") as boolean
-        tell defaults to set my vncPassword to objectForKey_("vncPassword")
-        tell defaults to set my timeServerSelected to objectForKey_("timeServerSelected")
-        tell defaults to set my timeZoneSelected to objectForKey_("timeZoneSelected")
-        tell defaults to set my languageSelected to objectForKey_("languageSelected")
-        tell defaults to set my inputLanguageSelected to objectForKey_("inputLanguageSelected")
+        tell defaults to set my vncPassword to objectForKey_("vncPassword") as string
+        tell defaults to set my timeServerSelected to objectForKey_("timeServerSelected") as string
+        tell defaults to set my timeZoneSelected to objectForKey_("timeZoneSelected") as string
+        tell defaults to set my languageSelected to objectForKey_("languageSelected") as string
+        tell defaults to set my inputLanguageSelected to objectForKey_("inputLanguageSelected") as string
         tell defaults to set my installRCNetBootSelected to objectForKey_("installRCNetBootSelected") as boolean
         tell defaults to set my createReadOnlyDMG to objectForKey_("createReadOnlyDMG") as boolean
         tell defaults to set my simpleFinderEnabled to objectForKey_("simpleFinderEnabled") as boolean
-        tell defaults to set my additionalCerts to objectForKey_("additionalCerts")
-        tell defaults to set my additionalPKGs to objectForKey_("additionalPKGs")
+        tell defaults to set my additionalCerts to objectForKey_("additionalCerts") as list
+        tell defaults to set my additionalPKGs to objectForKey_("additionalPKGs") as list
     end retrieveDefaults_
     
     ----- BUTTON HANDLERS ----
     -- Open Options window
     on showOptionsWindow_(sender)
+        -- check the JSS URL
+        checkJSSURL_(me)
         -- reset value
         set optionsWindowPreCheckPassed to true
         -- Make sure a name is specified for the NetBoot Image, error if not.
@@ -286,6 +293,7 @@ script AutoCasperNBIAppDelegate
         netBootImageIndexCheck_(me)
         -- Set to boolean
         set optionsWindowPreCheckPassed to optionsWindowPreCheckPassed as boolean
+        -- If we ok to proceed
         if optionsWindowPreCheckPassed is true then
             -- Disable main windows buttons
             set my optionWindowEnabled to false
@@ -344,6 +352,17 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to missing value
         set my mainWindowCog to false
     end resetMainWindowLabel_
+    
+    ---- HELP MENU ----
+    -- Open the User Guide
+    on openUserGuide_(sender)
+        open location "https://macmule.com/AutoCasperNBI"
+    end openUserGuide_
+    
+    -- Open default browser to the below
+    on logAnIssue_(sender)
+        open location "https://github.com/macmule/AutoCasperNBI/issues"
+    end logAnIssue_
 
 ----- LAUNCHING -----
 
@@ -363,13 +382,10 @@ script AutoCasperNBIAppDelegate
     
     -- On launch as for administrative credentials & validate
     on adminCheck_(sender)
-        
         -- Checking variable
         set isAdminUser to false
-        
         -- Set to text
         set adminUserName to adminUserName as text
-        
         try
             -- Check to see if supplied User is a member of the Administrator group
             if ("80" is not in (do shell script "/usr/bin/id " & adminUserName & " -G")) then
@@ -386,94 +402,65 @@ script AutoCasperNBIAppDelegate
         on error
             -- Set to false to display
             set my userNotifyErrorHidden to false
-        
             -- Set Error message
             set my userNotifyError to "Authentication failed. Please retry the administrative credentials."
-            
             --Log Action
             set logMe to "Authentication failed for user: " & adminUserName
             logToFile_(me)
-   
             -- Notify of errors or success
             userNotify_(me)
         end try
         
-        
         -- If the User is an Administrator
         if isAdminUser is true then
-            
             -- Set to text
             set adminUsersPassword to adminUsersPassword as text
-            
             try
-                
                 -- Perform a check of privileges
                 do shell script "/bin/ls " user name adminUserName password adminUsersPassword with administrator privileges
-                
                 -- Open the Main Window
                 openMainWindow_(me)
-                
             on error
-            
                 -- Set to false to display
                 set my userNotifyErrorHidden to false
-                
                 -- Set Error message
                 set my userNotifyError to "Authentication failed. Please retry the administrative credentials."
-                
                 set isAdminUser to false
-                
                 -- Notify of errors or success
                 userNotify_(me)
-                
                 --Log Action
                 set logMe to "Authentication failed for user: " & adminUserName
                 logToFile_(me)
-            
             end try
-            
         end if
-        
     end adminCheck_
     
     -- Open the Main Window
     on openMainWindow_(sender)
-        
         -- close build process window
         adminUserWindow's orderOut_(null)
-        
         -- activate main window
         activate
         mainWindow's makeKeyAndOrderFront_(null)
-        
     end openMainWindow_
 
-
 ----- LOGGING -----
+
     -- Log to file
     on logToFile_(sender)
-        
         -- Comment out before release.. this will send log messages to Xcode's log
         --log logMe
-        
         -- Get time & date of command execution for log file
         set timeStamp to do shell script "/bin/date"
-        
         -- Set to boolean of value
         set logNewLine to logNewLine as boolean
-        
         -- If we're to create a newline ion the log
         if logNewLine is true then
-            
             try
-                
                 -- Create an empty new line for log if exists
                 do shell script "/bin/echo \"\" >> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
-                
             end try
-            
         end if
-        
         try
             -- Write message to log file
             do shell script "/bin/echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
@@ -485,7 +472,6 @@ script AutoCasperNBIAppDelegate
         end try
         -- Set to false so we don't create a newline until next time the app is run
         set logNewLine to false
-        
     end logToFile_
     
 ----- MAIN WINDOW----
@@ -542,6 +528,12 @@ script AutoCasperNBIAppDelegate
                 set my selectedOSDMGTextField to "Mac OS " & selectedOSdmgVersion & " (" & selectedOSBuilddmgVersion & ")"
                 -- Reset OSDMG Icons
                 doResetOSDMGIcons_(me)
+                -- If we're building a 10.10 NBI, enable Yosemite icons
+                if selectedOSdmgVersion begins with "10.10" then
+                    set my yosemiteOS to true
+                else
+                    set my yosemiteOS to false
+                end if
                 -- Display green check icon
                 set my checkGreenOSDMG to true
                 -- Set netBoot Name
@@ -609,186 +601,135 @@ script AutoCasperNBIAppDelegate
 
     -- Make sure OS & Imaging.app is specified before proceeding, once checked enable JSS options, as well as Build & Option buttons
     on checkIfReadyToProceed_(sender)
-        
         -- Check to see if we have ticks or minor warning before we proceed
         if (checkGreenSelectedApp or minorJSSAndCasperImagingVersionDiff) and checkGreenOSDMG is equal to true
-        
             -- Enable Options & Build
             set my disableOptionsAndBuild to false
-            
             --Log Action
             set logMe to "Pre-Reqs met, Options & Build enabled."
             logToFile_(me)
-            
             -- Get the NetBoot Serve option
             netBootServeOption_(me)
-            
         end if
-
     end checkIfReadyToProceed_
 
     -- Check selected app is Casper Imaging & return version
     on selectedAppCheck_(sender)
-
         -- Set label to Casper Imaging version
         set my selectedAppTextField to "Examining..."
-
         -- Display the cog to reinforce we're busy
         set my cogSelectedApp to true
-        
         -- Delay needed to update label
         delay 0.1
-        
         -- Get Bundle Name of selected app
         set selectedAppBundleName to do shell script "/usr/bin/defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleName"
-        
         --Log Action
         set logMe to "Bundle Name: " & selectedAppBundleName
         logToFile_(me)
-
         -- If Bundle Name is Casper Imaging, proceed to get version
         if selectedAppBundleName is equal to "Casper Imaging" then
-            
             try
-               
                 -- If Casper Imaging, return version
                 set selectedCasperImagingAppVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleGetInfoString"
-                
                 --Log Action
                 set logMe to "Casper Imaging Version: " & selectedCasperImagingAppVersion
                 logToFile_(me)
-                
                 -- Set label to Casper Imaging version
                 set my selectedAppTextField to "Casper Imaging " & selectedCasperImagingAppVersion
-                
                 -- Reset Selected App Icons
                 doResetSelectedAppIcons_(me)
-                
                 -- Set Image Index (reset index to make sure we don't create images with the same)
                 netBootImageIndex_(me)
-                
                 -- Display green tick
                 set my checkGreenSelectedApp to true
-                
-                -- if jssURL has a value, then get it's version
-                if jssURL is not equal missing value
-                
-                    -- Compare JSS & Casper Imaging Versions
-                    checkJSSURL_(me)
-                
-                end if
-            
+                -- Compare JSS & Casper Imaging Versions
+                checkJSSURL_(me)
             -- Error if cannot get the version number
             on error
-            
                 -- Reset Selected App Icons
                 doResetSelectedAppIcons_(me)
-            
                 -- Display Error if cannot get version number
                 set my selectedAppTextField to "Cannot Get Version"
                 set my exclamationRedSelectedApp to true
-                
                 -- Disable options and build
                 set my disableOptionsAndBuild to true
-            
             end try
-        
         -- If selected app is not Casper Imaging.
         else
-        
             --Log Action
             set logMe to "Select Casper Imaging.app"
             logToFile_(me)
-        
             -- Reset Selected App Icons
             doResetSelectedAppIcons_(me)
-        
             -- Display message that we have selected Casper Imaging
             set my selectedAppTextField to "Select Casper Imaging.app"
             set my exclamationRedSelectedApp to true
-            
             -- Disable options and build
             set my disableOptionsAndBuild to true
-        
         end if
-
         -- See if pre-reqs have been met
         checkIfReadyToProceed_(me)
-
     end selectedAppCheck_
 
     -- Check the JSS URL details & try & get version of the JSS
-    on checkJSSURL_(sender)
-        
+    on checkJSSURL_(aNotification)
         -- Make sure jssURL has a value before we proceed
-        if jssURL is not equal to missing value
-        
+        if my jssURL as string is not equal to "" then
             -- Update plist
             tell defaults to setObject_forKey_(jssURL, "jssURL")
-        
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
-            
             -- Update lable to show we're doing something
             set my enteredJSSURLTextField to "Examining..."
-            
             -- Display the cog to reinforce we're busy
             set my cogJSSURL to true
-            
             -- Delay needed to update label
             delay 0.1
-            
             try
-                
                 --Log Action
                 set logMe to "Trying to get JSS version"
                 logToFile_(me)
-                
                 -- Try & get URL using insecure method, this way it will work with or without a valid SSL cert
                 set jssURLHtml to do shell script "/usr/bin/curl -k " & jssURL & "/jss.html"
-
                 --Log Action
                 set logMe to "Received JSS version"
                 logToFile_(me)
-                
                 -- Run Handler
                 getJSSVersion_(me)
-                
             -- Error if we cannot get the JSS version
             on error
-            
-                    --Log Action
-                    set logMe to "Cannot get JSS Version"
-                    logToFile_(me)
-            
-                    -- Reset JSS URL icons
-                    doResetJSSURLIcons_(me)
-                    
-                    -- Error if cannot get JSS Version
-                    set logMe to "Cannot get JSS Version"
-                    logToFile_(me)
-                    
-                    -- Set JSS exclaimation icon to show
-                    set my exclamationRedJSSURL to true
-                    
-                    -- Update text field with error
-                    set my enteredJSSURLTextField to "Cannot get JSS version"
-                
+                    if jssURL is "missing value" then
+                        -- Reset JSS URL icons
+                        doResetJSSURLIcons_(me)
+                        -- Blank JSS Text Field
+                        set my enteredJSSURLTextField to missing value
+                        -- Delete jssURL from plist
+                        tell defaults to removeObjectForKey_("jssURL")
+                        -- Reset JSS URL
+                        set jssURL to ""
+                    else
+                        --Log Action
+                        set logMe to "Cannot get JSS Version"
+                        logToFile_(me)
+                        -- Reset JSS URL icons
+                        doResetJSSURLIcons_(me)
+                        -- Error if cannot get JSS Version
+                        set logMe to "Cannot get JSS Version"
+                        logToFile_(me)
+                        -- Set JSS exclaimation icon to show
+                        set my exclamationRedJSSURL to true
+                        -- Update text field with error
+                        set my enteredJSSURLTextField to "Cannot get JSS version"
+                    end if
             end try
-            
         else
-        
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
-            
             -- Blank JSS Text Field
             set my enteredJSSURLTextField to missing value
-        
             -- Delete jssURL from plist
             tell defaults to removeObjectForKey_("jssURL")
-            
         end if
-
     end checkJSSURL_
 
     -- Get JSS Version from given URL
@@ -957,36 +898,25 @@ script AutoCasperNBIAppDelegate
 
     -- Make sure a name is specified for the NetBoot Image, error if not.
     on netBootName_(sender)
-        
         -- If textfield is empty
         if netBootNameTextField is missing value then
-            
             -- Set netBoot Name
             set my netBootNameTextField to selectedOSdmgVersion & " AutoCasperNBI"
-            
             -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
             servedFromNetSUS_(me)
-        
             -- Display error to user
             display dialog "Please select a Name for the NetBoot Image" with icon 0 buttons {"OK"}
-            
             --Log Action
             set logMe to "Error: Name required for NetBoot Image"
             logToFile_(me)
-            
             -- Set to false so we don't proceed showing options window
             set optionsWindowPreCheckPassed to false
-            
             -- Set to false so we don't proceed with build
             set buildButtonPreCheckPassed to false
-            
         else
-        
             -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
             servedFromNetSUS_(me)
-            
         end if
-        
     end netBootName_
 
     -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
@@ -1023,378 +953,260 @@ script AutoCasperNBIAppDelegate
             
     -- Bound to "Will be served from more than one server"
     on netBootImageIndex_(sender)
-    
         -- Set netBootImageIndexLoadBalanced to boolean of value
         set netBootImageIndexLoadBalanced to netBootImageIndexLoadBalanced as boolean
-        
         -- Set options depending on checkbox
         if netBootImageIndexLoadBalanced is true then
-            
             --Log Action
             set logMe to "NetBoot is to be hosted on multiple servers."
             logToFile_(me)
-            
             -- Set min & max values for Index
             set netBootImageIndexMinValue to 4096 as integer
             set netBootImageIndexMaxValue to 65535 as integer
-            
         else
-        
             --Log Action
             set logMe to "NetBoot is to be hosted on a single server."
             logToFile_(me)
-            
             -- Set min & max values for Index
             set netBootImageIndexMinValue to 1 as integer
             set netBootImageIndexMaxValue to 4095 as integer
-            
         end if
-    
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootImageIndexLoadBalanced, "netBootImageIndexLoadBalanced")
-        
         -- Update lable to show index value based on hosting option
         set my netBootImageIndexLabel to "(" & netBootImageIndexMinValue & " - " & netBootImageIndexMaxValue & ")"
-        
         -- Update text field to show the random number
         set my netBootImageIndexTextField to current application's (random number from (netBootImageIndexMinValue) to (netBootImageIndexMaxValue))
-
     end netBootImageIndex_
 
     -- Error if incorrect value specified
     on netBootImageIndexCheck_(sender)
-
         -- If we have a value
         if netBootImageIndexTextField is not equal to missing value
-        
             -- Set to integer of value
             set netBootImageIndexTextField to netBootImageIndexTextField as integer
-
         end if
-
         -- If integer value is outside of allowed range
         if (netBootImageIndexTextField less than netBootImageIndexMinValue) or (netBootImageIndexTextField greater than netBootImageIndexMaxValue) or (netBootImageIndexTextField is equal to missing value) then
-        
             -- Display error to user
             display dialog "Please select an Index between " & netBootImageIndexMinValue & " & " & netBootImageIndexMaxValue with icon 0 buttons {"OK"}
-        
             -- Reset using below function.
             netBootImageIndex_(me)
-            
             -- Set to false so we proceed showing options window
             set optionsWindowPreCheckPassed to false
-            
             -- Set to false so we don't proceed with build
             set buildButtonPreCheckPassed to false
-            
         end if
-
     end netBootImageIndexCheck_
 
     -- Bound to NetBoot Serve over HTTP radio button
     on netbootServeOverHTTPSelected_(sender)
-        
         -- Set NetBoot Serve Over NFS to false
         set netBootServeOverNFS to false
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootServeOverNFS, "netBootServeOverNFS")
-        
         --Log Action
         set logMe to "NetBoot is to served over HTTP"
         logToFile_(me)
-        
     end netbootServeOverHTTPSelected_
 
     -- Bound to NetBoot Serve over NFS radio button
     on netbootServeOverNFSSelected_(sender)
-        
         -- Set NetBoot Serve Over NFS to true
         set netBootServeOverNFS to true
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootServeOverNFS, "netBootServeOverNFS")
-        
         --Log Action
         set logMe to "NetBoot is to served over NFS"
         logToFile_(me)
-        
     end netbootServeOverNFSSelected_
 
     -- Get NetBoot Serve Option, if missing value set to NFS
     on netBootServeOption_(sender)
-        
         -- Set to variable to boolean
         set netBootServeOverNFS to netBootServeOverNFS as boolean
-            
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootServeOverNFS, "netBootServeOverNFS")
-            
     end netBootServeOption_
 
 ----- OPTIONS WINDOW  -----
 
     -- Bound to "Enable Description"
     on enablenetBootDescription_(sender)
-        
-            --If not enabled, delete from plist
-            if netBootDescriptionEnabled is false then
-                
-                -- Update plist with selection
-                tell defaults to setObject_forKey_(netBootDescriptionEnabled, "netBootDescriptionEnabled")
-                
+        --If not enabled, delete from plist
+        if netBootDescriptionEnabled is false then
+            -- Update plist with selection
+            tell defaults to setObject_forKey_(netBootDescriptionEnabled, "netBootDescriptionEnabled")
+            --Log Action
+            set logMe to "NetBoot description not enabled"
+            logToFile_(me)
+        else
+            --Log Action
+            set logMe to "NetBoot description enabled"
+            logToFile_(me)
+            -- Get Build date (should return localised).
+            set buildDate to date string of (current date)
+            -- Get the full name of the user running AutoCasperNBI
+            set longUserName to long user name of (system info)
+            -- If we don't have a JSS URL set, then omit
+            if jssURL is equal to "" then
+                -- Set NetBoot Description
+                set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & ". Created by, " & longUserName & " on: " & buildDate & "."
                 --Log Action
-                set logMe to "NetBoot description not enabled"
+                set logMe to "NetBoot description set to " & quoted form of netBootDescription
                 logToFile_(me)
-                
             else
-            
+                -- Set NetBoot Description
+                set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & " pointing to JSS " & jssURL & ". Created by, " & longUserName & " on: " & buildDate & "."
                 --Log Action
-                set logMe to "NetBoot description enabled"
+                set logMe to "NetBoot description set to " & quoted form of netBootDescription
                 logToFile_(me)
-                
-                -- Get Build date (should return localised).
-                set buildDate to date string of (current date)
-            
-                -- Get the full name of the user running AutoCasperNBI
-                set longUserName to long user name of (system info)
-
-                -- If we don't have a JSS URL set, then omit
-                if jssURL is equal to missing value
-                
-                    -- Set NetBoot Description
-                    set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & ". Created by, " & longUserName & " on: " & buildDate & "."
-                    
-                    --Log Action
-                    set logMe to "NetBoot description set to " & quoted form of netBootDescription
-                    logToFile_(me)
-                    
-                else
-                
-                    -- Set NetBoot Description
-                    set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & " pointing to JSS " & jssURL & ". Created by, " & longUserName & " on: " & buildDate & "."
-                    
-                    --Log Action
-                    set logMe to "NetBoot description set to " & quoted form of netBootDescription
-                    logToFile_(me)
-                    
-                end if
-            
-                -- Update plist with selection
-                tell defaults to setObject_forKey_(netBootDescriptionEnabled, "netBootDescriptionEnabled")
-                
             end if
-                
+            -- Update plist with selection
+            tell defaults to setObject_forKey_(netBootDescriptionEnabled, "netBootDescriptionEnabled")
+        end if
     end enablenetBootDescriptionTextField_
 
     -- Verify that the description field has a value & reset & prompt if not
     on netBootDescriptionCheck_(sender)
-        
         -- Set netBootDescriptionEnabled to boolean of value
         set netBootDescriptionEnabled to netBootDescriptionEnabled as boolean
-        
         --If enabled
         if netBootDescriptionEnabled is true then
-        
             -- If the description field is emptied.
             if netBootDescription is equal to missing value then
-                
                 -- Set to false so we don't proceed
                 set closeButtonPreCheckPassed to false
-                
                 -- Reset description to auto generated
                 enablenetBootDescription_(me)
-                
                 -- Display error to user
                 display dialog "Please select enter a Description or uncheck Set NetBoot Description" with icon 0 buttons {"OK"}
-                
             end if
-        
         end if
-
     end netBootDescriptionCheck_
 
     -- Bound to "Reduce Image Size"
     on netBootImageReduce_(sender)
-        
         -- Set netBootImageReduceEnabled to boolean of value
         set netBootImageReduceEnabled to netBootImageReduceEnabled as boolean
-        
         -- Set options depending on checkbox
         if netBootImageReduceEnabled is true then
-            
             --Log Action
             set logMe to "NetBoot Reduce by enabled"
             logToFile_(me)
-            
         else
-        
             --Log Action
             set logMe to "NetBoot Reduce option unchecked"
             logToFile_(me)
-            
         end if
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootImageReduceEnabled, "netBootImageReduceEnabled")
-        
     end netBootImageReduce_
 
     -- Bound to "Expand by"
     on netBootImageExpand_(sender)
-        
         -- Set netBootImageExpandEnabled to boolean of value
         set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
-        
         -- Set options depending on checkbox
         if netBootImageExpandEnabled is true then
-            
             --Log Action
             set logMe to "NetBoot expand enabled"
             logToFile_(me)
-            
         else
-            
             --Log Action
             set logMe to "NetBoot expand option unchecked"
             logToFile_(me)
-            
         end if
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootImageExpandEnabled, "netBootImageExpandEnabled")
-        
     end netBootImageExpand_
 
     -- Bound to NetBoot Image Resize value
     on netBootImageExpandEnteredValue_(sender)
-        
         -- Set netBootImageExpandEnabled to boolean of value
         set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
-        
         -- If we're expanding the NetBoot Image
         if netBootImageExpandEnabled is true then
-            
             -- If we have a value
-            if netBootImageExpandValue is equal to missing value
-            
+            if netBootImageExpandValue is equal to ""
                 -- Display error to user
                 display dialog "Please select a value to resize the NetBoot Image or deselect \"Expand By\"" with icon 0 buttons {"OK"}
-                
                 -- Set to false so we don't proceed
                 set closeButtonPreCheckPassed to false
-            
             end if
-        
             -- Update plist with selection
             tell defaults to setObject_forKey_(netBootImageExpandValue, "netBootImageExpandValue")
-            
         end if
-
     end netBootImageExpandEnteredValue_
 
     -- Bound to "Enable ARD"
     on ardOption_(sender)
-        
         -- If false
         if ardEnabled is false then
-            
             -- Update plist with selection
             tell defaults to setObject_forKey_(ardEnabled, "ardEnabled")
-            
             -- ARD details check status
             set ardDetailsCheck to true
- 
         else
-        
             -- Update plist with selection
             tell defaults to setObject_forKey_(ardEnabled, "ardEnabled")
-            
             -- ARD details check status
             set ardDetailsCheck to false
-            
         end if
-        
     end ardOption_
 
     -- Check the value entered in the ARD Username textfield
     on checkardUsername_(sender)
-        
         -- Set to boolean of value
         set ardEnabled to ardEnabled as boolean
-        
         -- If ard enabled
         if ardEnabled is true
-        
             -- If textfield is empty
-            if ardUsername is equal to missing value then
-                
+            if ardUsername is equal to "" then
                 -- Delete ardUsername from plist
                 tell defaults to removeObjectForKey_("ardUsername")
-                
                 -- Display error to user
                 display dialog "Please enter a Username for the ARD user or deselect the ARD option" with icon 0 buttons {"OK"}
-                
                 --Log Action
                 set logMe to "Error: Please enter a Username for the ARD user or deselect the ARD option"
                 logToFile_(me)
-                
                 -- Set to false so we don't proceed
                 set closeButtonPreCheckPassed to false
-                
             else
-                
                 -- Update plist with selection
                 tell defaults to setObject_forKey_(ardUsername, "ardUsername")
-                
                 --Log Action
                 set logMe to "ARD Username written to plist"
                 logToFile_(me)
-                
             end if
-
         end if
-
     end checkardUsername_
 
     -- Check the value entered in the ARD Password textfield
     on checkardPassword_(sender)
-        
         -- Set to boolean of value
         set ardEnabled to ardEnabled as boolean
-        
         -- If ard enabled
         if ardEnabled is true
-        
             -- If textfield is empty
-            if ardPassword is equal to missing value then
-            
+            if ardPassword is equal to "" then
                 -- Delete ardPassword from plist
                 tell defaults to removeObjectForKey_("ardPassword")
-                
                 -- Display error to user
                 display dialog "Please enter a password for the ARD user or deselect the ARD option" with icon 0 buttons {"OK"}
-                
                 --Log Action
                 set logMe to "Error: Please enter a password for the ARD user or deselect the ARD option"
                 logToFile_(me)
-                
                 -- Set to false so we don't proceed
                 set closeButtonPreCheckPassed to false
-                
             else
-                
                 -- Update plist with selection
                 tell defaults to setObject_forKey_(ardPassword, "ardPassword")
-                
                 --Log Action
                 set logMe to "ARD password written to plist"
                 logToFile_(me)
-            
             end if
-            
         end if
-
     end checkardPassword_
 
     -- Bound to "Enable VNC"
@@ -1415,558 +1227,392 @@ script AutoCasperNBIAppDelegate
 
     -- Check the value entered in the vnc Password textfield
     on checkvncPassword_(sender)
-
         -- Set to boolean of value
         set vncEnabled to vncEnabled as boolean
-        
         -- If VNC enabled
         if vncEnabled is true
-        
             -- If textfield is empty
-            if vncPassword is equal to missing value then
-                
+            if vncPassword is equal to "" then
                 -- Delete vncPassword from plist
                 tell defaults to removeObjectForKey_("vncPassword")
-                
                 -- Display error to user
                 display dialog "Please enter a VNC password, or deselect the VNC option" with icon 0 buttons {"OK"}
-                
                 --Log Action
                 set logMe to "Error: Please enter a VNC password, or deselect the VNC option"
                 logToFile_(me)
-                
                 -- Set to false so we don't proceed
                 set closeButtonPreCheckPassed to false
-                
             else
-            
                 -- Set to text of value
                 set vncPassword to vncPassword as text
-                
                 -- If vncPassword's length is more than 8 characters
                 if length of vncPassword is greater than 8
-                
                     -- Delete vncPassword from plist
                     tell defaults to removeObjectForKey_("vncPassword")
-                    
                     -- Display error to user
                     display dialog "Please enter a VNC Password that is less than 8 characters" with icon 0 buttons {"OK"}
-                    
                     --Log Action
                     set logMe to "Error: Please enter a VNC Password that is less than 8 characters"
                     logToFile_(me)
-                    
                     -- Set to false so we don't proceed
                     set closeButtonPreCheckPassed to false
-            
                 else
-            
                     -- Update plist with selection
                     tell defaults to setObject_forKey_(vncPassword, "vncPassword")
-                    
                     --Log Action
                     set logMe to "VNC password written to plist"
                     logToFile_(me)
-
                 end if
-            
             end if
-
         end if
-        
     end checkvncPassword_
 
     -- To load at launch, verifying that we have correct values for ARD & VNC in plist
     on checkPasswords_(sender)
-        
         -- If ARD enabled is set
         if ardEnabled is true then
-            
             -- Get ARD username
             tell defaults to set my ardUsername to objectForKey_("ardUsername")
-            
             -- If we can't get ARD Username,
             if ardUsername is missing value then
-                
                 -- Disable ARD options if pre-reqs are not met
                 ardDisable_(me)
-                
             else
-                
                 -- If No ARD Password
                 if ardPassword is missing value then
-                    
                     -- Disable ARD options if pre-reqs are not met
                     ardDisable_(me)
-                    
                 else
-                    
                     -- Get ARD password from plist
                     tell defaults to set my ardPassword to objectForKey_("ardPassword")
-                    
                 end if
-                
             end if
-            
         end if
-        
         -- If VNC enabled is set
         if vncEnabled is true then
-            
             -- Get VNC password from plist
             tell defaults to set vncPassword to objectForKey_("vncPassword")
-            
             -- If No VNC Password
             if vncPassword is equal to missing value then
-                
                 -- Disable VNC options if pre-reqs are not met
                 vncDisable_(me)
-                
             end if
-            
         end if
-        
     end checkPasswords_
 
     -- Disable ARD options if pre-reqs are not met
     on ardDisable_(sender)
-        
         -- Disable Enabled option
         set ardEnabled to false
-        
         ardOption_(me)
-        
     end ardDisable_
 
     -- Disable VNC options if pre-reqs are not met
     on vncDisable_(sender)
-        
         -- Disable Enabled option
         set vncEnabled to false
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(vncEnabled, "vncEnabled")
-        
     end vncDisable_
 
     -- Bound to "Use a custom desktop image" checkbox, sets plist
     on customDesktopImageSelected_(sender)
-        
         -- Set to variable to boolean
         set customDesktopImageEnabled to customDesktopImageEnabled as boolean
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(customDesktopImageEnabled, "customDesktopImageEnabled")
-        
         if customDesktopImageEnabled is false
-        
             -- Delete desktop image path from plist
             tell defaults to removeObjectForKey_("customDesktopImagePath")
-        
             -- Set lable to blank
-            set my customDesktopImageLabel to missing value
-            
+            set my customDesktopImageLabel to ""
             -- Update plist with selection
             tell defaults to setObject_forKey_(customDesktopImagePath, "customDesktopImagePath")
-            
         end if
-        
     end customDesktopImageSelected_
 
     -- Display a window for the user to select an Desktop Image.
     on selectedDesktopImage_(sender)
-        
         try
-            
             -- Prompt user to chose an Image
             choose file of type {"public.jpeg"} with prompt "Select an Desktop Image:" default location (path to pictures folder)
-            
             -- Set selectedDesktopImagePath to path of OS.dmg given
             set customDesktopImagePath to POSIX path of result
-            
             --Update Label with path
             set my customDesktopImageLabel to "Image Selected: " & customDesktopImagePath
-            
             -- Log path of selected Image
             set logMe to customDesktopImageLabel
-            
             -- Update plist with selection
             tell defaults to setObject_forKey_(customDesktopImagePath, "customDesktopImagePath")
-        
         end
-        
         -- If custom Desktop Image has a value, then check file exists & update error if it does.
         checkDesktopImage_(me)
-        
     end selectedDesktopImage_
 
     -- If custom Desktop Image has a value, then check file exists & update error if it does not.
     on checkDesktopImage_(sender)
-        
         -- Set veriable to boolean
         set customDesktopImageEnabled to customDesktopImageEnabled as boolean
-        
         -- If custom desktop image is selected
         if customDesktopImageEnabled is true
-        
             -- If a custom desktop is selected
-            if customDesktopImagePath is equal to missing value
-                
+            if customDesktopImagePath is equal to ""
                 -- Set to false
                 set customDesktopImageEnabled to false
-                
                 -- Bound to "Use a custom desktop image" checkbox, sets plist
                 customDesktopImageSelected_(me)
-                
             else
-                
                 try
-                    
                     -- Set customDesktopImagePath to value as text
                     set customDesktopImagePath to customDesktopImagePath as text
-                    
                     -- Check for file
                     do shell script "/bin/ls " & quoted form of customDesktopImagePath
-                    
                     -- True if file exists
                     set desktopImageExists to true
-                    
                     -- Update label
                     set my customDesktopImageLabel to "Image Selected: " & customDesktopImagePath
-                    
                 on error
-                    
                     -- Update label
                     set my customDesktopImageLabel to "Cannot Find: " & customDesktopImagePath
-                    
                     -- True if file exists
                     set desktopImageExists to false
-                    
                 end try
-            
             end if
-
         end if
-
     end checkDesktopImage_
 
     -- Check that a custom desktop image has been selected
     on checkcustomDesktopImagePath_(sender)
-        
         -- Set to boolean of value
         set customDesktopImageEnabled to customDesktopImageEnabled as boolean
-        
         -- If ard enabled
         if customDesktopImageEnabled is true
-        
             -- If textfield is empty
             if customDesktopImagePath is equal to missing value then
-                
                 -- Delete customDesktopImagePath from plist
                 tell defaults to removeObjectForKey_("customDesktopImagePath")
-                
                 -- Display error to user
                 display dialog "Please select a Desktop Image or deselect the Desktop Image option" with icon 0 buttons {"OK"}
-                
                 --Log Action
                 set logMe to "Error: Please select a Desktop Image or deselect the Desktop Image option"
                 logToFile_(me)
-                
                 -- Set to false so we don't proceed
                 set closeButtonPreCheckPassed to false
-                
             else
-                
                 -- If custom Desktop Image has a value, then check file exists & update error if it does not.
                 checkDesktopImage_(me)
-                
             end if
         end if
     end checkcustomDesktopImagePath_
 
     -- Bound to Time Server Text field
     on timeServerCheck_(sender)
-        
         -- If textfield is empty
         if timeServerSelected is missing value then
-            
             -- Set netBoot Name
             set my timeServerSelected to "time.apple.com"
-            
             -- Display error to user
             display dialog "Please enter a Time Server" with icon 0 buttons {"OK"}
-            
             --Log Action
             set logMe to "Error: Please enter a Time Server"
             logToFile_(me)
-            
             -- Update plist with selection
             tell defaults to setObject_forKey_(timeServerSelected, "timeServerSelected")
-            
             -- Set to false so we don't proceed
             set closeButtonPreCheckPassed to false
-            
         else
-            
             --Log Action
             set logMe to "Time Server: " & timeServerSelected
             logToFile_(me)
-            
             -- Update plist with selection
             tell defaults to setObject_forKey_(timeServerSelected, "timeServerSelected")
-            
         end if
-        
     end timeServerCheck_
 
     -- Bound to Time Zone drop down
     on timeZone_(sender)
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(timeZoneSelected, "timeZoneSelected")
-        
         --Log Action
         set logMe to "Time Zone selected: " & timeZoneSelected
         logToFile_(me)
-        
     end timeZone_
 
     -- Bound to OS Language drop down
     on netBootLanguage_(sender)
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(languageSelected, "languageSelected")
-        
         --Log Action
         set logMe to "Language Selected: " & languageSelected
         logToFile_(me)
-        
     end netBootLanguage_
 
 
     -- Bound to Input Language drop down
     on inputLanguage_(sender)
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(inputLanguageSelected, "inputLanguageSelected")
-        
         --Log Action
         set logMe to "Input Language Selected: " & inputLanguageSelected
         logToFile_(me)
-        
     end inputLanguage_
 
     -- Bound to "Install modified rc.netboot file" checkbox, sets plist
     on installRCNetBootCheckBox_(sender)
-        
         -- Set to variable to boolean
         set installRCNetBootSelected to installRCNetBootSelected as boolean
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(installRCNetBootSelected, "installRCNetBootSelected")
-        
         --Log Action
         set logMe to "Install rc.netboot set to: " & installRCNetBootSelected
         logToFile_(me)
-        
     end installRCNetBootCheckBox_
 
     -- Bound to "Create Read-Only DMG" checkbox, sets plist
     on createReadOnlyDMGCheckBox_(sender)
-        
         -- Set to variable to boolean
         set createReadOnlyDMG to createReadOnlyDMG as boolean
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(createReadOnlyDMG, "createReadOnlyDMG")
-        
         --Log Action
         set logMe to "Create a ReadOnly DMG set to: " & createReadOnlyDMG
         logToFile_(me)
-        
     end createReadOnlyDMGCheckBox_
 
     -- Bound to "Enable Simple Finder" checkbox, sets plist
     on simpleFinderCheckBox_(sender)
-        
         -- Set to variable to boolean
         set simpleFinderEnabled to simpleFinderEnabled as boolean
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(simpleFinderEnabled, "simpleFinderEnabled")
-        
         --Log Action
         set logMe to "Enable Simple Finder set to : " & simpleFinderEnabled
         logToFile_(me)
-        
     end simpleFinderCheckBox_
 
     -- Check additional Certs array, & amend accordingly
     on checkAdditionalCerts_(sender)
         -- For prompting later
         set certsMissing to false
-        -- Check if set before
-        if additionalCerts is not equal to missing value then
+        -- Check to see if list has a value
+        if my additionalCerts as string is not equal to "" then
             -- Set variable to list
             set additionalCerts to additionalCerts as list
+            try
+                -- Empty array
+                (additionalCertsArray's removeObjects:(additionalCertsArray's arrangedObjects()))
+                -- For each item in array
+                repeat with selectedCertsPath in additionalCerts
+                    try
+                        -- Check for file
+                        do shell script "ls " & quoted form of selectedCertsPath
+                        -- Set text to black
+                        set selectedCertsColour to current application's NSColor's blackColor()
+                        -- Add to array
+                        (additionalCertsArray's addObject:{certPath:selectedCertsPath, certPathColour:selectedCertsColour})
+                    on error
+                        -- Get array's value of missing item
+                        set certList to {certPathColour:selectedCertsColour, certPath:selectedCertsPath}
+                        -- Remove from Array
+                        (additionalCertsArray's removeObject:certList)
+                        -- Set Text to red
+                        set my selectedCertsColour to current application's NSColor's redColor()
+                        -- Add to array
+                        (additionalCertsArray's addObject:{certPath:selectedCertsPath, certPathColour:selectedCertsColour})
+                        -- For prompting later
+                        set certsMissing to true
+                    end try
+                end repeat
+            end try
         end if
-        try
-            -- Empty array
-            (additionalCertsArray's removeObjects:(additionalCertsArray's arrangedObjects()))
-            -- For each item in array
-            repeat with selectedCertsPath in additionalCerts
-                try
-                    -- Check for file
-                    do shell script "ls " & quoted form of selectedCertsPath
-                    -- Set text to black
-                    set selectedCertsColour to current application's NSColor's blackColor()
-                    -- Add to array
-                    (additionalCertsArray's addObject:{certPath:selectedCertsPath, certPathColour:selectedCertsColour})
-                on error
-                    -- Get array's value of missing item
-                    set certList to {certPathColour:selectedCertsColour, certPath:selectedCertsPath}
-                    -- Remove from Array
-                    (additionalCertsArray's removeObject:certList)
-                    -- Set Text to red
-                    set my selectedCertsColour to current application's NSColor's redColor()
-                    -- Add to array
-                    (additionalCertsArray's addObject:{certPath:selectedCertsPath, certPathColour:selectedCertsColour})
-                    -- For prompting later
-                    set certsMissing to true
-                end try
-            end repeat
-        end try
     end checkAdditionalCerts_
 
     -- Add Cert selected by user
     on selectCert_(sender)
-        
         -- Reset text colour
         set selectedCertsColour to current application's NSColor's blackColor()
-        
         try
-            
             -- Prompt user to select
             choose file of type {"public.x509-certificate"} with prompt "Select a Certificate to add:" default location (path to desktop folder)
-            
             -- Get path of the item selected
             set my selectedCertsPath to POSIX path of result
-            
             -- Do not add if a duplicate, also make sure we have a value or we'll error
-            if additionalCerts is equal to missing value
-            
+            if additionalCerts as string is equal to missing value
                 -- If we're missing value
                 set certList to selectedCertsPath
-                
             else
-                
                 -- Set variable to list
                 set certList to additionalCerts as list
-                
                 -- Verify that we're not adding a duplicate
                 if certList does not contain selectedCertsPath then
-                
                     -- Add to end of list
                     set end of certList to selectedCertsPath
                 else
-                
                     display dialog "The Cert " & selectedCertsPath & " has already been added." with icon 2 buttons {"OK"}
-                    
                 end if
-                
             end if
-        
             -- Add to array
             (additionalCertsArray's addObject:{certPath:selectedCertsPath})
-            
             -- Update plist with selection
             tell defaults to setObject_forKey_(certList, "additionalCerts")
-            
             -- Update variable
             tell defaults to set my additionalCerts to objectForKey_("additionalCerts") as list
-            
             -- Check additional Certs array, & amend accordingly
             checkAdditionalCerts_(me)
-        
         end try
-
     end selectCert_
 
     -- Remove Selected Cert
     on deleteCert_(sender)
-        
         -- Get selected object
         tell additionalCertsArray to set my selectedObjects to selectedObjects()
-        
         -- Remove from array
         tell additionalCertsArray to removeObjects:selectedObjects
-        
         -- Set variable
         set certList to (theCerts's valueForKey:"certPath") as list
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(certList, "additionalCerts") as list
-        
         -- Get value from plist
         tell defaults to set my additionalCerts to objectForKey_("additionalCerts")
-        
     end deleteCert_
 
     -- Check additional pkgs array, & amend accordingly
     on checkAdditionalPKGs_(sender)
-        
         -- For prompting later
         set pkgsMissing to false
-        
-        -- Check if set before
-        if additionalPKGs is not equal to missing value then
-            
+        -- Check to see if list has a value
+        if my additionalPKGs as string is not equal to "" then
             -- Set variable to list
             set additionalPKGs to additionalPKGs as list
-            
+            try
+                -- Empty array
+                (additionalPKGsArray's removeObjects:(additionalPKGsArray's arrangedObjects()))
+                -- For each item in array
+                repeat with selectedPKGsPath in additionalPKGs
+                    if my selectedPKGsPath as string is not "" then
+                        try
+                            -- Check for file
+                            do shell script "ls " & quoted form of selectedPKGsPath
+                            -- Set text to black
+                            set selectedPKGsColour to current application's NSColor's blackColor()
+                            -- Add to array
+                            (additionalPKGsArray's addObject:{pkgPath:selectedPKGsPath, pkgPathColour:selectedPKGsColour})
+                        on error
+                            -- Get array's value of missing item
+                            set pkgList to {pkgPathColour:selectedPKGsColour, pkgPath:selectedPKGsPath}
+                            -- Remove from Array
+                            (additionalPKGsArray's removeObject:pkgList)
+                            -- Set Text to red
+                            set my selectedPKGsColour to current application's NSColor's redColor()
+                            -- Add to array
+                            (additionalPKGsArray's addObject:{pkgPath:selectedPKGsPath, pkgPathColour:selectedPKGsColour})
+                            -- For prompting later
+                            set pkgsMissing to true
+                        end try
+                    end if
+                end repeat
+            end try
         end if
-        
-        try
-            
-            -- Empty array
-            (additionalPKGsArray's removeObjects:(additionalPKGsArray's arrangedObjects()))
-            
-            -- For each item in array
-            repeat with selectedPKGsPath in additionalPKGs
-                
-                try
-                    -- Check for file
-                    do shell script "ls " & quoted form of selectedPKGsPath
-                    
-                    -- Set text to black
-                    set selectedPKGsColour to current application's NSColor's blackColor()
-                    
-                    -- Add to array
-                    (additionalPKGsArray's addObject:{pkgPath:selectedPKGsPath, pkgPathColour:selectedPKGsColour})
-                    
-                on error
-                
-                    -- Get array's value of missing item
-                    set pkgList to {pkgPathColour:selectedPKGsColour, pkgPath:selectedPKGsPath}
-                    
-                    -- Remove from Array
-                    (additionalPKGsArray's removeObject:pkgList)
-                    
-                    -- Set Text to red
-                    set my selectedPKGsColour to current application's NSColor's redColor()
-                    
-                    -- Add to array
-                    (additionalPKGsArray's addObject:{pkgPath:selectedPKGsPath, pkgPathColour:selectedPKGsColour})
-                    
-                    -- For prompting later
-                    set pkgsMissing to true
-                    
-                end try
-                
-            end repeat
-            
-        end try
-        
     end checkAdditionalPKGs_
 
     -- Add PKG selected by user
@@ -1999,10 +1645,9 @@ script AutoCasperNBIAppDelegate
             tell defaults to setObject_forKey_(pkgList, "additionalPKGs")
             -- Update variable
             tell defaults to set my additionalPKGs to objectForKey_("additionalPKGs") as list
-            -- Check additional Certs array, & amend accordingly
+            -- Check additional pkgs array, & amend accordingly
             checkAdditionalPKGs_(me)
         end try
-
     end selectPKG_
 
     -- Remove Selected PKG
@@ -2221,7 +1866,7 @@ script AutoCasperNBIAppDelegate
                 set freeSpaceOnVolume to freeSpaceOnVolume * 1000
             end if
             --Log Action
-            set logMe to "The volume /" & selectedVolume & " has " & freeSpaceOnVolume & "GB free, rounding down"
+            set logMe to "The volume " & selectedVolume & " has " & freeSpaceOnVolume & "GB free, rounding down"
             logToFile_(me)
             -- Get the space needed
             set spaceNeeded to netBootDmgRequiredSize
@@ -2274,12 +1919,14 @@ script AutoCasperNBIAppDelegate
 
     -- Check that selected files exist
     on checkFiles_(sender)
+        -- Reset variable
+        set my buildPreCheckPassed to true
         -- If custom desktop image is selected
         if customDesktopImageEnabled is true
             -- Bound to "Use a custom desktop image" checkbox, sets plist
             customDesktopImageSelected_(me)
             -- If a custom desktop is selected
-            if customDesktopImagePath is equal to missing value
+            if customDesktopImagePath is missing value then
                 -- Set to false
                 set customDesktopImageEnabled to false
                 -- Bound to "Use a custom desktop image" checkbox, sets plist
@@ -2302,7 +1949,7 @@ script AutoCasperNBIAppDelegate
                     -- Update label
                     set my customDesktopImageLabel to "Image Selected: " & customDesktopImagePath
                     -- Create the .nbi folder
-                    netBootLocationCreate_(me)
+                    --netBootLocationCreate_(me)
                 on error
                     -- Update label
                     set my customDesktopImageLabel to "Cannot Find: " & customDesktopImagePath
@@ -2312,8 +1959,10 @@ script AutoCasperNBIAppDelegate
                         --Log Action
                         set logMe to "User chose not to proceed as missing Desktop Image"
                         logToFile_(me)
+                        -- Set to false
+                        set my buildPreCheckPassed to false
                         -- Detach mounted volumes
-                        tidyUpTimeKids_(me)
+                        --tidyUpTimeKids_(me)
                     else
                         --Log Action
                         set logMe to "User chose to proceed with a missing Desktop Image"
@@ -2321,7 +1970,7 @@ script AutoCasperNBIAppDelegate
                         -- True if file exists
                         set desktopImageExists to false
                         -- Create the .nbi folder
-                        netBootLocationCreate_(me)
+                        --netBootLocationCreate_(me)
                     end if
                 end try
             end if
@@ -2341,6 +1990,8 @@ script AutoCasperNBIAppDelegate
             set my userNotifyError to "Error: One or more additional Certificates & Packages are missing."
             -- Notify of errors or success
             userNotify_(me)
+            -- Set to false
+            set my buildPreCheckPassed to false
         else if certsMissing is true then
             --Log Action
             set logMe to "Error: One or more additional Certificates are missing."
@@ -2351,6 +2002,8 @@ script AutoCasperNBIAppDelegate
             set my userNotifyError to "Error: One or more additional Certificates are missing."
             -- Notify of errors or success
             userNotify_(me)
+            -- Set to false
+            set my buildPreCheckPassed to false
         else if pkgsMissing is true then
             --Log Action
             set logMe to "Error: One or more additional Packages are missing."
@@ -2361,10 +2014,18 @@ script AutoCasperNBIAppDelegate
             set my userNotifyError to "Error: One or more additional Packages are missing."
             -- Notify of errors or success
             userNotify_(me)
+            -- Set to false
+            set my buildPreCheckPassed to false
         else
-            -- Create the .nbi folder
-            netBootLocationCreate_(me)
         end if
+    -- Build pre check is has been passed.
+    if buildPreCheckPassed is true then
+        -- Create the .nbi folder
+        netBootLocationCreate_(me)
+    else
+        -- Detach mounted volumes
+        tidyUpTimeKids_(me)
+    end if
     end checkFiles_
 
 ----- BUILD -----
@@ -2459,18 +2120,18 @@ script AutoCasperNBIAppDelegate
             set netBootNameTextField to netBootNameTextField as text
             
             -- If we're building an OS newer than 10.9
-            if selectedOSdmgVersionMajor is greater than 9
+           -- if selectedOSdmgVersionMajor is greater than 9
             
                 -- Create the NetBoot.dmg
                 do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot -size " & netBootDmgRequiredSize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"GPTSPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
             
-            else
+            --else
             
                 -- Create the NetBoot.dmg
-                do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot -size " & netBootDmgRequiredSize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
+              --  do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot -size " & netBootDmgRequiredSize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
             
             
-            end if
+           -- end if
             
             --Log action
             set logMe to "Successfully created NetBoot.dmg in " & quoted form of netBootDirectory
@@ -3634,8 +3295,8 @@ script AutoCasperNBIAppDelegate
             set logMe to "App Nap disabled"
             logToFile_(me)
             
-            -- Copy the com.apple.PowerManagement.plist used by SIU
-            copyPowerManagementPlist_(me)
+            -- Disable Screen Saver
+            disableScreenSaver_(me)
             
         on error
             
@@ -3656,11 +3317,10 @@ script AutoCasperNBIAppDelegate
         
     end disableAppNap_
 
-    -- Copy the com.apple.PowerManagement.plist used by SIU
-    on copyPowerManagementPlist_(sender)
+    -- Disable Screen Saver
+    on disableScreenSaver_(sender)
         
         -- Update Build Process Window's Text Field
-        --set my buildProcessTextField to "Copying com.apple.PowerManagement.plist"
         set my buildProcessTextField to "Disabling screensaver"
         
         delay 0.1
@@ -3669,17 +3329,6 @@ script AutoCasperNBIAppDelegate
         set my buildProccessProgressBar to 170
         
         try
-            
-            --Log Action
-           -- set logMe to "Copying com.apple.PowerManagement.plist"
-            --logToFile_(me)
-        
-            -- Copy the plist
-            --do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/com.apple.PowerManagement.plist " & quoted form of netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            --Log Action
-            --set logMe to "Copied com.apple.PowerManagement.plist"
-            --logToFile_(me)
            
             --Log Action
             set logMe to "Disabling screensaver"
@@ -3736,7 +3385,7 @@ script AutoCasperNBIAppDelegate
                 set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Settings/ARDUser.plist"
                 
                 -- Encode ardUsername
-                set ardUsernameEncoded to do shell script "/bin/echo " & ardUsername & " | openssl base64 "
+                set ardUsernameEncoded to do shell script "/bin/echo " & quoted form of ardUsername & " | openssl base64 "
                 
                 --Log Action
                 set logMe to "ARD Username encoded"
@@ -3750,7 +3399,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Encode ardPassword
-                set ardPasswordEncoded to do shell script "/bin/echo " & ardPassword & " | openssl base64 "
+                set ardPasswordEncoded to do shell script "/bin/echo " & quoted form of ardPassword & " | openssl base64 "
                 
                 --Log Action
                 set logMe to "ARD Password encoded"
@@ -3821,7 +3470,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 
                 -- Write hashed vncPassword to /Library/Preferences/com.apple.VNCSettings.txt on .nbi
-                do shell script "/bin/echo " & vncPassword & " | perl -we 'BEGIN { @k = unpack \"C*\", pack \"H*\", \"1734516E8BA8C5E2FF1C39567390ADCA\"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack \"C*\", $_; foreach (@k) { printf \"%02X\", $_ ^ (shift @p || 0) }; print \"
+                do shell script "/bin/echo " & quoted form of vncPassword & " | perl -we 'BEGIN { @k = unpack \"C*\", pack \"H*\", \"1734516E8BA8C5E2FF1C39567390ADCA\"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack \"C*\", $_; foreach (@k) { printf \"%02X\", $_ ^ (shift @p || 0) }; print \"
                 \"' | sudo tee " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
                 
                 --Log Action
@@ -4344,59 +3993,40 @@ script AutoCasperNBIAppDelegate
 
     -- Write the Casper Imaging plist
     on writeCasperImagingPlist_(sender)
-        
         try
-            
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Writing Casper Imaging plist"
-            
             delay 0.1
-            
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 240
-            
             -- JSS Plist location on mounted volume
             set variableVariable to netBootDmgMountPath & "/private/var/root/Library/Preferences/com.jamfsoftware.jss.plist"
-            
             -- Write Casper Imaging plist to allow invalid cert,
             do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " allowInvalidCertificate -bool true" user name adminUserName password adminUsersPassword with administrator privileges
-            
             -- Log Action
             set logMe to "com.jamfsoftware.jss.plist created & allow invalid certificate set"
             logToFile_(me)
-            
             -- If a JSS URL is specified
-            if jssURL is not equal missing value
-            
+            if jssURL is not ""
                 -- Write JSS URL to plist,
                 do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " url -string " & jssURL user name adminUserName password adminUsersPassword with administrator privileges
-      
                 --Log Action
                 set logMe to "plist updated with JSS url"
                 logToFile_(me)
-            
             end if
-            
             -- Install CasperImagingLaunchAgent
             installCasperImagingLaunchAgent_(me)
-                
         on error
-            
             --Log Action
-            set logMe to "Error: Installing the Casper Imaging plist"
+            set logMe to "Error: Writing the Casper Imaging plist"
             logToFile_(me)
-            
             -- Set to false to display
             set my userNotifyErrorHidden to false
-            
             -- Set Error message
-            set my userNotifyError to "Error: Installing the Casper Imaging plist"
-            
+            set my userNotifyError to "Error: Writing the Casper Imaging plist"
             -- Notify of errors or success
             userNotify_(me)
-            
         end try
-
     end writeCasperImagingPlist_
 
     -- Install CasperImagingLaunchAgent
@@ -4454,66 +4084,48 @@ script AutoCasperNBIAppDelegate
 
     -- Get JSS CA Cert if JSS URL given
     on importJSSCACert_(sender)
-        
         -- If a JSS URL is specified
-        if jssURL is not equal missing value
-        
+        if jssURL is not equal to "" then
             try
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Downloading JSS CA Cert"
-            
                 delay 0.1
-                
                 -- Update build Process ProgressBar
                 set my buildProccessProgressBar to 260
-                
                 -- Application Support location on TempOSdmg for installing at boot
                 set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Certificates/"
-                
                 -- Log Action
                 set logMe to "Downloading JSS CA Cert for " & jssURL
                 logToFile_(me)
-                
                 -- Download CA Cert from JSS to /Library/Application Support/AutoCasperNBI/Certificates/UUID
                 do shell script "curl -k -o " & quoted form of variableVariable & tempUUID & ".cer " & jssURL & "/CA/SCEP?operation=getcacert" user name adminUserName password adminUsersPassword with administrator privileges
-         
                 -- Log Action
                 set logMe to "Downloaded JSS CA Cert to " & quoted form of variableVariable
                 logToFile_(me)
-                
                 -- Add any additional certs if specified
                 importAdditionalCerts_(me)
-                
             on error
-            
                 --Log Action
                 set logMe to "Error: Importing JSS CA Cert"
                 logToFile_(me)
-            
                 -- Set to false to display
                 set my userNotifyErrorHidden to false
-                
                 -- Set Error message
                 set my userNotifyError to "Error: Importing JSS CA Cert"
-                
                 -- Notify of errors or success
                 userNotify_(me)
-                
             end try
-        
         else
-
             -- Add any additional certs if specified
             importAdditionalCerts_(me)
-
         end if
-
     end importJSSCACert_
 
     -- Add any additional certs if specified
     on importAdditionalCerts_(sender)
         -- If we're importing certs
-        if additionalCerts is not missing value then
+        --if additionalCerts is not {}
+        if my additionalCerts as string is not equal to "" then
                 try
                     -- Update Build Process Window's Text Field
                     set my buildProcessTextField to "Copying Additional Certs"
@@ -4574,8 +4186,8 @@ script AutoCasperNBIAppDelegate
                 --Log Action
                 set logMe to "Simple Finder enabled"
                 logToFile_(me)
-                -- Set the language of the .nbi
-                setNetBootLanguage_(me)
+                -- Disable Fast User Switching
+                disableFastUserSwitching_(me)
             on error
                 --Log Action
                 set logMe to "Error: Enabling Simple Finder"
@@ -4588,376 +4200,373 @@ script AutoCasperNBIAppDelegate
                 userNotify_(me)
             end try
         else
-            -- Set the language of the .nbi
-            setNetBootLanguage_(me)
+            -- Disable Fast User Switching
+            disableFastUserSwitching_(me)
         end if
     end enableSimpleFinder_
 
+    -- Disable Fast User Switching
+    on disableFastUserSwitching_(sender)
+        try
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Disabling Fast User Switching"
+            delay 0.1
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 275
+            --Log Action
+            set logMe to "Trying disable Fast User Switching"
+            logToFile_(me)
+            -- Enable Simple Finder
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/.GlobalPreferences MultipleSessionEnabled -bool NO" user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "Fast User Switching disabled"
+            logToFile_(me)
+            -- Set the language of the .nbi
+            setNetBootLanguage_(me)
+            on error
+            --Log Action
+            set logMe to "Error: Disabling Fast User Switching"
+            logToFile_(me)
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+            -- Set Error message
+            set my userNotifyError to "Error: Disabling Fast User Switching"
+            -- Notify of errors or success
+            userNotify_(me)
+        end try
+    end disableFastUserSwitching_
+
     -- Set the language of the .nbi
     on setNetBootLanguage_(sender)
-        
         try
-            
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Setting NetBoot's OS Language"
-            
             delay 0.1
-            
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 280
-            
             --Log Action
             set logMe to "Getting language code for selected language " & languageSelected
             logToFile_(me)
-            
             -- Language codes taken from /System/Library/PrivateFrameworks/IntlPreferences.framework/Versions/A/Resources/Languages.strings
-            
             -- Set to text of value
             set languageSelected to languageSelected as text
-            
             -- Get Language code from languages selected (code is after : in the drop down).
             set languageCode to text ((offset of ":" in languageSelected) + 2) thru -1 of languageSelected
-            
             --Log Action
             set logMe to "Language Code is: " & languageCode
             logToFile_(me)
-            
             --Log Action
             set logMe to "Trying to set NetBoot's OS Language"
             logToFile_(me)
-            
             -- Set Language
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/.GlobalPreferences.plist AppleLanguages -array " & quoted form of languageCode & " en fr de \"zh-Hans\" \"zh-Hant\" ja es it nl ko pt \"pt-PT\" da fi nb sv ru pl tr ar th cs hu ca hr el he ro sk uk id ms vi" user name adminUserName password adminUsersPassword with administrator privileges
-            
             --Log Action
             set logMe to "NetBoot's OS Language set"
             logToFile_(me)
-            
             -- Set the NetBoot's Input Language
             setNetBootInputLanguage_(me)
-            
         on error
-            
             --Log Action
             set logMe to "Error: Setting NetBoot's Language"
             logToFile_(me)
-            
             -- Set to false to display
             set my userNotifyErrorHidden to false
-            
             -- Set Error message
             set my userNotifyError to "Error: Setting NetBoot's Language"
-            
             -- Notify of errors or success
             userNotify_(me)
-            
         end try
-        
     end setNetBootLanguage_
 
     -- Set the NetBoot's Input Language
     on setNetBootInputLanguage_(sender)
-        
         try
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Setting NetBoot's Input Language"
-                
-                delay 0.1
-                
-                -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 285
-                
-                --Log Action
-                set logMe to "Trying to get input layout id for: " & inputLanguageSelected
-                logToFile_(me)
-            
-                -- Set to text of value
-                set inputLanguageSelected to inputLanguageSelected as text
-                
-                -- Set Keyboard ID depending on Input Language.
-                if inputLanguageSelected is equal to "Afghan Dari" then
-                    set inputLayoutID to "-2092"
-                    else if inputLanguageSelected is equal to "Afghan Pashto" then
-                    set inputLayoutID to "-2094"
-                    else if inputLanguageSelected is equal to "Afghan Uzbek" then
-                    set inputLayoutID to "-2093"
-                    else if inputLanguageSelected is equal to "Arabic" then
-                    set inputLayoutID to "-17920"
-                    else if inputLanguageSelected is equal to "Arabic PC" then
-                    set inputLayoutID to "-17921"
-                    else if inputLanguageSelected is equal to "Arabic-QWERTY" then
-                    set inputLayoutID to "-18000"
-                    else if inputLanguageSelected is equal to "Armenian-HM QWERTY" then
-                    set inputLayoutID to "-28161"
-                    else if inputLanguageSelected is equal to "Armenian-Western QWERTY" then
-                    set inputLayoutID to "-28164"
-                    else if inputLanguageSelected is equal to "Australian" then
-                    set inputLayoutID to "15"
-                    else if inputLanguageSelected is equal to "Austrian" then
-                    set inputLayoutID to "92"
-                    else if inputLanguageSelected is equal to "Azeri" then
-                    set inputLayoutID to "-49"
-                    else if inputLanguageSelected is equal to "Bangla" then
-                    set inputLayoutID to "-22528"
-                    else if inputLanguageSelected is equal to "Bangla-QWERTY" then
-                    set inputLayoutID to "-22529"
-                    else if inputLanguageSelected is equal to "Belgian" then
-                    set inputLayoutID to "6"
-                    else if inputLanguageSelected is equal to "Brazilian" then
-                    set inputLayoutID to "71"
-                    else if inputLanguageSelected is equal to "British" then
-                    set inputLayoutID to "2"
-                    else if inputLanguageSelected is equal to "British-PC" then
-                    set inputLayoutID to "250"
-                    else if inputLanguageSelected is equal to "Bulgarian" then
-                    set inputLayoutID to "19528"
-                    else if inputLanguageSelected is equal to "Bulgarian - Phonetic" then
-                    set inputLayoutID to "19529"
-                    else if inputLanguageSelected is equal to "Byelorussian" then
-                    set inputLayoutID to "19517"
-                    else if inputLanguageSelected is equal to "Canadian" then
-                    set inputLayoutID to "29"
-                    else if inputLanguageSelected is equal to "Canadian - CSA" then
-                    set inputLayoutID to "80"
-                    else if inputLanguageSelected is equal to "Cherokee-Nation" then
-                    set inputLayoutID to "-26112"
-                    else if inputLanguageSelected is equal to "Cherokee-QWERTY" then
-                    set inputLayoutID to "-26113"
-                    else if inputLanguageSelected is equal to "Czech-QWERTY" then
-                    set inputLayoutID to "30778"
-                    else if inputLanguageSelected is equal to "Devanagari" then
-                    set inputLayoutID to "20480"
-                    else if inputLanguageSelected is equal to "Devanagari-QWERTY" then
-                    set inputLayoutID to "-20481"
-                    else if inputLanguageSelected is equal to "Dutch" then
-                    set inputLayoutID to "26"
-                    else if inputLanguageSelected is equal to "Dvorak" then
-                    set inputLayoutID to "16300"
-                    else if inputLanguageSelected is equal to "Dvorak - Left" then
-                    set inputLayoutID to "16302"
-                    else if inputLanguageSelected is equal to "DVORAK - QWERTY CMD" then
-                    set inputLayoutID to "16301"
-                    else if inputLanguageSelected is equal to "Dvorak - Right" then
-                    set inputLayoutID to "16303"
-                    else if inputLanguageSelected is equal to "Estonian" then
-                    set inputLayoutID to "30764"
-                    else if inputLanguageSelected is equal to "Faroese" then
-                    set inputLayoutID to "-47"
-                    else if inputLanguageSelected is equal to "Finnish" then
-                    set inputLayoutID to "17"
-                    else if inputLanguageSelected is equal to "FinnishExtended" then
-                    set inputLayoutID to "-17"
-                    else if inputLanguageSelected is equal to "FinnishSami-PC" then
-                    set inputLayoutID to "-18"
-                    else if inputLanguageSelected is equal to "French" then
-                    set inputLayoutID to "1"
-                    else if inputLanguageSelected is equal to "French-numerical" then
-                    set inputLayoutID to "1111"
-                    else if inputLanguageSelected is equal to "Georgian-QWERTY" then
-                    set inputLayoutID to "-27650"
-                    else if inputLanguageSelected is equal to "German" then
-                    set inputLayoutID to "3"
-                    else if inputLanguageSelected is equal to "Greek" then
-                    set inputLayoutID to "-18944"
-                    else if inputLanguageSelected is equal to "Greek Polytonic" then
-                    set inputLayoutID to "-18945"
-                    else if inputLanguageSelected is equal to "Gujarati" then
-                    set inputLayoutID to "-21504"
-                    else if inputLanguageSelected is equal to "Gujarati-QWERTY" then
-                    set inputLayoutID to "-21505"
-                    else if inputLanguageSelected is equal to "Gurmukhi" then
-                    set inputLayoutID to "-20992"
-                    else if inputLanguageSelected is equal to "Gurmukhi-QWERTY" then
-                    set inputLayoutID to "-20993"
-                    else if inputLanguageSelected is equal to "Hawaiian" then
-                    set inputLayoutID to "-50"
-                    else if inputLanguageSelected is equal to "Hebrew" then
-                    set inputLayoutID to "-18432"
-                    else if inputLanguageSelected is equal to "Hebrew-PC" then
-                    set inputLayoutID to "-18433"
-                    else if inputLanguageSelected is equal to "Hebrew-QWERTY" then
-                    set inputLayoutID to "-18500"
-                    else if inputLanguageSelected is equal to "Hungarian" then
-                    set inputLayoutID to "30763"
-                    else if inputLanguageSelected is equal to "Icelandic" then
-                    set inputLayoutID to "-21"
-                    else if inputLanguageSelected is equal to "Inuktitut-Nunavut" then
-                    set inputLayoutID to "-30604"
-                    else if inputLanguageSelected is equal to "Inuktitut-Nutaaq" then
-                    set inputLayoutID to "-30602"
-                    else if inputLanguageSelected is equal to "Inuktitut-QWERTY" then
-                    set inputLayoutID to "-30600"
-                    else if inputLanguageSelected is equal to "Inuttitut Nunavik" then
-                    set inputLayoutID to "-30603"
-                    else if inputLanguageSelected is equal to "Irish" then
-                    set inputLayoutID to "50"
-                    else if inputLanguageSelected is equal to "Irish Extended" then
-                    set inputLayoutID to "-500"
-                    else if inputLanguageSelected is equal to "Italian" then
-                    set inputLayoutID to "4"
-                    else if inputLanguageSelected is equal to "Italian - Pro" then
-                    set inputLayoutID to "223"
-                    else if inputLanguageSelected is equal to "Jawi-QWERTY" then
-                    set inputLayoutID to "-19000"
-                    else if inputLanguageSelected is equal to "Kannada" then
-                    set inputLayoutID to "-24064"
-                    else if inputLanguageSelected is equal to "Kannada-QWERTY" then
-                    set inputLayoutID to "-24065"
-                    else if inputLanguageSelected is equal to "Kazakh" then
-                    set inputLayoutID to "-19501"
-                    else if inputLanguageSelected is equal to "Khmer" then
-                    set inputLayoutID to "-26114"
-                    else if inputLanguageSelected is equal to "Kurdish-Sorani" then
-                    set inputLayoutID to "-17926"
-                    else if inputLanguageSelected is equal to "Latvian" then
-                    set inputLayoutID to "30765"
-                    else if inputLanguageSelected is equal to "Lithuanian" then
-                    set inputLayoutID to "30761"
-                    else if inputLanguageSelected is equal to "Macedonian" then
-                    set inputLayoutID to "19523"
-                    else if inputLanguageSelected is equal to "Malayalam" then
-                    set inputLayoutID to "-24576"
-                    else if inputLanguageSelected is equal to "Malayalam-QWERTY" then
-                    set inputLayoutID to "-24577"
-                    else if inputLanguageSelected is equal to "Maltese" then
-                    set inputLayoutID to "-501"
-                    else if inputLanguageSelected is equal to "Maori" then
-                    set inputLayoutID to "-51"
-                    else if inputLanguageSelected is equal to "Myanmar-QWERTY" then
-                    set inputLayoutID to "-25601"
-                    else if inputLanguageSelected is equal to "Nepali" then
-                    set inputLayoutID to "-20484"
-                    else if inputLanguageSelected is equal to "Northern Sami" then
-                    set inputLayoutID to "-1200"
-                    else if inputLanguageSelected is equal to "Norwegian" then
-                    set inputLayoutID to "12"
-                    else if inputLanguageSelected is equal to "Norwegian Extended" then
-                    set inputLayoutID to "-12"
-                    else if inputLanguageSelected is equal to "NorwegianSami-PC" then
-                    set inputLayoutID to "-13"
-                    else if inputLanguageSelected is equal to "Oriya" then
-                    set inputLayoutID to "-22016"
-                    else if inputLanguageSelected is equal to "Oriya-QWERTY" then
-                    set inputLayoutID to "-22017"
-                    else if inputLanguageSelected is equal to "Persian" then
-                    set inputLayoutID to "--17960"
-                    else if inputLanguageSelected is equal to "Persian-ISIRI 2901" then
-                    set inputLayoutID to "-2901"
-                    else if inputLanguageSelected is equal to "Persian-QWERTY" then
-                    set inputLayoutID to "-1959"
-                    else if inputLanguageSelected is equal to "Polish" then
-                    set inputLayoutID to "30762"
-                    else if inputLanguageSelected is equal to "Polish Pro" then
-                    set inputLayoutID to "30788"
-                    else if inputLanguageSelected is equal to "Portuguese" then
-                    set inputLayoutID to "10"
-                    else if inputLanguageSelected is equal to "Romanian" then
-                    set inputLayoutID to "-39"
-                    else if inputLanguageSelected is equal to "Romanian-Standard" then
-                    set inputLayoutID to "-38"
-                    else if inputLanguageSelected is equal to "Russian" then
-                    set inputLayoutID to "19456"
-                    else if inputLanguageSelected is equal to "RussianWin" then
-                    set inputLayoutID to "19458"
-                    else if inputLanguageSelected is equal to "Russian - Phonetic" then
-                    set inputLayoutID to "19457"
-                    else if inputLanguageSelected is equal to "Sami-PC" then
-                    set inputLayoutID to "-1201"
-                    else if inputLanguageSelected is equal to "Serbian" then
-                    set inputLayoutID to "19521"
-                    else if inputLanguageSelected is equal to "Serbian-Latin" then
-                    set inputLayoutID to "-19521"
-                    else if inputLanguageSelected is equal to "Sinhala" then
-                    set inputLayoutID to "-25088"
-                    else if inputLanguageSelected is equal to "Sinhala-QWERTY" then
-                    set inputLayoutID to "-25089"
-                    else if inputLanguageSelected is equal to "Slovak" then
-                    set inputLayoutID to "30777"
-                    else if inputLanguageSelected is equal to "Slovak-QWERTY" then
-                    set inputLayoutID to "30779"
-                    else if inputLanguageSelected is equal to "Slovenian" then
-                    set inputLayoutID to "-66"
-                    else if inputLanguageSelected is equal to "Spanish" then
-                    set inputLayoutID to "8"
-                    else if inputLanguageSelected is equal to "Spanish - ISO" then
-                    set inputLayoutID to "87"
-                    else if inputLanguageSelected is equal to "Swedish" then
-                    set inputLayoutID to "224"
-                    else if inputLanguageSelected is equal to "Swedish - Pro" then
-                    set inputLayoutID to "7"
-                    else if inputLanguageSelected is equal to "SwedishSami-PC" then
-                    set inputLayoutID to "-15"
-                    else if inputLanguageSelected is equal to "Swiss French" then
-                    set inputLayoutID to "18"
-                    else if inputLanguageSelected is equal to "Swiss German" then
-                    set inputLayoutID to "19"
-                    else if inputLanguageSelected is equal to "Telugu" then
-                    set inputLayoutID to "-23552"
-                    else if inputLanguageSelected is equal to "Telugu-QWERTY" then
-                    set inputLayoutID to "-23553"
-                    else if inputLanguageSelected is equal to "Thai" then
-                    set inputLayoutID to "-26624"
-                    else if inputLanguageSelected is equal to "Thai-PattaChote" then
-                    set inputLayoutID to "-226626"
-                    else if inputLanguageSelected is equal to "TibetanOtaniUS" then
-                    set inputLayoutID to "-26628"
-                    else if inputLanguageSelected is equal to "Tibetan-QWERTY" then
-                    set inputLayoutID to "-26625"
-                    else if inputLanguageSelected is equal to "Tibetan-Wylie" then
-                    set inputLayoutID to "-2398"
-                    else if inputLanguageSelected is equal to "Turkish" then
-                    set inputLayoutID to "-24"
-                    else if inputLanguageSelected is equal to "Turkish-QWERTY" then
-                    set inputLayoutID to "-35"
-                    else if inputLanguageSelected is equal to "Turkish-QWERTY-PC" then
-                    set inputLayoutID to "-36"
-                    else if inputLanguageSelected is equal to "Ukrainian" then
-                    set inputLayoutID to "19518"
-                    else if inputLanguageSelected is equal to "UnicodeHexInput" then
-                    set inputLayoutID to "-1"
-                    else if inputLanguageSelected is equal to "Urdu" then
-                    set inputLayoutID to "--17925"
-                    else if inputLanguageSelected is equal to "U.S." then
-                    set inputLayoutID to "0"
-                    else if inputLanguageSelected is equal to "US Extended" then
-                    set inputLayoutID to "-2"
-                    else if inputLanguageSelected is equal to "USInternational-PC" then
-                    set inputLayoutID to "15000"
-                    else if inputLanguageSelected is equal to "Uyghur" then
-                    set inputLayoutID to "-27000"
-                    else if inputLanguageSelected is equal to "Vietnamese" then
-                    set inputLayoutID to "-31232"
-                    else if inputLanguageSelected is equal to "Welsh" then
-                    set inputLayoutID to "-790"
-                end if
-                
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Setting NetBoot's Input Language"
+            delay 0.1
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 285
+            --Log Action
+            set logMe to "Trying to get input layout id for: " & inputLanguageSelected
+            logToFile_(me)
+            -- Set to text of value
+            set inputLanguageSelected to inputLanguageSelected as text
+            -- Set Keyboard ID depending on Input Language.
+            if inputLanguageSelected is equal to "Afghan Dari" then
+                set inputLayoutID to "-2092"
+                else if inputLanguageSelected is equal to "Afghan Pashto" then
+                set inputLayoutID to "-2094"
+                else if inputLanguageSelected is equal to "Afghan Uzbek" then
+                set inputLayoutID to "-2093"
+                else if inputLanguageSelected is equal to "Arabic" then
+                set inputLayoutID to "-17920"
+                else if inputLanguageSelected is equal to "Arabic PC" then
+                set inputLayoutID to "-17921"
+                else if inputLanguageSelected is equal to "Arabic-QWERTY" then
+                set inputLayoutID to "-18000"
+                else if inputLanguageSelected is equal to "Armenian-HM QWERTY" then
+                set inputLayoutID to "-28161"
+                else if inputLanguageSelected is equal to "Armenian-Western QWERTY" then
+                set inputLayoutID to "-28164"
+                else if inputLanguageSelected is equal to "Australian" then
+                set inputLayoutID to "15"
+                else if inputLanguageSelected is equal to "Austrian" then
+                set inputLayoutID to "92"
+                else if inputLanguageSelected is equal to "Azeri" then
+                set inputLayoutID to "-49"
+                else if inputLanguageSelected is equal to "Bangla" then
+                set inputLayoutID to "-22528"
+                else if inputLanguageSelected is equal to "Bangla-QWERTY" then
+                set inputLayoutID to "-22529"
+                else if inputLanguageSelected is equal to "Belgian" then
+                set inputLayoutID to "6"
+                else if inputLanguageSelected is equal to "Brazilian" then
+                set inputLayoutID to "71"
+                else if inputLanguageSelected is equal to "British" then
+                set inputLayoutID to "2"
+                else if inputLanguageSelected is equal to "British-PC" then
+                set inputLayoutID to "250"
+                else if inputLanguageSelected is equal to "Bulgarian" then
+                set inputLayoutID to "19528"
+                else if inputLanguageSelected is equal to "Bulgarian - Phonetic" then
+                set inputLayoutID to "19529"
+                else if inputLanguageSelected is equal to "Byelorussian" then
+                set inputLayoutID to "19517"
+                else if inputLanguageSelected is equal to "Canadian" then
+                set inputLayoutID to "29"
+                else if inputLanguageSelected is equal to "Canadian - CSA" then
+                set inputLayoutID to "80"
+                else if inputLanguageSelected is equal to "Cherokee-Nation" then
+                set inputLayoutID to "-26112"
+                else if inputLanguageSelected is equal to "Cherokee-QWERTY" then
+                set inputLayoutID to "-26113"
+                else if inputLanguageSelected is equal to "Czech-QWERTY" then
+                set inputLayoutID to "30778"
+                else if inputLanguageSelected is equal to "Devanagari" then
+                set inputLayoutID to "20480"
+                else if inputLanguageSelected is equal to "Devanagari-QWERTY" then
+                set inputLayoutID to "-20481"
+                else if inputLanguageSelected is equal to "Dutch" then
+                set inputLayoutID to "26"
+                else if inputLanguageSelected is equal to "Dvorak" then
+                set inputLayoutID to "16300"
+                else if inputLanguageSelected is equal to "Dvorak - Left" then
+                set inputLayoutID to "16302"
+                else if inputLanguageSelected is equal to "DVORAK - QWERTY CMD" then
+                set inputLayoutID to "16301"
+                else if inputLanguageSelected is equal to "Dvorak - Right" then
+                set inputLayoutID to "16303"
+                else if inputLanguageSelected is equal to "Estonian" then
+                set inputLayoutID to "30764"
+                else if inputLanguageSelected is equal to "Faroese" then
+                set inputLayoutID to "-47"
+                else if inputLanguageSelected is equal to "Finnish" then
+                set inputLayoutID to "17"
+                else if inputLanguageSelected is equal to "FinnishExtended" then
+                set inputLayoutID to "-17"
+                else if inputLanguageSelected is equal to "FinnishSami-PC" then
+                set inputLayoutID to "-18"
+                else if inputLanguageSelected is equal to "French" then
+                set inputLayoutID to "1"
+                else if inputLanguageSelected is equal to "French-numerical" then
+                set inputLayoutID to "1111"
+                else if inputLanguageSelected is equal to "Georgian-QWERTY" then
+                set inputLayoutID to "-27650"
+                else if inputLanguageSelected is equal to "German" then
+                set inputLayoutID to "3"
+                else if inputLanguageSelected is equal to "Greek" then
+                set inputLayoutID to "-18944"
+                else if inputLanguageSelected is equal to "Greek Polytonic" then
+                set inputLayoutID to "-18945"
+                else if inputLanguageSelected is equal to "Gujarati" then
+                set inputLayoutID to "-21504"
+                else if inputLanguageSelected is equal to "Gujarati-QWERTY" then
+                set inputLayoutID to "-21505"
+                else if inputLanguageSelected is equal to "Gurmukhi" then
+                set inputLayoutID to "-20992"
+                else if inputLanguageSelected is equal to "Gurmukhi-QWERTY" then
+                set inputLayoutID to "-20993"
+                else if inputLanguageSelected is equal to "Hawaiian" then
+                set inputLayoutID to "-50"
+                else if inputLanguageSelected is equal to "Hebrew" then
+                set inputLayoutID to "-18432"
+                else if inputLanguageSelected is equal to "Hebrew-PC" then
+                set inputLayoutID to "-18433"
+                else if inputLanguageSelected is equal to "Hebrew-QWERTY" then
+                set inputLayoutID to "-18500"
+                else if inputLanguageSelected is equal to "Hungarian" then
+                set inputLayoutID to "30763"
+                else if inputLanguageSelected is equal to "Icelandic" then
+                set inputLayoutID to "-21"
+                else if inputLanguageSelected is equal to "Inuktitut-Nunavut" then
+                set inputLayoutID to "-30604"
+                else if inputLanguageSelected is equal to "Inuktitut-Nutaaq" then
+                set inputLayoutID to "-30602"
+                else if inputLanguageSelected is equal to "Inuktitut-QWERTY" then
+                set inputLayoutID to "-30600"
+                else if inputLanguageSelected is equal to "Inuttitut Nunavik" then
+                set inputLayoutID to "-30603"
+                else if inputLanguageSelected is equal to "Irish" then
+                set inputLayoutID to "50"
+                else if inputLanguageSelected is equal to "Irish Extended" then
+                set inputLayoutID to "-500"
+                else if inputLanguageSelected is equal to "Italian" then
+                set inputLayoutID to "4"
+                else if inputLanguageSelected is equal to "Italian - Pro" then
+                set inputLayoutID to "223"
+                else if inputLanguageSelected is equal to "Jawi-QWERTY" then
+                set inputLayoutID to "-19000"
+                else if inputLanguageSelected is equal to "Kannada" then
+                set inputLayoutID to "-24064"
+                else if inputLanguageSelected is equal to "Kannada-QWERTY" then
+                set inputLayoutID to "-24065"
+                else if inputLanguageSelected is equal to "Kazakh" then
+                set inputLayoutID to "-19501"
+                else if inputLanguageSelected is equal to "Khmer" then
+                set inputLayoutID to "-26114"
+                else if inputLanguageSelected is equal to "Kurdish-Sorani" then
+                set inputLayoutID to "-17926"
+                else if inputLanguageSelected is equal to "Latvian" then
+                set inputLayoutID to "30765"
+                else if inputLanguageSelected is equal to "Lithuanian" then
+                set inputLayoutID to "30761"
+                else if inputLanguageSelected is equal to "Macedonian" then
+                set inputLayoutID to "19523"
+                else if inputLanguageSelected is equal to "Malayalam" then
+                set inputLayoutID to "-24576"
+                else if inputLanguageSelected is equal to "Malayalam-QWERTY" then
+                set inputLayoutID to "-24577"
+                else if inputLanguageSelected is equal to "Maltese" then
+                set inputLayoutID to "-501"
+                else if inputLanguageSelected is equal to "Maori" then
+                set inputLayoutID to "-51"
+                else if inputLanguageSelected is equal to "Myanmar-QWERTY" then
+                set inputLayoutID to "-25601"
+                else if inputLanguageSelected is equal to "Nepali" then
+                set inputLayoutID to "-20484"
+                else if inputLanguageSelected is equal to "Northern Sami" then
+                set inputLayoutID to "-1200"
+                else if inputLanguageSelected is equal to "Norwegian" then
+                set inputLayoutID to "12"
+                else if inputLanguageSelected is equal to "Norwegian Extended" then
+                set inputLayoutID to "-12"
+                else if inputLanguageSelected is equal to "NorwegianSami-PC" then
+                set inputLayoutID to "-13"
+                else if inputLanguageSelected is equal to "Oriya" then
+                set inputLayoutID to "-22016"
+                else if inputLanguageSelected is equal to "Oriya-QWERTY" then
+                set inputLayoutID to "-22017"
+                else if inputLanguageSelected is equal to "Persian" then
+                set inputLayoutID to "--17960"
+                else if inputLanguageSelected is equal to "Persian-ISIRI 2901" then
+                set inputLayoutID to "-2901"
+                else if inputLanguageSelected is equal to "Persian-QWERTY" then
+                set inputLayoutID to "-1959"
+                else if inputLanguageSelected is equal to "Polish" then
+                set inputLayoutID to "30762"
+                else if inputLanguageSelected is equal to "Polish Pro" then
+                set inputLayoutID to "30788"
+                else if inputLanguageSelected is equal to "Portuguese" then
+                set inputLayoutID to "10"
+                else if inputLanguageSelected is equal to "Romanian" then
+                set inputLayoutID to "-39"
+                else if inputLanguageSelected is equal to "Romanian-Standard" then
+                set inputLayoutID to "-38"
+                else if inputLanguageSelected is equal to "Russian" then
+                set inputLayoutID to "19456"
+                else if inputLanguageSelected is equal to "RussianWin" then
+                set inputLayoutID to "19458"
+                else if inputLanguageSelected is equal to "Russian - Phonetic" then
+                set inputLayoutID to "19457"
+                else if inputLanguageSelected is equal to "Sami-PC" then
+                set inputLayoutID to "-1201"
+                else if inputLanguageSelected is equal to "Serbian" then
+                set inputLayoutID to "19521"
+                else if inputLanguageSelected is equal to "Serbian-Latin" then
+                set inputLayoutID to "-19521"
+                else if inputLanguageSelected is equal to "Sinhala" then
+                set inputLayoutID to "-25088"
+                else if inputLanguageSelected is equal to "Sinhala-QWERTY" then
+                set inputLayoutID to "-25089"
+                else if inputLanguageSelected is equal to "Slovak" then
+                set inputLayoutID to "30777"
+                else if inputLanguageSelected is equal to "Slovak-QWERTY" then
+                set inputLayoutID to "30779"
+                else if inputLanguageSelected is equal to "Slovenian" then
+                set inputLayoutID to "-66"
+                else if inputLanguageSelected is equal to "Spanish" then
+                set inputLayoutID to "8"
+                else if inputLanguageSelected is equal to "Spanish - ISO" then
+                set inputLayoutID to "87"
+                else if inputLanguageSelected is equal to "Swedish" then
+                set inputLayoutID to "224"
+                else if inputLanguageSelected is equal to "Swedish - Pro" then
+                set inputLayoutID to "7"
+                else if inputLanguageSelected is equal to "SwedishSami-PC" then
+                set inputLayoutID to "-15"
+                else if inputLanguageSelected is equal to "Swiss French" then
+                set inputLayoutID to "18"
+                else if inputLanguageSelected is equal to "Swiss German" then
+                set inputLayoutID to "19"
+                else if inputLanguageSelected is equal to "Telugu" then
+                set inputLayoutID to "-23552"
+                else if inputLanguageSelected is equal to "Telugu-QWERTY" then
+                set inputLayoutID to "-23553"
+                else if inputLanguageSelected is equal to "Thai" then
+                set inputLayoutID to "-26624"
+                else if inputLanguageSelected is equal to "Thai-PattaChote" then
+                set inputLayoutID to "-226626"
+                else if inputLanguageSelected is equal to "TibetanOtaniUS" then
+                set inputLayoutID to "-26628"
+                else if inputLanguageSelected is equal to "Tibetan-QWERTY" then
+                set inputLayoutID to "-26625"
+                else if inputLanguageSelected is equal to "Tibetan-Wylie" then
+                set inputLayoutID to "-2398"
+                else if inputLanguageSelected is equal to "Turkish" then
+                set inputLayoutID to "-24"
+                else if inputLanguageSelected is equal to "Turkish-QWERTY" then
+                set inputLayoutID to "-35"
+                else if inputLanguageSelected is equal to "Turkish-QWERTY-PC" then
+                set inputLayoutID to "-36"
+                else if inputLanguageSelected is equal to "Ukrainian" then
+                set inputLayoutID to "19518"
+                else if inputLanguageSelected is equal to "UnicodeHexInput" then
+                set inputLayoutID to "-1"
+                else if inputLanguageSelected is equal to "Urdu" then
+                set inputLayoutID to "--17925"
+                else if inputLanguageSelected is equal to "U.S." then
+                set inputLayoutID to "0"
+                else if inputLanguageSelected is equal to "US Extended" then
+                set inputLayoutID to "-2"
+                else if inputLanguageSelected is equal to "USInternational-PC" then
+                set inputLayoutID to "15000"
+                else if inputLanguageSelected is equal to "Uyghur" then
+                set inputLayoutID to "-27000"
+                else if inputLanguageSelected is equal to "Vietnamese" then
+                set inputLayoutID to "-31232"
+                else if inputLanguageSelected is equal to "Welsh" then
+                set inputLayoutID to "-790"
+            end if
             --Log Action
             set logMe to "Keyboard Layout ID set to " & inputLayoutID
             logToFile_(me)
-
             --Log Action
             set logMe to "Trying to set NetBoot's Input Language"
             logToFile_(me)
-            
             -- Set variableVariables's value
             set variableVariable to quoted form of ("com.apple.keylayout." & inputLanguageSelected)
-            
             --Remove Spaces from variableVariable
             repeat with letters in variableVariable
                 if letters does not contain " " then
                     set my keyboardLayoutInputSourceID to keyboardLayoutInputSourceID & letters
                 end if
             end repeat
-            
             -- Set Source ID
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleCurrentKeyboardLayoutInputSourceID " & keyboardLayoutInputSourceID user name adminUserName password adminUsersPassword with administrator privileges
-            
             -- Set Ascii Input Source
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleDefaultAsciiInputSource -dict InputSourceKind \"Keyboard Layout\" \"KeyboardLayout ID\" -int " & quoted form of inputLayoutID & " \"KeyboardLayout Name\" " & quoted form of inputLanguageSelected user name adminUserName password adminUsersPassword with administrator privileges
-
             -- reset variable
             set variableVariable to ""
-            
             -- Add a \ if a space is found
             repeat with letters in inputLanguageSelected
                 if letters contains " " then
@@ -4967,46 +4576,35 @@ script AutoCasperNBIAppDelegate
                     set variableVariable to variableVariable & letters
                 end if
             end repeat
-            
             -- Set Enabled Input Sources
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleEnabledInputSources -array '{ InputSourceKind = \"Keyboard Layout\"; \"KeyboardLayout ID\" = " & quoted form of inputLayoutID & "; \"KeyboardLayout Name\" = \"" & variableVariable & "\"; }'" user name adminUserName password adminUsersPassword with administrator privileges
-
             -- Set Input Source History
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleInputSourceHistory -array '{ InputSourceKind = \"Keyboard Layout\"; \"KeyboardLayout ID\" = " & quoted form of inputLayoutID & "; \"KeyboardLayout Name\" = \"" & variableVariable & "\"; }'" user name adminUserName password adminUsersPassword with administrator privileges
-            
             -- Set Selected Input Sources
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources -array '{ InputSourceKind = \"Keyboard Layout\"; \"KeyboardLayout ID\" = " & quoted form of inputLayoutID & "; \"KeyboardLayout Name\" = \"" & variableVariable & "\"; }'" user name adminUserName password adminUsersPassword with administrator privileges
-            
             --Log Action
             set logMe to "NetBoot's Input Language set"
             logToFile_(me)
-            
             -- Add any additional pkgs if specified
             installAdditionalPKGs_(me)
-
         on error
-
             --Log Action
             set logMe to "Error: Setting NetBoot's Input Language"
             logToFile_(me)
-
             -- Set to false to display
             set my userNotifyErrorHidden to false
-
             -- Set Error message
             set my userNotifyError to "Error: Setting NetBoot's Input Language"
-
             -- Notify of errors or success
             userNotify_(me)
-
         end try
-        
     end setNetBootInputLanguage_
 
     -- Add any additional pkgs if specified
     on installAdditionalPKGs_(sender)
         -- If we're installing additional PKGs
-        if additionalPKGs is not missing value then
+        --if additionalPKGs is not missing value then
+        if my additionalCerts as string is not equal to "" then
             try
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Installing Additional PKGs"
@@ -5139,61 +4737,35 @@ script AutoCasperNBIAppDelegate
 
     ---- Reduce NetBoot Image
     on createReducedNetBootImage_(sedner)
-        
-        -- Update Build Process Window's Text Field
-        set my buildProcessTextField to "Creating a smaller NetBoot.dmg"
-        
-        delay 0.1
-        
-        -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 310
-        
-        --Log action
-        set logMe to "Trying to create NetBoot.reduced.dmg in " & netBootDirectory
-        logToFile_(me)
-        
-        -- Set to text value, to avoid an issue when name changed
-        set netBootNameTextField to netBootNameTextField as text
-        
         try
-            
-            -- If we're building an OS newer than 10.9
-            if selectedOSdmgVersionMajor is greater than 9
-            
-                -- Create the NetBoot.dmg
-                do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot.reduced -size " & netBootDmgResize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"GPTSPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            else
-            
-                -- Create the NetBoot.dmg
-                do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot.reduced -size " & netBootDmgResize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"SPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
-            
-            end if
-            
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Creating a smaller NetBoot.dmg"
+            delay 0.1
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 310
+            --Log action
+            set logMe to "Trying to create NetBoot.reduced.dmg in " & netBootDirectory
+            logToFile_(me)
+            -- Set to text value, to avoid an issue when name changed
+            set netBootNameTextField to netBootNameTextField as text
+            -- Create the NetBoot.dmg
+            do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot.reduced -size " & netBootDmgResize & "g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"GPTSPUD\" -fs \"HFS+\" -stretch 500g" user name adminUserName password adminUsersPassword with administrator privileges
             --Log action
             set logMe to "Successfully created NetBoot.reduced.dmg in " & quoted form of netBootDirectory
             logToFile_(me)
-            
             -- Mount the NetBoot.dmg
             mountReducedNetBootDmg_(me)
-            
         on error
-            
             --Log Action
             set logMe to "Error: Failed to create NetBoot.reduced.dmg"
             logToFile_(me)
-            
             -- Set to false to display
             set my userNotifyErrorHidden to false
-            
             -- Set Error message
             set my userNotifyError to "Error: Failed to create NetBoot.reduced.dmg"
-            
             -- Notify of errors or success
             userNotify_(me)
-            
         end try
-        
     end createReducedNetBootImage_
 
     -- Mount the NetBoot.reduced.dmg
@@ -5602,50 +5174,35 @@ script AutoCasperNBIAppDelegate
 
     -- Create dlyd shared cache files
     on createDlydCaches_(sender)
-
         try
-            
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Creating dyld shared cache files"
-            
             delay 0.1
-            
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 370
-            
             --Log Action
             set logMe to "Creating dyld shared cache files on: " & netBootDmgMountPath
             logToFile_(me)
-            
-            do shell script "/usr/bin/update_dyld_shared_cache -root " & quoted form of netBootDmgMountPath & " -universal_boot -force" user name adminUserName password adminUsersPassword with administrator privileges
-            
+            -- Update dylyd cache, this can error on success.
+            try
+                do shell script "/usr/bin/update_dyld_shared_cache -root " & quoted form of netBootDmgMountPath & " -universal_boot -force" user name adminUserName password adminUsersPassword with administrator privileges
+            end try
             --Log Action
             set logMe to "Successfully created dyld caches"
             logToFile_(me)
-            
             -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
             manualKernelCacheReductionCheck_(me)
-            
-            -- Reduce Kernel cache if we're on 10.9.0 - .3
-            --reduceKernelCache_(me)
-            
         on error
-        
             --Log Action
             set logMe to "Error: Creating dyld shared cache files"
             logToFile_(me)
-        
             -- Set to false to display
             set my userNotifyErrorHidden to false
-            
             -- Set Error message
             set my userNotifyError to "Error: Creating dyld shared cache files"
-            
             -- Notify of errors or success
             userNotify_(me)
-            
         end try
-        
     end createDlydCaches
 
     -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
@@ -6350,14 +5907,14 @@ script AutoCasperNBIAppDelegate
             set logMe to "Set ownership to root:staff on " & netBootDirectory & "/NBImageInfo.plist"
             logToFile_(me)
 
-            ---- Revert NBImageInfo.plist permissionchanges ----
+            ---- Revert NBImageInfo.plist permission changes ----
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Changing permissions on NBImageInfo.plist"
 
             delay 0.1
 
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 455
+            set my buildProccessProgressBar to 454
 
             --Log Action
             set logMe to "Trying to correct permissions on " & netBootDirectory & "/NBImageInfo.plist"
@@ -6368,6 +5925,27 @@ script AutoCasperNBIAppDelegate
 
             --Log Action
             set logMe to "Set permissons on " & netBootDirectory & "/NBImageInfo.plist to 644"
+            logToFile_(me)
+
+
+            ---- Convert NBImageInfo.plist to xml ----
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Converting NBImageInfo.plist to xml"
+
+            delay 0.1
+
+            -- Update build Process ProgressBar
+            set my buildProccessProgressBar to 456
+
+            --Log Action
+            set logMe to "Trying to convert " & netBootDirectory & "/NBImageInfo.plist to xml"
+            logToFile_(me)
+
+            -- Making NBImageInfo.plist writable
+            do shell script "/usr/bin/plutil -convert xml1 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+
+            --Log Action
+            set logMe to "Converted " & netBootDirectory & "/NBImageInfo.plist to xml"
             logToFile_(me)
 
             -- Create Read Only DMG
