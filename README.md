@@ -4,7 +4,6 @@
 <url>https://macmule.com/AutoCasperNBI</url><br>
 <br>
 <b>KNOWN ISSUES</b><br>
--- Ampersand characters do not seem to correctly write to NBI for ARD User creation.<br>
 -- Yosemite DMGs are around 1GB larger than 10.7-10.9<br>
 <br>
 <b>VERSIONS</b>
