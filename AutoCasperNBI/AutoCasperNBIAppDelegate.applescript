@@ -6,7 +6,7 @@
 --  Copyright (c) 2014 macmule. All rights reserved.
 --
 
-script AutoCasperNBIAppDelegatel
+script AutoCasperNBIAppDelegate
 
 --- PROPERTIES ---
 
