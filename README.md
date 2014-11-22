@@ -10,7 +10,7 @@
 <br>
 1.0.2<br>
 <br>
-- Added “LastSeenBuddyBuildVersion” to skip diagnostics prompt on 10.10.1 <br>
+Added “LastSeenBuddyBuildVersion” to skip diagnostics prompt on 10.10.1 <br>
 https://github.com/macmule/AutoCasperNBI/issues/8<br>
 <br>
 1.0.1<br>
