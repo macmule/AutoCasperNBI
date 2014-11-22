@@ -3150,6 +3150,9 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             -- Write LastSeenCloudProductVersion to com.apple.SetupAssistant
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist LastSeenCloudProductVersion " & quoted form of selectedOSdmgVersion user name adminUserName password adminUsersPassword with administrator privileges
+            -- Write LastSeenBuddyBuild to com.apple.SetupAssistant
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist LastSeenBuddyBuildVersion " & quoted form of selectedOSdmgVersion user name adminUserName password adminUsersPassword with administrator privileges
+            
             --Log Action
             set logMe to "LastSeenCloudProductVersion " & quoted form of selectedOSdmgVersion & " written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
             logToFile_(me)
