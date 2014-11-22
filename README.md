@@ -9,12 +9,10 @@
 <b>VERSIONS</b>
 <br>
 1.0.2<br>
-<br>
 — Added “LastSeenBuddyBuildVersion” to skip diagnostics prompt on 10.10.1 <br>
 https://github.com/macmule/AutoCasperNBI/issues/8<br>
 <br>
 1.0.1<br>
-<br>
 — Fixes an issue with a blank value added to the additionalPKGs array.<br>
 https://github.com/macmule/AutoCasperNBI/issues/1<br>
 — Fixes the invalid declaration of the additionalCerts array<br>
