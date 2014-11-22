@@ -23,6 +23,7 @@ script AutoCasperNBIAppDelegate
     property selectedOSdmgPath : ""
     property selectedOSdmgMountPath : ""
     property selectedOSdmgVersion : ""
+    property selectedOSBuilddmgVersion : ""
     property selectedAppPath : ""
     property selectedAppTextField : ""
     property selectedAppBundleName : ""
@@ -521,9 +522,9 @@ script AutoCasperNBIAppDelegate
             -- If a dmg, mount & try & read /System/Library/CoreServices/SystemVersion.plist
             try
                 -- Try & get OS version
-                set selectedOSdmgVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedOSdmgMountPath & "/System/Library/CoreServices/SystemVersion.plist ProductVersion"
+                set my selectedOSdmgVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedOSdmgMountPath & "/System/Library/CoreServices/SystemVersion.plist ProductVersion"
                 -- Try & get build version
-                set selectedOSBuilddmgVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedOSdmgMountPath & "/System/Library/CoreServices/SystemVersion.plist ProductBuildVersion"
+                set my selectedOSBuilddmgVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedOSdmgMountPath & "/System/Library/CoreServices/SystemVersion.plist ProductBuildVersion"
                 -- If we have both OS & build versions, display them
                 set my selectedOSDMGTextField to "Mac OS " & selectedOSdmgVersion & " (" & selectedOSBuilddmgVersion & ")"
                 -- Reset OSDMG Icons
@@ -1589,7 +1590,7 @@ script AutoCasperNBIAppDelegate
                 (additionalPKGsArray's removeObjects:(additionalPKGsArray's arrangedObjects()))
                 -- For each item in array
                 repeat with selectedPKGsPath in additionalPKGs
-                    if my selectedPKGsPath as string is not "" then
+                    --if my selectedPKGsPath as string is not "" then
                         try
                             -- Check for file
                             do shell script "ls " & quoted form of selectedPKGsPath
@@ -1609,7 +1610,7 @@ script AutoCasperNBIAppDelegate
                             -- For prompting later
                             set pkgsMissing to true
                         end try
-                    end if
+                    --end if
                 end repeat
             end try
         end if
@@ -3134,12 +3135,29 @@ script AutoCasperNBIAppDelegate
             delay 0.1
             -- Update build Process ProgressBar
             set my buildProccessProgressBar to 140
+            --Log Action
+            set logMe to "Bypassing iCloud Setup Assistants"
+            logToFile_(me)
             -- Write DidSeeCloudSetup to com.apple.SetupAssistant
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist DidSeeCloudSetup -bool true" user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "DidSeeCloudSetup true, written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
+            logToFile_(me)
             -- Write GestureMovieSeen to com.apple.SetupAssistant
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist GestureMovieSeen none" user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "GestureMovieSeen none, written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
+            logToFile_(me)
             -- Write LastSeenCloudProductVersion to com.apple.SetupAssistant
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist LastSeenCloudProductVersion " & quoted form of selectedOSdmgVersion user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "LastSeenCloudProductVersion " & quoted form of selectedOSdmgVersion & " written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
+            logToFile_(me)
+            -- Write LastSeenBuddyBuildVersion to com.apple.SetupAssistant
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant LastSeenBuddyBuildVersion " & quoted form of selectedOSBuilddmgVersion user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "LastSeenBuddyBuildVersion " & quoted form of selectedOSBuilddmgVersion & " written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
+            logToFile_(me)
             --Log Action
             set logMe to "iCloud Bypass options written to " & netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.SetupAssistant.plist"
             logToFile_(me)
