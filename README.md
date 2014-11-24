@@ -8,9 +8,12 @@
 <br>
 <b>VERSIONS</b>
 <br>
-1.0.2<br>
-— Added “LastSeenBuddyBuildVersion” to skip diagnostics prompt on 10.10.1 <br>
-https://github.com/macmule/AutoCasperNBI/issues/8<br>
+<br>1.1.3<br>
+<br>Fixes an issue where additional PKG’s are only installed if certs are added too.<br>
+<br>Corrects the Error message when failing during installing Additional PKGs.<br>
+<br>1.1.2<br>
+- Version number structure changed from 1.xx.x to 1.x.xx. In future x.x releases will be major changes, x.x.x will be minor or bug fixes.<br>
+- Added “LastSeenBuddyBuildVersion” to skip diagnostics prompt on 10.10.1 https://github.com/macmule/AutoCasperNBI/issues/8<br>
 <br>
 1.0.1<br>
 — Fixes an issue with a blank value added to the additionalPKGs array.<br>
