@@ -4622,7 +4622,7 @@ script AutoCasperNBIAppDelegate
     on installAdditionalPKGs_(sender)
         -- If we're installing additional PKGs
         --if additionalPKGs is not missing value then
-        if my additionalCerts as string is not equal to "" then
+        if my additionalPKGs as string is not equal to "" then
             try
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Installing Additional PKGs"
@@ -4643,14 +4643,14 @@ script AutoCasperNBIAppDelegate
                 getNetBootDmgSize_(me)
             on error
                 --Log Action
-                set logMe to "Error: Copying Additional PKG(s)"
+                set logMe to "Error: Installing Additional PKG(s)"
                 logToFile_(me)
                 
                 -- Set to false to display
                 set my userNotifyErrorHidden to false
                 
                 -- Set Error message
-                set my userNotifyError to "Error: Copying Additional PKG(s)"
+                set my userNotifyError to "Error: Installing Additional PKG(s)"
                 
                 -- Notify of errors or success
                 userNotify_(me)
