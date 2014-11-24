@@ -9,21 +9,21 @@
 <b>VERSIONS</b>
 <br>
 <br>1.1.3<br>
-<br>Fixes an issue where additional PKG’s are only installed if certs are added too.<br>
-<br>Corrects the Error message when failing during installing Additional PKGs.<br>
+-- Fixes an issue where additional PKG’s are only installed if certs are added too.<br>
+-- Corrects the Error message when failing during installing Additional PKGs.<br>
 <br>1.1.2<br>
-- Version number structure changed from 1.xx.x to 1.x.xx. In future x.x releases will be major changes, x.x.x will be minor or bug fixes.<br>
-- Added “LastSeenBuddyBuildVersion” to skip diagnostics prompt on 10.10.1 https://github.com/macmule/AutoCasperNBI/issues/8<br>
+-- Version number structure changed from 1.xx.x to 1.x.xx. In future x.x releases will be major changes, x.x.x will be minor or bug fixes.<br>
+-- Added “LastSeenBuddyBuildVersion” to skip diagnostics prompt on 10.10.1 https://github.com/macmule/AutoCasperNBI/issues/8<br>
 <br>
 1.0.1<br>
-— Fixes an issue with a blank value added to the additionalPKGs array.<br>
+-- Fixes an issue with a blank value added to the additionalPKGs array.<br>
 https://github.com/macmule/AutoCasperNBI/issues/1<br>
-— Fixes the invalid declaration of the additionalCerts array<br>
+-- Fixes the invalid declaration of the additionalCerts array<br>
 https://github.com/macmule/AutoCasperNBI/issues/5<br>
-— Fixes an issue where ARD password would not be written correctly if<br>
+-- Fixes an issue where ARD password would not be written correctly if<br>
 some characters are used<br>
 https://github.com/macmule/AutoCasperNBI/issues/2<br>
-— NBImageInfo.plist is now converted to xml for use on non-OSX NetBoot<br>
+-- NBImageInfo.plist is now converted to xml for use on non-OSX NetBoot<br>
 servers https://github.com/macmule/AutoCasperNBI/issues/3<br>
 <br>
 1.0<br>
