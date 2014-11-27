@@ -8,6 +8,8 @@
 <br>
 <b>VERSIONS</b>
 <br>
+<br>1.1.4<br>
+— Fixes an where changing the NetBoot Image Index field. Results in the error "Maximum Exceeded - Please provide a valid value "https://github.com/macmule/AutoCasperNBI/issues/12"<br>
 <br>1.1.3<br>
 -- Fixes an issue where additional PKG’s are only installed if certs are added too.<br>
 -- Corrects the Error message when failing during installing Additional PKGs.<br>
