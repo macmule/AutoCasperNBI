@@ -925,31 +925,22 @@ script AutoCasperNBIAppDelegate
         
         -- Set netBootImageIndexLoadBalanced to boolean of value
         set servedFromNetSUS to servedFromNetSUS as boolean
-        
         -- If true, remove spaces from NetBoot Name
         if servedFromNetSUS is true then
-            
             -- Set netBootNameTextField to text of value
             set my netBootNameTextField to netBootNameTextField as text
-
             -- Remove spaces from NetBoot Name
             set my netBootNameTextField to words of netBootNameTextField as string
-            
             --Log Action
             set logMe to "NetBoot Name: " & netBootNameTextField
             logToFile_(me)
-
         else
-        
             --Log Action
             set logMe to "NetBoot Name: " & netBootNameTextField
             logToFile_(me)
-            
         end if
-        
         -- Update plist with selection
         tell defaults to setObject_forKey_(servedFromNetSUS, "servedFromNetSUS")
-        
     end servedFromNetSUS
             
     -- Bound to "Will be served from more than one server"
@@ -962,15 +953,15 @@ script AutoCasperNBIAppDelegate
             set logMe to "NetBoot is to be hosted on multiple servers."
             logToFile_(me)
             -- Set min & max values for Index
-            set netBootImageIndexMinValue to 4096 as integer
-            set netBootImageIndexMaxValue to 65535 as integer
+            set my netBootImageIndexMinValue to 4096 as integer
+            set my netBootImageIndexMaxValue to 65535 as integer
         else
             --Log Action
             set logMe to "NetBoot is to be hosted on a single server."
             logToFile_(me)
             -- Set min & max values for Index
-            set netBootImageIndexMinValue to 1 as integer
-            set netBootImageIndexMaxValue to 4095 as integer
+            set my netBootImageIndexMinValue to 1 as integer
+            set my netBootImageIndexMaxValue to 4095 as integer
         end if
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootImageIndexLoadBalanced, "netBootImageIndexLoadBalanced")
