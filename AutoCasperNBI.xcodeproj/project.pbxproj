@@ -11,6 +11,8 @@
 		7C07F19319F10B5E00314193 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C07F19219F10B5E00314193 /* Sparkle.framework */; };
 		7C07F19519F10BA600314193 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7C07F19219F10B5E00314193 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7C07F19719F10C8B00314193 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7C07F19619F10C8B00314193 /* dsa_pub.pem */; };
+		7C0E1A281A700D8E0008ED3C /* Casper Imaging.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C0E1A261A700D8E0008ED3C /* Casper Imaging.icns */; };
+		7C0E1A291A700D8E0008ED3C /* JSS.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C0E1A271A700D8E0008ED3C /* JSS.icns */; };
 		7C13057F193FC0B60060F343 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C13057E193FC0B60060F343 /* Cocoa.framework */; };
 		7C130581193FC0B60060F343 /* AppleScriptObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C130580193FC0B60060F343 /* AppleScriptObjC.framework */; };
 		7C13058B193FC0B60060F343 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7C130589193FC0B60060F343 /* InfoPlist.strings */; };
@@ -73,6 +75,8 @@
 		7C06F40619DA19680057D6ED /* 10.8+root.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = "10.8+root.plist"; sourceTree = "<group>"; };
 		7C07F19219F10B5E00314193 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		7C07F19619F10C8B00314193 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
+		7C0E1A261A700D8E0008ED3C /* Casper Imaging.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Casper Imaging.icns"; sourceTree = "<group>"; };
+		7C0E1A271A700D8E0008ED3C /* JSS.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = JSS.icns; sourceTree = "<group>"; };
 		7C13057B193FC0B60060F343 /* AutoCasperNBI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoCasperNBI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C13057E193FC0B60060F343 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		7C130580193FC0B60060F343 /* AppleScriptObjC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppleScriptObjC.framework; path = System/Library/Frameworks/AppleScriptObjC.framework; sourceTree = SDKROOT; };
@@ -214,6 +218,8 @@
 		7C1305A0193FC0F70060F343 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				7C0E1A261A700D8E0008ED3C /* Casper Imaging.icns */,
+				7C0E1A271A700D8E0008ED3C /* JSS.icns */,
 				7C83B57519A3B41700E9572E /* CDiskImage.icns */,
 				7C83B57319A3B39A00E9572E /* diskcopy.icns */,
 				7C83B57119A3AF3E00E9572E /* Localization.icns */,
@@ -303,6 +309,7 @@
 				7C06F40719DA19680057D6ED /* 10.8+root.plist in Resources */,
 				7CDD2BBD19EC7BAA008D370F /* YoYo-icn_desktop.tiff in Resources */,
 				7C1305AC193FC10A0060F343 /* osx-jss-login.png in Resources */,
+				7C0E1A281A700D8E0008ED3C /* Casper Imaging.icns in Resources */,
 				7C07F19719F10C8B00314193 /* dsa_pub.pem in Resources */,
 				7C27FA26198C357900BD5A07 /* AlertStopIcon.icns in Resources */,
 				7C23C474195A3AEB00FAC70A /* Screensharing.icns in Resources */,
@@ -315,6 +322,7 @@
 				7C9BC9E519EC7D0500C4FDDD /* YoYo-Localization.icns in Resources */,
 				7C13058B193FC0B60060F343 /* InfoPlist.strings in Resources */,
 				7CDD2BC119EC7BAA008D370F /* YoYo-AppIcon.icns in Resources */,
+				7C0E1A291A700D8E0008ED3C /* JSS.icns in Resources */,
 				7CC26BDC19DA1DF8002A093B /* rc.netboot in Resources */,
 				7C19700A198058F00092062D /* Scripts.icns in Resources */,
 				7C9BC9E719EC7EE800C4FDDD /* YoYo-package.icns in Resources */,

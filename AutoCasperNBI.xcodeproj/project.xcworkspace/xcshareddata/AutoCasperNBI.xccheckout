@@ -14,7 +14,7 @@
 		<string>https://github.com/macmule/AutoCasperNBI.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>AutoCasperNBI.xcodeproj/project.xcworkspace</string>
+	<string>AutoCasperNBI.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>194F1E6039C31C5213C2199E9E12E9882FD5D353</key>
