@@ -151,8 +151,8 @@ script AutoCasperNBIAppDelegate
     property netBootDescriptionEnabled : false
     property mainWindowCog : false
     property mainWindowCogAnimate : true
-    property buildProccessProgressBarIndeterminate : false
-    property buildProccessProgressBarAniminate : false
+    property buildProcessProgressBarIndeterminate : false
+    property buildProcessProgressBarAniminate : false
     property netBootCreationSuccessful : false
     property netBootServeOverNFS : true
     property customDesktopImageEnabled : false
@@ -180,8 +180,8 @@ script AutoCasperNBIAppDelegate
     property netBootDescriptionSet : false
     
     -- Others
-    property requiredSpace : 20
-    property buildProccessProgressBar : 0
+    property buildProcessProgressBarMax : 0
+    property buildProcessProgressBar : 0
     property selectedOSdmgTotalSize : 0
     property selectedOSdmgFreeSpace : 0
     property selectedOSdmgUsedSpace : 0
@@ -204,7 +204,8 @@ script AutoCasperNBIAppDelegate
     property NSPropertyListSerialization: current application's class "NSPropertyListSerialization"
     property NSUTF8StringEncoding: current application's NSUTF8StringEncoding
     property NSPropertyListImmutable: current application's NSPropertyListImmutable
-    property None: missing value
+    property None : missing value
+    property languagePopup : missing value
       
 --- HANDLERS ---
 
@@ -423,10 +424,6 @@ script AutoCasperNBIAppDelegate
     
     -- Open the Main Window
     on openMainWindow_(sender)
-        --remove
-        -- close build process window
-        --adminUserWindow's orderOut_(null)
-        -- activate main window
         activate
         mainWindow's makeKeyAndOrderFront_(null)
     end openMainWindow_
@@ -436,7 +433,7 @@ script AutoCasperNBIAppDelegate
     -- Log to file
     on logToFile_(sender)
         -- Comment out before release.. this will send log messages to Xcode's log
-        log logMe
+        --log logMe
         -- Get time & date of command execution for log file
         set timeStamp to do shell script "/bin/date"
         -- Set to boolean of value
@@ -448,8 +445,8 @@ script AutoCasperNBIAppDelegate
                 do shell script "/bin/echo \"\" >> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
             end try
         end if
+        -- Write message to log file
         try
-            -- Write message to log file
             do shell script "/bin/echo " & timeStamp & space & quoted form of logMe & ">> ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
         on error
             -- Create directory if doesn't exist
@@ -482,8 +479,6 @@ script AutoCasperNBIAppDelegate
 
     -- Try & get OS version from dropped dmg, error if something is not quite right
     on doOSDMG_(sender)
-        -- Reset build Process ProgressBar
-        set my buildProccessProgressBar to 0
         -- Log that we're tryin to mount selected DMG
         set logMe to "Trying to mount: " & selectedOSdmgPath
         logToFile_(me)
@@ -567,10 +562,6 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 -- Error advising we cannot get the OS version from dmg
                 set my selectedOSDMGTextField to "Cannot read OS Version"
-                --remove
-                -- Reset OSDMG Icons & hide cog
-                -- Display exclamation icon
-                --set my exclamationRedOSDMG to true
             end try
         else
             --Log Action
@@ -649,8 +640,6 @@ script AutoCasperNBIAppDelegate
                 doResetSelectedAppIcons_(me)
                 -- Display Error if cannot get version number
                 set my selectedAppTextField to "Cannot Get Version"
-                --remove
-                --set my exclamationRedSelectedApp to true
                 -- Disable options and build
                 set my disableOptionsAndBuild to true
             end try
@@ -663,8 +652,6 @@ script AutoCasperNBIAppDelegate
             doResetSelectedAppIcons_(me)
             -- Display message that we have selected Casper Imaging
             set my selectedAppTextField to "Select Casper Imaging.app"
-            --remove
-            --set my exclamationRedSelectedApp to true
             -- Disable options and build
             set my disableOptionsAndBuild to true
         end if
@@ -673,7 +660,9 @@ script AutoCasperNBIAppDelegate
     end selectedAppCheck_
 
     -- Check the JSS URL details & try & get version of the JSS
-    on checkJSSURL_(aNotification)
+    on checkJSSURL_(sender)
+        -- Reset Variable
+        set my jssAndCasperImagingVersionCheckTextfield to ""
         -- Make sure jssURL has a value before we proceed
         if my jssURL as string is not equal to "" then
             -- Update plist
@@ -770,9 +759,6 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
-            --remove
-            -- Set JSS exclaimation icon to show
-            --set my exclamationRedJSSURL to true
             -- Update text field with error
             set my enteredJSSURLTextField to "Cannot get JSS version"
             -- Reset delimiters
@@ -811,10 +797,6 @@ script AutoCasperNBIAppDelegate
             doResetSelectedAppIcons_(me)
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
-            --remove
-            -- Show exclamation if major version difference
-            --set my exclamationRedJSSURL to true
-            --set my exclamationRedSelectedApp to true
             -- Update lable with JSS & Casper Imaging version comparison result
             set my jssAndCasperImagingVersionCheckTextfield to "Major version difference between JSS & Casper Imaging"
             -- If major versions match
@@ -829,10 +811,6 @@ script AutoCasperNBIAppDelegate
                 -- Reset JSS URL icons
                 doResetJSSURLIcons_(me)
                 set my disableOptionsAndBuild to false
-                --remove
-                -- Show warning labels
-                --set my warningSelectedApp to true
-                --set my warningJSSURL to true
                 -- Update lable with JSS & Casper Imaging version comparison result
                 set my jssAndCasperImagingVersionCheckTextfield to "Minor version difference between JSS & Casper Imaging"
                 -- See if pre-reqs have been met
@@ -1414,6 +1392,12 @@ script AutoCasperNBIAppDelegate
         --Log Action
         set logMe to "Input Language Selected: " & inputLanguageSelected
         logToFile_(me)
+        -- Get Tag of inputLanguageSelected popup item
+        set currentCell to (languagePopup's selectedCell)
+        set inputLayoutID to (currentCell's tag())
+        --Log Action
+        set logMe to "Keyboard Layout ID set to : " & inputLayoutID
+        logToFile_(me)
     end inputLanguage_
 
     -- Bound to "Install modified rc.netboot file" checkbox, sets plist
@@ -1492,7 +1476,7 @@ script AutoCasperNBIAppDelegate
         set selectedCertsColour to current application's NSColor's blackColor()
         try
             -- Prompt user to select
-            choose file of type {"public.x509-certificate"} with prompt "Select a Certificate to add:" --default location (path to desktop folder)
+            choose file of type {"public.x509-certificate"} with prompt "Select a Certificate to add:"
             -- Get path of the item selected
             set my selectedCertsPath to POSIX path of result
             -- Do not add if a duplicate, also make sure we have a value or we'll error
@@ -1580,7 +1564,7 @@ script AutoCasperNBIAppDelegate
         set selectedPKGsColour to current application's NSColor's blackColor()
         try
             -- Prompt user to select
-            choose file of type {"pkg"} with prompt "Select a .pkg to add:" --default location (path to desktop folder)
+            choose file of type {"pkg"} with prompt "Select a .pkg to add:"
             -- Get path of the item selected
             set my selectedPKGsPath to POSIX path of result
             -- Do not add if a duplicate, also make sure we have a value or we'll error
@@ -1672,7 +1656,6 @@ script AutoCasperNBIAppDelegate
         set adminUsersPassword to adminUsersPassword as text
          -- Perform a check of privileges
         try
-           
             do shell script "/bin/ls " user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Authentication passed for user: " & adminUserName
@@ -1729,10 +1712,69 @@ script AutoCasperNBIAppDelegate
             checkAdditionalPKGs_(me)
             -- Check additional Certs array, & amend accordingly
             checkAdditionalCerts_(me)
+            -- Calculate progressbar max length, depending on selection
+            calcBuildProgressBarMax_(me)
             -- Prompt user for location to create the .nbi
             netBootLocation_(me)
         end if
     end buildPreCheck_
+
+    -- Calculate progressbar max length, depending on selection
+    on calcBuildProgressBarMax_(sender)
+        -- Reset
+        set my buildProcessProgressBarMax to 67
+        -- Update build Process ProgressBar
+        set my buildProcessProgressBar to 0
+        -- Check if reduce NetBoot Image is ticked
+        if netBootImageReduceEnabled is true then
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 5
+        end if
+        -- If ARD option has been enabled
+        if ardEnabled is equal to true then
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 1
+        end if
+        -- If VNC option has been enabled
+        if vncEnabled is equal to true then
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 1
+        end if
+        -- if we're installing rc.netboot.pkg
+        if installRCNetBootSelected is true
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 2
+        end if
+        -- If we have a desktop selected & we can find it
+        if desktopImageExists is true
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 1
+        end if
+        -- If a JSS URL is specified
+        if jssURL is not ""
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 2
+        end if
+        -- If we're importing certs
+        if my additionalCerts as string is not equal to "" then
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 1
+        end if
+        -- If we're enabling simple Finder
+        if simpleFinderEnabled is true
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 1
+        end if
+        --if additionalPKGs is not missing value then
+        if my additionalPKGs as string is not equal to "" then
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 1
+        end if
+        -- If we're creating on a 10.9.x netboot
+        if hostMacOSVersion starts with "10.9" then
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 1
+        end if
+        -- If we're creating a Restorable DMG
+        if createReadOnlyDMG is true
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 2
+        end if
+        -- If true, rename sparseimage
+        if servedFromNetSUS is true
+            set my buildProcessProgressBarMax to buildProcessProgressBarMax + 2
+        end if
+        log "Progress Bar set to " & buildProcessProgressBarMax
+    end calcBuildProgressBarMax_
 
     -- Prompt user for location to create the .nbi
     on netBootLocation_(sender)
@@ -1772,16 +1814,12 @@ script AutoCasperNBIAppDelegate
             set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
             -- Set netBootCreationSuccessful value, for notifying later
             set my netBootCreationSuccessful to false
-            -- Reset required space
-            set requiredSpace to 20
             -- Set build Process ProgressBar to indeterminate & animated to false
-            set my buildProccessProgressBarIndeterminate to false
-            set my buildProccessProgressBarAniminate to false
+            set my buildProcessProgressBarIndeterminate to false
+            set my buildProcessProgressBarAniminate to false
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Calculating NetBoot.sparseimage size"
             delay 0.1
-            -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 0
             -- Close main window
             mainWindow's orderOut_(null)
             -- activate build process window
@@ -2037,13 +2075,13 @@ script AutoCasperNBIAppDelegate
         if netBootCreationSuccessful is not equal to true
             try
                 -- Set build Process ProgressBar to indeterminate & animated to false
-                set my buildProccessProgressBarIndeterminate to false
-                set my buildProccessProgressBarAniminate to false
+                set my buildProcessProgressBarIndeterminate to false
+                set my buildProcessProgressBarAniminate to false
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Creating .nbi folder"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 10
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 -- Set to path of NetBoot directory
                 set netBootDirectory to netBootSelectedLocation & netBootNameTextField & ".nbi"
                 --Log action
@@ -2089,14 +2127,14 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Creating NetBoot.sparseimage"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 20
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log action
             set logMe to "Trying to create NetBoot.sparseimage in " & netBootDirectory
             logToFile_(me)
             -- Set to text value, to avoid an issue when name changed
             set netBootNameTextField to netBootNameTextField as text
             -- Create the NetBoot.sparseimage
-            do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot.sparseimage -type SPARSE -size 128g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"GPTSPUD\" -fs \"HFS+\" -stretch 500g -ov -puppetstrings" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot.sparseimage -type SPARSE -size 64g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"GPTSPUD\" -fs \"HFS+\" -stretch 500g -ov -puppetstrings" user name adminUserName password adminUsersPassword with administrator privileges
             --Log action
             set logMe to "Successfully created NetBoot.sparseimage in " & quoted form of netBootDirectory
             logToFile_(me)
@@ -2122,7 +2160,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Mounting NetBoot.sparseimage"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 30
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to mount: " & quoted form of netBootDirectory
             logToFile_(me)
@@ -2149,14 +2187,11 @@ script AutoCasperNBIAppDelegate
     -- Copy OS.dmg's content to NetBoot.dmg
     on copyOSDmgToNetBootDmg_(sender)
         try
-            -- Set build Process ProgressBar to indeterminate & animated to false
-            set my buildProccessProgressBarIndeterminate to false
-            set my buildProccessProgressBarAniminate to false
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Copying the contents of the OS.dmg to NetBoot.sparseimage"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 40
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log action
             set logMe to "Copying contents of " & quoted form of selectedOSdmgMountPath & " to " & quoted form of netBootDirectory & "/NetBoot.sparseimage"
             logToFile_(me)
@@ -2191,7 +2226,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Reducing size"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 50
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 ---- Applications ----
                 --Log Action
                 set logMe to "Trying to delete Applications from: " & netBootDmgMountPath & "/Applications/"
@@ -2211,7 +2246,7 @@ script AutoCasperNBIAppDelegate
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Reducing NetBoot size by deleting unneeded Utilities"
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 52
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 delay 0.1
                 -- Delete all in the location except those that are given below
                 do shell script "find " & quoted form of netBootDmgMountPath & "/Applications/Utilities/* -maxdepth 0 -not -path \"*Activity Monitor.app*\" -not -path \"*Console.app*\" -not -path \"*Disk Utility.app*\" -not -path \"*Grab.app*\" -not -path \"*Keychain Access.app*\" -not -path \"*System Information.app*\" -not -path \"*Terminal.app*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
@@ -2225,7 +2260,7 @@ script AutoCasperNBIAppDelegate
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Reducing NetBoot size by deleting unneeded Preference Panes"
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 54
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 delay 0.1
                 -- Delete all in the location except those that are given below \"*DateAndTime.prefPane*\" -not -path
                 do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/PreferencePanes/* -maxdepth 0 -not -path  \"*Displays.prefPane*\" -not -path \"*Network.prefPane*\" -not -path \"*SharingPref.prefPane*\" -not -path \"*StartupDisk.prefPane*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
@@ -2238,7 +2273,7 @@ script AutoCasperNBIAppDelegate
                 set logMe to "Trying to empty directories in " & netBootDmgMountPath & "/Library/"
                 logToFile_(me)
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 56
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 delay 0.1
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying /Library/Application Support/"
@@ -2369,7 +2404,7 @@ script AutoCasperNBIAppDelegate
                 -- Log To file
                 logToFile_(me)
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 58
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 delay 0.1
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying /System/Library/Address Book Plug-Ins/"
@@ -2478,7 +2513,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Removing swapfiles"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 60
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         --Log Action
         set logMe to "Deleting " & netBootDmgMountPath & "/private/var/vm/swapfile*"
         -- Log To file
@@ -2500,7 +2535,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Removing sleepimage"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 70
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         --Log Action
         set logMe to "Deleting " & netBootDmgMountPath & "/private/var/vm/sleepimage"
         logToFile_(me)
@@ -2523,7 +2558,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Emptying /private/tmp"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 80
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Emptying " & netBootDmgMountPath & "/private/tmp/*"
             logToFile_(me)
@@ -2554,7 +2589,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Emptying /private/var/tmp/"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 90
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Emptying " & netBootDmgMountPath & "/private/var/tmp/*"
             logToFile_(me)
@@ -2585,7 +2620,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Emptying /Volumes/"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 100
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Emptying " & netBootDmgMountPath & "/Volumes/"
             logToFile_(me)
@@ -2617,7 +2652,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Emptying /dev/"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 110
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         set logMe to "Emptying " & netBootDmgMountPath & "/dev/"
         -- Log To file
         logToFile_(me)
@@ -2648,7 +2683,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Emptying /var/run/"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 110
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         --Log Action
         set logMe to "Emptying " & netBootDmgMountPath & "/var/run/"
         logToFile_(me)
@@ -2679,7 +2714,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Disabling Software Update"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 120
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         --Log Action
         set logMe to "Deleting " & netBootDmgMountPath & "/System/Library/CoreServices/Software Update.app"
         logToFile_(me)
@@ -2718,7 +2753,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Deleting /Library/Preferences/SystemConfiguration/preferences.plist"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 125
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         --Log Action
         set logMe to "Deleting " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/preferences.plist"
         logToFile_(me)
@@ -2733,7 +2768,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Deleting /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 130
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         --Log Action
         set logMe to "Deleting " & netBootDmgMountPath & "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
         logToFile_(me)
@@ -2755,7 +2790,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Bypassing Apple Setup Assistant"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 134
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             ---- .AppleSetupDone ----
             -- Write .AppleSetupDone file
             do shell script "touch " & quoted form of netBootDmgMountPath & "/var/db/.AppleSetupDone" user name adminUserName password adminUsersPassword with administrator privileges
@@ -2767,7 +2802,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Bypassing Registration"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 138
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             ---- .SetupRegComplete ----
             -- Write .SetupRegComplete file
             do shell script "touch " & quoted form of netBootDmgMountPath & "/Library/Receipts/.SetupRegComplete" user name adminUserName password adminUsersPassword with administrator privileges
@@ -2779,7 +2814,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Deleting Setup Assistant.app"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 142
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Deleting " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/Setup Assistant.app"
             logToFile_(me)
@@ -2809,7 +2844,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Enabling Disk Utilties Debug Menu"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 146
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         try
             -- Enable Disk Utilties Debug Menu
             do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.DiskUtility.plist DUDebugMenuEnabled -bool true" user name adminUserName password adminUsersPassword with administrator privileges
@@ -2837,7 +2872,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Disabling TimeMachine prompts"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 150
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         try
             -- TimeMachine Plist location on mounted volume
             set variableVariable to netBootDmgMountPath & "/Library/Preferences/com.apple.TimeMachine.plist"
@@ -2867,7 +2902,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Deleting com.apple.dockfixup.plist"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 160
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         try
             -- If we're building a 10.10 .nbi
             if selectedOSdmgVersionMajor is 10
@@ -2911,7 +2946,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Disabling App Nap"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 165
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to disable App Nap"
             logToFile_(me)
@@ -2941,7 +2976,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Disabling Screen Saver"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 170
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         try
             --Log Action
             set logMe to "Disabling Screen Saver"
@@ -2977,7 +3012,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Creating ARD User"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 175
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 -- JSS Plist location on mounted volume
                 set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Settings/ARDUser.plist"
                 -- Encode ardUsername
@@ -3032,7 +3067,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Writing VNC password to com.apple.VNCSettings.txt"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 180
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 -- Set variableVariable to location of com.apple.VNCSettings.txt
                 set variableVariable to netBootDmgMountPath & "/Library/Preferences/com.apple.VNCSettings.txt"
                 --Log Action
@@ -3075,7 +3110,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Writing Time Server & Zone Settings"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 185
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 -- JSS Plist location on mounted volume
                 set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Settings/TimeSettings.plist"
                 -- Write Time Server to plist
@@ -3116,7 +3151,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Trying to install AutoCasperNBIStartup files"
             logToFile_(me)
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 190
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to copy Boot.sh"
             logToFile_(me)
@@ -3126,7 +3161,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Boot.sh copied"
             logToFile_(me)
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 192
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to create " & quoted form of variableVariable & "/Certificates/"
             logToFile_(me)
@@ -3136,12 +3171,12 @@ script AutoCasperNBIAppDelegate
             set logMe to "Created " & quoted form of variableVariable & "/Certificates/"
             logToFile_(me)
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 193
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to create " & quoted form of variableVariable & "/Settings/"
             logToFile_(me)
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 194
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to set ownership to root:wheel on " & quoted form of variableVariable & "/Settings/"
             logToFile_(me)
@@ -3151,7 +3186,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Set ownership to root:wheel on " & quoted form of variableVariable & "/"
             logToFile_(me)
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 195
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to set permissions to 755 on " & quoted form of variableVariable & "/"
             logToFile_(me)
@@ -3161,7 +3196,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Set permissions to 755 on " & quoted form of variableVariable & "/Settings/"
             logToFile_(me)
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 196
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to copy com.AutoCasperNBI.boot.plist"
             logToFile_(me)
@@ -3171,7 +3206,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "com.AutoCasperNBI.boot.plist copied"
             logToFile_(me)
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 197
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to set ownership to root:wheel on " & quoted form of netBootDmgMountPath & "/Library/LaunchDaemons/com.AutoCasperNBI.boot.plist"
             logToFile_(me)
@@ -3211,7 +3246,7 @@ script AutoCasperNBIAppDelegate
                      set my buildProcessTextField to "Copying Lion Root User plist"
                      delay 0.1
                      -- Update build Process ProgressBar
-                     set my buildProccessProgressBar to 200
+                     set my buildProcessProgressBar to buildProcessProgressBar + 1
                      -- Copy the root.plist
                      do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/root.plist " & quoted form of netBootDmgMountPath & "/private/var/db/dslocal/nodes/Default/users/" user name adminUserName password adminUsersPassword with administrator privileges
                      --Log Action
@@ -3225,7 +3260,7 @@ script AutoCasperNBIAppDelegate
                     set my buildProcessTextField to "Copying Root User plist"
                     delay 0.1
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 200
+                    set my buildProcessProgressBar to buildProcessProgressBar + 1
                     -- Copy the root.plist
                     do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/10.8+root.plist " & quoted form of netBootDmgMountPath & "/private/var/db/dslocal/nodes/Default/users/root.plist" user name adminUserName password adminUsersPassword with administrator privileges
                     --Log Action
@@ -3258,7 +3293,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Copying Root User /etc/kcpassword"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 202
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             -- Copy kcpassword
             do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/kcpassword " & quoted form of netBootDmgMountPath & "/etc/" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
@@ -3268,7 +3303,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Correcting permissions on /etc/kcpassword"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 204
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to set ownership to root on " & quoted form of netBootDmgMountPath & "/etc/kcpassword"
             logToFile_(me)
@@ -3289,7 +3324,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Setting Root User auto login"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 206
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to set Root User auto login"
             logToFile_(me)
@@ -3323,7 +3358,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Copying Root User dock.plist"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 208
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             -- Copy the root.plist
             do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/com.apple.dock.plist " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
@@ -3357,7 +3392,7 @@ script AutoCasperNBIAppDelegate
                 set logMe to "Trying to copy /etc/rc.netboot"
                 logToFile_(me)
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 210
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 -- Copy the root.plist
                 do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/rc.netboot " & quoted form of netBootDmgMountPath & "/etc/" user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
@@ -3367,7 +3402,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Correcting permissions on /etc/rc.netboot"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 215
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to set ownership to root:wheel on " & quoted form of netBootDmgMountPath & "/etc/rc.netboot"
                 logToFile_(me)
@@ -3405,14 +3440,14 @@ script AutoCasperNBIAppDelegate
 
     -- Set Desktop Image to selected
     on copyDesktopImage_(sender)
-        -- If we have a desktop selected & we can found it
+        -- If we have a desktop selected & we can find it
         if desktopImageExists is true
             try
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Copying Desktop Image"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 220
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 -- Set variableVariable to path of DefaultDesktop.jpg
                 set variableVariable to netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
                 --Log Action
@@ -3458,7 +3493,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Copying Casper Imaging.app"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 230
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             -- Cut the trailing /
             set selectedAppPathToCopy to do shell script "/bin/echo " & quoted form of selectedAppPath & " | rev | cut -c 2- | rev"
             --Log Action
@@ -3510,7 +3545,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Setting Casper Imaging to Debug mode"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 235
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             -- Try as errors if found
             try
                 -- Make Debug folder
@@ -3523,8 +3558,8 @@ script AutoCasperNBIAppDelegate
                 set logMe to "Debug found at "  & quoted form of copiedAppPath & "/Contents/Support/debug"
                 logToFile_(me)
             end try
-            -- Install CasperImagingLaunchAgent
-            installCasperImagingLaunchAgent_(me)
+            -- Write the Casper Imaging plist
+            writeCasperImagingPlist_(me)
         on error
             --Log Action
             set logMe to "Error: Setting Casper Imaging to Debug mode"
@@ -3541,20 +3576,20 @@ script AutoCasperNBIAppDelegate
     -- Write the Casper Imaging plist
     on writeCasperImagingPlist_(sender)
         try
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Writing Casper Imaging plist"
-            delay 0.1
-            -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 240
-            -- JSS Plist location on mounted volume
-            set variableVariable to netBootDmgMountPath & "/private/var/root/Library/Preferences/com.jamfsoftware.jss.plist"
-            -- Write Casper Imaging plist to allow invalid cert,
-            do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " allowInvalidCertificate -bool true" user name adminUserName password adminUsersPassword with administrator privileges
-            -- Log Action
-            set logMe to "com.jamfsoftware.jss.plist created & allow invalid certificate set"
-            logToFile_(me)
             -- If a JSS URL is specified
             if jssURL is not ""
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Writing Casper Imaging plist"
+                delay 0.1
+                -- Update build Process ProgressBar
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
+                -- JSS Plist location on mounted volume
+                set variableVariable to netBootDmgMountPath & "/private/var/root/Library/Preferences/com.jamfsoftware.jss.plist"
+                -- Write Casper Imaging plist to allow invalid cert,
+                do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " allowInvalidCertificate -bool true" user name adminUserName password adminUsersPassword with administrator privileges
+                -- Log Action
+                set logMe to "com.jamfsoftware.jss.plist created & allow invalid certificate set"
+                logToFile_(me)
                 -- Write JSS URL to plist,
                 do shell script "/usr/bin/defaults write " & quoted form of variableVariable & " url -string " & jssURL user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
@@ -3583,7 +3618,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Installing Casper Imaging LaunchAgent"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 250
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to install Casper Imaging LaunchAgent"
             logToFile_(me)
@@ -3593,7 +3628,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Casper Imaging LaunchAgent plist installed"
             logToFile_(me)
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 253
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Correcting ownership on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist"
             logToFile_(me)
@@ -3603,7 +3638,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Set ownership to root:wheel on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist"
             logToFile_(me)
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 256
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to correct permissions on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist"
             logToFile_(me)
@@ -3637,7 +3672,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Downloading JSS CA Cert"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 260
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 -- Application Support location on TempOSdmg for installing at boot
                 set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Certificates/"
                 -- Log Action
@@ -3670,14 +3705,13 @@ script AutoCasperNBIAppDelegate
     -- Add any additional certs if specified
     on importAdditionalCerts_(sender)
         -- If we're importing certs
-        --if additionalCerts is not {}
         if my additionalCerts as string is not equal to "" then
                 try
                     -- Update Build Process Window's Text Field
                     set my buildProcessTextField to "Copying Additional Certs"
                     delay 0.1
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 265
+                    set my buildProcessProgressBar to buildProcessProgressBar + 1
                     -- Set variable to list
                     set additionalCerts to additionalCerts as list
                     -- For each item in array
@@ -3720,7 +3754,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Enabling Simple Finder"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 270
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying enable Simple Finder"
                 logToFile_(me)
@@ -3755,7 +3789,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Disabling Fast User Switching"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 275
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying disable Fast User Switching"
             logToFile_(me)
@@ -3786,7 +3820,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Setting NetBoot's OS Language"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 280
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Getting language code for selected language " & languageSelected
             logToFile_(me)
@@ -3828,268 +3862,17 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Setting NetBoot's Input Language"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 285
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to get input layout id for: " & inputLanguageSelected
             logToFile_(me)
             -- Set to text of value
             set inputLanguageSelected to inputLanguageSelected as text
-            -- Set Keyboard ID depending on Input Language.
-            if inputLanguageSelected is equal to "Afghan Dari" then
-                set inputLayoutID to "-2092"
-                else if inputLanguageSelected is equal to "Afghan Pashto" then
-                set inputLayoutID to "-2094"
-                else if inputLanguageSelected is equal to "Afghan Uzbek" then
-                set inputLayoutID to "-2093"
-                else if inputLanguageSelected is equal to "Arabic" then
-                set inputLayoutID to "-17920"
-                else if inputLanguageSelected is equal to "Arabic PC" then
-                set inputLayoutID to "-17921"
-                else if inputLanguageSelected is equal to "Arabic-QWERTY" then
-                set inputLayoutID to "-18000"
-                else if inputLanguageSelected is equal to "Armenian-HM QWERTY" then
-                set inputLayoutID to "-28161"
-                else if inputLanguageSelected is equal to "Armenian-Western QWERTY" then
-                set inputLayoutID to "-28164"
-                else if inputLanguageSelected is equal to "Australian" then
-                set inputLayoutID to "15"
-                else if inputLanguageSelected is equal to "Austrian" then
-                set inputLayoutID to "92"
-                else if inputLanguageSelected is equal to "Azeri" then
-                set inputLayoutID to "-49"
-                else if inputLanguageSelected is equal to "Bangla" then
-                set inputLayoutID to "-22528"
-                else if inputLanguageSelected is equal to "Bangla-QWERTY" then
-                set inputLayoutID to "-22529"
-                else if inputLanguageSelected is equal to "Belgian" then
-                set inputLayoutID to "6"
-                else if inputLanguageSelected is equal to "Brazilian" then
-                set inputLayoutID to "71"
-                else if inputLanguageSelected is equal to "British" then
-                set inputLayoutID to "2"
-                else if inputLanguageSelected is equal to "British-PC" then
-                set inputLayoutID to "250"
-                else if inputLanguageSelected is equal to "Bulgarian" then
-                set inputLayoutID to "19528"
-                else if inputLanguageSelected is equal to "Bulgarian - Phonetic" then
-                set inputLayoutID to "19529"
-                else if inputLanguageSelected is equal to "Byelorussian" then
-                set inputLayoutID to "19517"
-                else if inputLanguageSelected is equal to "Canadian" then
-                set inputLayoutID to "29"
-                else if inputLanguageSelected is equal to "Canadian - CSA" then
-                set inputLayoutID to "80"
-                else if inputLanguageSelected is equal to "Cherokee-Nation" then
-                set inputLayoutID to "-26112"
-                else if inputLanguageSelected is equal to "Cherokee-QWERTY" then
-                set inputLayoutID to "-26113"
-                else if inputLanguageSelected is equal to "Czech-QWERTY" then
-                set inputLayoutID to "30778"
-                else if inputLanguageSelected is equal to "Devanagari" then
-                set inputLayoutID to "20480"
-                else if inputLanguageSelected is equal to "Devanagari-QWERTY" then
-                set inputLayoutID to "-20481"
-                else if inputLanguageSelected is equal to "Dutch" then
-                set inputLayoutID to "26"
-                else if inputLanguageSelected is equal to "Dvorak" then
-                set inputLayoutID to "16300"
-                else if inputLanguageSelected is equal to "Dvorak - Left" then
-                set inputLayoutID to "16302"
-                else if inputLanguageSelected is equal to "DVORAK - QWERTY CMD" then
-                set inputLayoutID to "16301"
-                else if inputLanguageSelected is equal to "Dvorak - Right" then
-                set inputLayoutID to "16303"
-                else if inputLanguageSelected is equal to "Estonian" then
-                set inputLayoutID to "30764"
-                else if inputLanguageSelected is equal to "Faroese" then
-                set inputLayoutID to "-47"
-                else if inputLanguageSelected is equal to "Finnish" then
-                set inputLayoutID to "17"
-                else if inputLanguageSelected is equal to "FinnishExtended" then
-                set inputLayoutID to "-17"
-                else if inputLanguageSelected is equal to "FinnishSami-PC" then
-                set inputLayoutID to "-18"
-                else if inputLanguageSelected is equal to "French" then
-                set inputLayoutID to "1"
-                else if inputLanguageSelected is equal to "French-numerical" then
-                set inputLayoutID to "1111"
-                else if inputLanguageSelected is equal to "Georgian-QWERTY" then
-                set inputLayoutID to "-27650"
-                else if inputLanguageSelected is equal to "German" then
-                set inputLayoutID to "3"
-                else if inputLanguageSelected is equal to "Greek" then
-                set inputLayoutID to "-18944"
-                else if inputLanguageSelected is equal to "Greek Polytonic" then
-                set inputLayoutID to "-18945"
-                else if inputLanguageSelected is equal to "Gujarati" then
-                set inputLayoutID to "-21504"
-                else if inputLanguageSelected is equal to "Gujarati-QWERTY" then
-                set inputLayoutID to "-21505"
-                else if inputLanguageSelected is equal to "Gurmukhi" then
-                set inputLayoutID to "-20992"
-                else if inputLanguageSelected is equal to "Gurmukhi-QWERTY" then
-                set inputLayoutID to "-20993"
-                else if inputLanguageSelected is equal to "Hawaiian" then
-                set inputLayoutID to "-50"
-                else if inputLanguageSelected is equal to "Hebrew" then
-                set inputLayoutID to "-18432"
-                else if inputLanguageSelected is equal to "Hebrew-PC" then
-                set inputLayoutID to "-18433"
-                else if inputLanguageSelected is equal to "Hebrew-QWERTY" then
-                set inputLayoutID to "-18500"
-                else if inputLanguageSelected is equal to "Hungarian" then
-                set inputLayoutID to "30763"
-                else if inputLanguageSelected is equal to "Icelandic" then
-                set inputLayoutID to "-21"
-                else if inputLanguageSelected is equal to "Inuktitut-Nunavut" then
-                set inputLayoutID to "-30604"
-                else if inputLanguageSelected is equal to "Inuktitut-Nutaaq" then
-                set inputLayoutID to "-30602"
-                else if inputLanguageSelected is equal to "Inuktitut-QWERTY" then
-                set inputLayoutID to "-30600"
-                else if inputLanguageSelected is equal to "Inuttitut Nunavik" then
-                set inputLayoutID to "-30603"
-                else if inputLanguageSelected is equal to "Irish" then
-                set inputLayoutID to "50"
-                else if inputLanguageSelected is equal to "Irish Extended" then
-                set inputLayoutID to "-500"
-                else if inputLanguageSelected is equal to "Italian" then
-                set inputLayoutID to "4"
-                else if inputLanguageSelected is equal to "Italian - Pro" then
-                set inputLayoutID to "223"
-                else if inputLanguageSelected is equal to "Jawi-QWERTY" then
-                set inputLayoutID to "-19000"
-                else if inputLanguageSelected is equal to "Kannada" then
-                set inputLayoutID to "-24064"
-                else if inputLanguageSelected is equal to "Kannada-QWERTY" then
-                set inputLayoutID to "-24065"
-                else if inputLanguageSelected is equal to "Kazakh" then
-                set inputLayoutID to "-19501"
-                else if inputLanguageSelected is equal to "Khmer" then
-                set inputLayoutID to "-26114"
-                else if inputLanguageSelected is equal to "Kurdish-Sorani" then
-                set inputLayoutID to "-17926"
-                else if inputLanguageSelected is equal to "Latvian" then
-                set inputLayoutID to "30765"
-                else if inputLanguageSelected is equal to "Lithuanian" then
-                set inputLayoutID to "30761"
-                else if inputLanguageSelected is equal to "Macedonian" then
-                set inputLayoutID to "19523"
-                else if inputLanguageSelected is equal to "Malayalam" then
-                set inputLayoutID to "-24576"
-                else if inputLanguageSelected is equal to "Malayalam-QWERTY" then
-                set inputLayoutID to "-24577"
-                else if inputLanguageSelected is equal to "Maltese" then
-                set inputLayoutID to "-501"
-                else if inputLanguageSelected is equal to "Maori" then
-                set inputLayoutID to "-51"
-                else if inputLanguageSelected is equal to "Myanmar-QWERTY" then
-                set inputLayoutID to "-25601"
-                else if inputLanguageSelected is equal to "Nepali" then
-                set inputLayoutID to "-20484"
-                else if inputLanguageSelected is equal to "Northern Sami" then
-                set inputLayoutID to "-1200"
-                else if inputLanguageSelected is equal to "Norwegian" then
-                set inputLayoutID to "12"
-                else if inputLanguageSelected is equal to "Norwegian Extended" then
-                set inputLayoutID to "-12"
-                else if inputLanguageSelected is equal to "NorwegianSami-PC" then
-                set inputLayoutID to "-13"
-                else if inputLanguageSelected is equal to "Oriya" then
-                set inputLayoutID to "-22016"
-                else if inputLanguageSelected is equal to "Oriya-QWERTY" then
-                set inputLayoutID to "-22017"
-                else if inputLanguageSelected is equal to "Persian" then
-                set inputLayoutID to "--17960"
-                else if inputLanguageSelected is equal to "Persian-ISIRI 2901" then
-                set inputLayoutID to "-2901"
-                else if inputLanguageSelected is equal to "Persian-QWERTY" then
-                set inputLayoutID to "-1959"
-                else if inputLanguageSelected is equal to "Polish" then
-                set inputLayoutID to "30762"
-                else if inputLanguageSelected is equal to "Polish Pro" then
-                set inputLayoutID to "30788"
-                else if inputLanguageSelected is equal to "Portuguese" then
-                set inputLayoutID to "10"
-                else if inputLanguageSelected is equal to "Romanian" then
-                set inputLayoutID to "-39"
-                else if inputLanguageSelected is equal to "Romanian-Standard" then
-                set inputLayoutID to "-38"
-                else if inputLanguageSelected is equal to "Russian" then
-                set inputLayoutID to "19456"
-                else if inputLanguageSelected is equal to "RussianWin" then
-                set inputLayoutID to "19458"
-                else if inputLanguageSelected is equal to "Russian - Phonetic" then
-                set inputLayoutID to "19457"
-                else if inputLanguageSelected is equal to "Sami-PC" then
-                set inputLayoutID to "-1201"
-                else if inputLanguageSelected is equal to "Serbian" then
-                set inputLayoutID to "19521"
-                else if inputLanguageSelected is equal to "Serbian-Latin" then
-                set inputLayoutID to "-19521"
-                else if inputLanguageSelected is equal to "Sinhala" then
-                set inputLayoutID to "-25088"
-                else if inputLanguageSelected is equal to "Sinhala-QWERTY" then
-                set inputLayoutID to "-25089"
-                else if inputLanguageSelected is equal to "Slovak" then
-                set inputLayoutID to "30777"
-                else if inputLanguageSelected is equal to "Slovak-QWERTY" then
-                set inputLayoutID to "30779"
-                else if inputLanguageSelected is equal to "Slovenian" then
-                set inputLayoutID to "-66"
-                else if inputLanguageSelected is equal to "Spanish" then
-                set inputLayoutID to "8"
-                else if inputLanguageSelected is equal to "Spanish - ISO" then
-                set inputLayoutID to "87"
-                else if inputLanguageSelected is equal to "Swedish" then
-                set inputLayoutID to "224"
-                else if inputLanguageSelected is equal to "Swedish - Pro" then
-                set inputLayoutID to "7"
-                else if inputLanguageSelected is equal to "SwedishSami-PC" then
-                set inputLayoutID to "-15"
-                else if inputLanguageSelected is equal to "Swiss French" then
-                set inputLayoutID to "18"
-                else if inputLanguageSelected is equal to "Swiss German" then
-                set inputLayoutID to "19"
-                else if inputLanguageSelected is equal to "Telugu" then
-                set inputLayoutID to "-23552"
-                else if inputLanguageSelected is equal to "Telugu-QWERTY" then
-                set inputLayoutID to "-23553"
-                else if inputLanguageSelected is equal to "Thai" then
-                set inputLayoutID to "-26624"
-                else if inputLanguageSelected is equal to "Thai-PattaChote" then
-                set inputLayoutID to "-226626"
-                else if inputLanguageSelected is equal to "TibetanOtaniUS" then
-                set inputLayoutID to "-26628"
-                else if inputLanguageSelected is equal to "Tibetan-QWERTY" then
-                set inputLayoutID to "-26625"
-                else if inputLanguageSelected is equal to "Tibetan-Wylie" then
-                set inputLayoutID to "-2398"
-                else if inputLanguageSelected is equal to "Turkish" then
-                set inputLayoutID to "-24"
-                else if inputLanguageSelected is equal to "Turkish-QWERTY" then
-                set inputLayoutID to "-35"
-                else if inputLanguageSelected is equal to "Turkish-QWERTY-PC" then
-                set inputLayoutID to "-36"
-                else if inputLanguageSelected is equal to "Ukrainian" then
-                set inputLayoutID to "19518"
-                else if inputLanguageSelected is equal to "UnicodeHexInput" then
-                set inputLayoutID to "-1"
-                else if inputLanguageSelected is equal to "Urdu" then
-                set inputLayoutID to "--17925"
-                else if inputLanguageSelected is equal to "U.S." then
-                set inputLayoutID to "0"
-                else if inputLanguageSelected is equal to "US Extended" then
-                set inputLayoutID to "-2"
-                else if inputLanguageSelected is equal to "USInternational-PC" then
-                set inputLayoutID to "15000"
-                else if inputLanguageSelected is equal to "Uyghur" then
-                set inputLayoutID to "-27000"
-                else if inputLanguageSelected is equal to "Vietnamese" then
-                set inputLayoutID to "-31232"
-                else if inputLanguageSelected is equal to "Welsh" then
-                set inputLayoutID to "-790"
-            end if
+            -- Get Tag of inputLanguageSelected popup item
+            set currentCell to (languagePopup's selectedCell)
+            set inputLayoutID to (currentCell's tag())
+            -- Set to variable to text
+            set inputLayoutID to inputLayoutID as text
             --Log Action
             set logMe to "Keyboard Layout ID set to " & inputLayoutID
             logToFile_(me)
@@ -4145,7 +3928,6 @@ script AutoCasperNBIAppDelegate
 
     -- Add any additional pkgs if specified
     on installAdditionalPKGs_(sender)
-        -- If we're installing additional PKGs
         --if additionalPKGs is not missing value then
         if my additionalPKGs as string is not equal to "" then
             try
@@ -4153,7 +3935,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Installing Additional PKGs"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 290
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 -- Set variable to list
                 set additionalPKGs to additionalPKGs as list
                 -- For each item in array
@@ -4177,9 +3959,9 @@ script AutoCasperNBIAppDelegate
                 -- Notify of errors or success
                 userNotify_(me)
             end try
-            else
-            -- Get size of NetBoot.sparseimage
-            getNetBootDmgSize_(me)
+        else
+            -- Disable Spotlight Indexing on NetBoot.sparseimage
+            disableSpotlight_(me)
         end if
     end installAdditionalPKGs_
 
@@ -4190,7 +3972,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Disabling Spotlight Indexing"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 360
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to disable Spotlight Indexing on " & netBootDmgMountPath
             logToFile_(me)
@@ -4221,7 +4003,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Creating dyld shared cache files"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 370
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Creating dyld shared cache files on: " & netBootDmgMountPath
             logToFile_(me)
@@ -4250,7 +4032,7 @@ script AutoCasperNBIAppDelegate
     -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
     on manualKernelCacheReductionCheck_(sender)
         considering numeric strings
-            -- If we're creating a 10.9.x netboot
+            -- If we're creating on a 10.9.x netboot
             if hostMacOSVersion starts with "10.9" then
                 --Log Action
                 set logMe to "Manually reducing kernel cache as on 10.9"
@@ -4274,7 +4056,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Deleting extensions to reduce kernel cache size"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 380
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
             logToFile_(me)
@@ -4330,7 +4112,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Creating x84_64 folder"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 390
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to create folder " & netBootDirectory & "/i386/x86_64"
             logToFile_(me)
@@ -4344,7 +4126,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Touching /System/Library/Extensions/"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 393
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Touching " & netBootDmgMountPath & "/System/Library/Extensions/"
             logToFile_(me)
@@ -4358,7 +4140,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Updating kernel cache"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 396
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Updating kernel cache on: " & netBootDmgMountPath
             logToFile_(me)
@@ -4372,7 +4154,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Generating kernel cache"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 398
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Generating kernel cache"
             logToFile_(me)
@@ -4393,7 +4175,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Copying updated kernel cache"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 401
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Copying updated kernel cache to: " & netBootDmgMountPath & "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache"
             logToFile_(me)
@@ -4407,7 +4189,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Deleting bootcaches.plist"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 404
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Deleting bootcaches.plist from: " & netBootDmgMountPath & "/usr/standalone/bootcaches.plist"
             logToFile_(me)
@@ -4447,7 +4229,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Copying boot.efi"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 407
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
             logToFile_(me)
@@ -4491,7 +4273,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Copying PlaformSupport.plist"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 410
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
             logToFile_(me)
@@ -4521,7 +4303,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessTextField to "Copying NBImageInfo.plist"
         delay 0.1
         -- Update build Process ProgressBar
-        set my buildProccessProgressBar to 425
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         try
             --Log Action
             set logMe to "Copying NBImageInfo.plist"
@@ -4554,7 +4336,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Amending NBImageInfo.plist"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 428
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to change permissions on " & netBootDirectory & "/NBImageInfo.plist"
                 logToFile_(me)
@@ -4573,7 +4355,7 @@ script AutoCasperNBIAppDelegate
                     set my buildProcessTextField to "Setting NBImageInfo.plist Description"
                     delay 0.1
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 430
+                    set my buildProcessProgressBar to buildProcessProgressBar + 1
                     --Log Action
                     set logMe to "Trying to set .nbi description to " & quoted form of netBootDescription
                     logToFile_(me)
@@ -4588,7 +4370,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Setting NBImageInfo.plist Index"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 432
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to set .nbi Index"
                 logToFile_(me)
@@ -4602,7 +4384,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Setting NBImageInfo.plist IsInstall value"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 434
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to set .nbi IsInstall value"
                 logToFile_(me)
@@ -4616,7 +4398,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Setting NBImageInfo.plist Name"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 436
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to set .nbi Name to " & netBootNameTextField
                 logToFile_(me)
@@ -4630,7 +4412,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Setting NBImageInfo.plist to Diskless"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 438
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to set .nbi to Diskless"
                 logToFile_(me)
@@ -4644,7 +4426,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Setting NBImageInfo.plist RootPath"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 440
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to set .nbi to RootPath"
                 logToFile_(me)
@@ -4662,7 +4444,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Setting NBImageInfo.plist ImageType"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 442
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to set .nbi to ImageType"
                 logToFile_(me)
@@ -4676,7 +4458,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Setting NBImageInfo.plist osVersion"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 444
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to set .nbi to osVersion"
                 logToFile_(me)
@@ -4697,7 +4479,7 @@ script AutoCasperNBIAppDelegate
                     set my buildProcessTextField to "Setting NBImageInfo.plist to being served over NFS"
                     delay 0.1
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 446
+                    set my buildProcessProgressBar to buildProcessProgressBar + 1
                     --Log Action
                     set logMe to "Trying to set .nbi to being served over NFS"
                     logToFile_(me)
@@ -4711,7 +4493,7 @@ script AutoCasperNBIAppDelegate
                     set my buildProcessTextField to "Setting NBImageInfo.plist to being served over HTTP"
                     delay 0.1
                     -- Update build Process ProgressBar
-                    set my buildProccessProgressBar to 446
+                    set my buildProcessProgressBar to buildProcessProgressBar + 1
                     --Log Action
                     set logMe to "Trying to set .nbi to being served over HTTP"
                     logToFile_(me)
@@ -4726,7 +4508,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Setting NBImageInfo.plist to Enabled"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 448
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to set .nbi to Enabled"
             logToFile_(me)
@@ -4740,13 +4522,13 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Updating NBImageInfo.plist RootPath"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 450
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             ---- EnabledSystemIdentifiers ----
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Setting NBImageInfo.plist's to EnabledSystemIdentifiers"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 452
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to set .nbi's EnabledSystemIdentifiers"
             logToFile_(me)
@@ -4768,7 +4550,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Changing permissions on NBImageInfo.plist"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 454
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to correct permissions on " & netBootDirectory & "/NBImageInfo.plist"
             logToFile_(me)
@@ -4782,7 +4564,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Converting NBImageInfo.plist to xml"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 456
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Trying to convert " & netBootDirectory & "/NBImageInfo.plist to xml"
             logToFile_(me)
@@ -4791,8 +4573,6 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Converted " & netBootDirectory & "/NBImageInfo.plist to xml"
             logToFile_(me)
-            -- Create Read Only DMG
-            --createReadOnlyDMG_(me)
             -- Detach mounted volumes
             unMountDMGs_(me)
         on error
@@ -4813,11 +4593,8 @@ script AutoCasperNBIAppDelegate
         -- Update Build Process Window's Text Field
         set my buildProcessTextField to "Detaching " & netBootDmgMountPath
         -- Reset build Process ProgressBar
-        set my buildProccessProgressBar to 460
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
         delay 0.1
-        -- Set build Process ProgressBar to indeterminate & animated
-        --set my buildProccessProgressBarIndeterminate to true
-        --set my buildProccessProgressBarAniminate to true
         -- activate build process window
         activate
         showBuildProcessWindow's makeKeyAndOrderFront_(null)
@@ -4842,7 +4619,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessTextField to "Compacting NetBoot.sparseimage"
             delay 0.1
             -- Update build Process ProgressBar
-            set my buildProccessProgressBar to 465
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log action
             set logMe to "Trying to compact NetBoot.sparseimage in " & netBootDirectory
             logToFile_(me)
@@ -4877,7 +4654,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Creating Restorable DMG"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 470
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying create Restorable DMG of " & netBootDirectory & "/NetBoot.sparseimage"
                 logToFile_(me)
@@ -4890,7 +4667,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Scanning Restorable DMG"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 475
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "ASR scanning " & netBootDirectory & "/NetBoot.restorable.dmg"
                 logToFile_(me)
@@ -4929,7 +4706,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Renaming NBI for serving from a NetSUS"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 480
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to rename " & netBootDirectory & "/NetBoot.sparseimage for serving from a  NetSUS"
                 logToFile_(me)
@@ -4942,7 +4719,7 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessTextField to "Setting NBImageInfo.plist RootPath"
                 delay 0.1
                 -- Update build Process ProgressBar
-                set my buildProccessProgressBar to 485
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
                 set logMe to "Trying to set .nbi to RootPath"
                 logToFile_(me)
@@ -4950,6 +4727,28 @@ script AutoCasperNBIAppDelegate
                 do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
                 set logMe to "Set .nbi to RootPath"
+                logToFile_(me)
+                --Log Action
+                set logMe to "Trying to correct permissions on " & netBootDirectory & "/NBImageInfo.plist"
+                logToFile_(me)
+                -- Making NBImageInfo.plist writable
+                do shell script "/bin/chmod 644 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Set permissons on " & netBootDirectory & "/NBImageInfo.plist to 644"
+                logToFile_(me)
+                ---- Convert NBImageInfo.plist to xml ----
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Converting NBImageInfo.plist to xml"
+                delay 0.1
+                -- Update build Process ProgressBar
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
+                --Log Action
+                set logMe to "Trying to convert " & netBootDirectory & "/NBImageInfo.plist to xml"
+                logToFile_(me)
+                -- Making NBImageInfo.plist writable
+                do shell script "/usr/bin/plutil -convert xml1 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Converted " & netBootDirectory & "/NBImageInfo.plist to xml"
                 logToFile_(me)
                 -- Reset build process variables
                 tidyUpTimeKids_(me)
@@ -4982,7 +4781,7 @@ script AutoCasperNBIAppDelegate
         activate
         mainWindow's makeKeyAndOrderFront_(null)
         -- Reset build Process ProgressBar
-        set my buildProccessProgressBar to 0
+        set my buildProcessProgressBar to 0
         -- High fives all round!
         weDidIt_(me)
     end tidyUpTimeKids_
@@ -5012,6 +4811,8 @@ script AutoCasperNBIAppDelegate
         -- activate user notify window
         activate
         userNotifyWindow's makeKeyAndOrderFront_(null)
+        -- Enable main windows buttons
+        set my disableOptionsAndBuild to false
 	end userNotify_
 
     -- Close User Notify Window
@@ -5037,11 +4838,9 @@ script AutoCasperNBIAppDelegate
         set my optionWindowEnabled to false
         -- close main window
         mainWindow's orderOut_(null)
-        -- Update Build Process Window's Text Field
-        --set my buildProcessTextField to "Detaching any Volumes we mounted"
         -- Set build Process ProgressBar to indeterminate & animated
-        set my buildProccessProgressBarIndeterminate to true
-        set my buildProccessProgressBarAniminate to true
+        set my buildProcessProgressBarIndeterminate to true
+        set my buildProcessProgressBarAniminate to true
         delay 0.1
         -- activate build process window
         activate
@@ -5051,6 +4850,7 @@ script AutoCasperNBIAppDelegate
             try
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Trying to detach " & netBootDmgMountPath
+                delay 0.1
                 --Log Action
                 set logMe to "Trying to detach " & netBootDmgMountPath
                 logToFile_(me)
@@ -5063,6 +4863,7 @@ script AutoCasperNBIAppDelegate
             try
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Trying to detach " & selectedOSdmgMountPath
+                delay 0.1
                 --Log Action
                 set logMe to "Trying to detach " & selectedOSdmgMountPath
                 logToFile_(me)

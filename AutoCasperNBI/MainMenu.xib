@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="13F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1066" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -229,20 +229,8 @@
                                         <binding destination="Voe-Tx-rLC" name="value" keyPath="jssAndCasperImagingVersionCheckTextfield" id="nO1-Wg-Y2h"/>
                                     </connections>
                                 </textField>
-                                <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="8ZA-2c-pj2">
-                                    <rect key="frame" x="250" y="18" width="16" height="16"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <connections>
-                                        <binding destination="Voe-Tx-rLC" name="hidden" keyPath="cogJSSURL" id="06h-D4-tBN">
-                                            <dictionary key="options">
-                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                            </dictionary>
-                                        </binding>
-                                        <binding destination="Voe-Tx-rLC" name="animate" keyPath="cogJSSURLAnimate" id="pVX-uq-jzZ"/>
-                                    </connections>
-                                </progressIndicator>
                                 <textField verticalHuggingPriority="750" id="3TG-5f-y7x">
-                                    <rect key="frame" x="110" y="52" width="300" height="22"/>
+                                    <rect key="frame" x="110" y="52" width="285" height="22"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" placeholderString="" drawsBackground="YES" usesSingleLineMode="YES" id="ciO-jn-z84">
                                         <font key="font" metaFont="system"/>
@@ -274,6 +262,42 @@
                                         </binding>
                                     </connections>
                                 </textField>
+                                <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="8ZA-2c-pj2">
+                                    <rect key="frame" x="244" y="14" width="16" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <connections>
+                                        <binding destination="Voe-Tx-rLC" name="hidden" keyPath="cogJSSURL" id="06h-D4-tBN">
+                                            <dictionary key="options">
+                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                            </dictionary>
+                                        </binding>
+                                        <binding destination="Voe-Tx-rLC" name="animate" keyPath="cogJSSURLAnimate" id="pVX-uq-jzZ"/>
+                                    </connections>
+                                </progressIndicator>
+                                <button toolTip="Refreshes selections above. Useful for rechecking for missing items." id="fPf-0m-Qf5">
+                                    <rect key="frame" x="400" y="52" width="18" height="22"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSRefreshFreestandingTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="RKX-Ab-2f7">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="checkJSSURL:" target="Voe-Tx-rLC" id="qIV-yE-V0R"/>
+                                        <binding destination="Voe-Tx-rLC" name="enabled2" keyPath="optionWindowEnabled" previousBinding="cCs-7b-DlJ" id="an1-lz-wXC">
+                                            <dictionary key="options">
+                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                <integer key="NSNullPlaceholder" value="-1"/>
+                                            </dictionary>
+                                        </binding>
+                                        <binding destination="Voe-Tx-rLC" name="enabled" keyPath="disableOptionsAndBuild" id="cCs-7b-DlJ">
+                                            <dictionary key="options">
+                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                            </dictionary>
+                                        </binding>
+                                    </connections>
+                                </button>
                             </subviews>
                         </view>
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -688,6 +712,7 @@ CA
                 <outlet property="additionalCertsArray" destination="VfG-Ov-HRL" id="h58-hO-WIS"/>
                 <outlet property="additionalPKGsArray" destination="YTQ-dg-HGV" id="scg-ep-sU0"/>
                 <outlet property="adminUserWindow" destination="1GG-CU-yDP" id="b1M-aL-Ngd"/>
+                <outlet property="languagePopup" destination="grW-Ka-h5v" id="887-IF-qzg"/>
                 <outlet property="mainWindow" destination="QvC-M9-y7g" id="6Rf-dT-Ksa"/>
                 <outlet property="optionsWindow" destination="Zut-qe-a6h" id="qUR-w9-P6L"/>
                 <outlet property="showBuildProcessWindow" destination="7PY-gM-M3V" id="2dV-xN-uCe"/>
@@ -2952,390 +2977,390 @@ CA
                                                         <rect key="frame" x="207" y="27" width="178" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <string key="toolTip">Keyboard Input Language for the NBI. This list is written as per com.apple.HIToolbox requires the keyboards names, even with dodgy capitalisation.</string>
-                                                        <popUpButtonCell key="cell" type="push" title="DVORAK - QWERTY CMD" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4c8-5D-MLF" id="gqa-pz-aIV">
+                                                        <popUpButtonCell key="cell" type="push" title="US Extended" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="-2" imageScaling="proportionallyDown" inset="2" selectedItem="jZ5-al-x8e" id="gqa-pz-aIV">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="OuF-Ay-0wN">
                                                                 <items>
-                                                                    <menuItem title="Afghan Dari" id="f6g-08-Faz">
+                                                                    <menuItem title="Afghan Dari" tag="-2092" id="f6g-08-Faz">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Afghan Pashto" id="wab-DG-X6j">
+                                                                    <menuItem title="Afghan Pashto" tag="-2094" id="wab-DG-X6j">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Afghan Uzbek" id="0Sz-qA-U0t">
+                                                                    <menuItem title="Afghan Uzbek" tag="-2093" id="0Sz-qA-U0t">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Arabic" id="woD-rH-hlf">
+                                                                    <menuItem title="Arabic" tag="-17920" id="woD-rH-hlf">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Arabic PC" id="9Tx-KJ-aAM">
+                                                                    <menuItem title="Arabic PC" tag="-17921" id="9Tx-KJ-aAM">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Arabic-QWERTY" id="8Yx-1A-rVj">
+                                                                    <menuItem title="Arabic-QWERTY" tag="-18000" id="8Yx-1A-rVj">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Armenian-HM QWERTY" id="w2V-dp-XWb">
+                                                                    <menuItem title="Armenian-HM QWERTY" tag="-28161" id="w2V-dp-XWb">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Armenian-Western QWERTY" id="mfg-tf-o4M">
+                                                                    <menuItem title="Armenian-Western QWERTY" tag="-28164" id="mfg-tf-o4M">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Australian" id="riG-Sg-Uev">
+                                                                    <menuItem title="Australian" tag="15" id="riG-Sg-Uev">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Austrian" id="HsM-9D-3kL">
+                                                                    <menuItem title="Austrian" tag="92" id="HsM-9D-3kL">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Azeri" id="mPo-Nm-xQU">
+                                                                    <menuItem title="Azeri" tag="-49" id="mPo-Nm-xQU">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Bangla" id="94V-1v-tpc">
+                                                                    <menuItem title="Bangla" tag="-22528" id="94V-1v-tpc">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Bangla-QWERTY" id="JWW-QU-qZ6">
+                                                                    <menuItem title="Bangla-QWERTY" tag="-22529" id="JWW-QU-qZ6">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Belgian" id="x4n-Tu-AL5">
+                                                                    <menuItem title="Belgian" tag="6" id="x4n-Tu-AL5">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Brazilian" id="UVe-8j-z7V">
+                                                                    <menuItem title="Brazilian" tag="71" id="UVe-8j-z7V">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="British" id="GeV-LZ-kGO">
+                                                                    <menuItem title="British" tag="2" id="GeV-LZ-kGO">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="British-PC" id="DoF-50-h0q">
+                                                                    <menuItem title="British-PC" tag="250" id="DoF-50-h0q">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Bulgarian" id="t3z-CC-uMC">
+                                                                    <menuItem title="Bulgarian" tag="19528" id="t3z-CC-uMC">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Bulgarian - Phonetic" id="FqN-km-8vY">
+                                                                    <menuItem title="Bulgarian - Phonetic" tag="19529" id="FqN-km-8vY">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Byelorussian" id="Saq-z5-Okc">
+                                                                    <menuItem title="Byelorussian" tag="19517" id="Saq-z5-Okc">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Cherokee-Nation" id="WUr-UI-xje">
+                                                                    <menuItem title="Canadian" tag="29" id="SS6-Uk-W8e">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Cherokee-QWERTY" id="rKh-cr-QkK">
+                                                                    <menuItem title="Canadian - CSA" tag="80" id="glZ-3B-WFe">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Canadian" id="SS6-Uk-W8e">
+                                                                    <menuItem title="Cherokee-Nation" tag="-26112" id="WUr-UI-xje">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Canadian - CSA" id="glZ-3B-WFe">
+                                                                    <menuItem title="Cherokee-QWERTY" tag="-26113" id="rKh-cr-QkK">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Czech-QWERTY" id="Njt-8U-vf2">
+                                                                    <menuItem title="Czech-QWERTY" tag="-30778" id="Njt-8U-vf2">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Devanagari" id="0ml-Es-Gef">
+                                                                    <menuItem title="Devanagari" tag="20480" id="0ml-Es-Gef">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Devanagari-QWERTY" id="NrP-11-wLm">
+                                                                    <menuItem title="Devanagari-QWERTY" tag="-20481" id="NrP-11-wLm">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Dutch" id="77f-Ul-D72">
+                                                                    <menuItem title="Dutch" tag="26" id="77f-Ul-D72">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Dvorak" id="kVV-Wf-GiJ">
+                                                                    <menuItem title="Dvorak" tag="16300" id="kVV-Wf-GiJ">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Dvorak - Left" id="A7s-Mi-dsx">
+                                                                    <menuItem title="Dvorak - Left" tag="16302" id="A7s-Mi-dsx">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="DVORAK - QWERTY CMD" state="on" id="4c8-5D-MLF">
+                                                                    <menuItem title="DVORAK - QWERTY CMD" tag="16301" id="4c8-5D-MLF">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Dvorak - Right" id="lHD-gz-Pds">
+                                                                    <menuItem title="Dvorak - Right" tag="16303" id="lHD-gz-Pds">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Estonian" id="ZLD-c0-Yrc">
+                                                                    <menuItem title="Estonian" tag="30764" id="ZLD-c0-Yrc">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Faroese" id="mIQ-6M-SAD">
+                                                                    <menuItem title="Faroese" tag="-47" id="mIQ-6M-SAD">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Finnish" id="3OX-Na-YtW">
+                                                                    <menuItem title="Finnish" tag="17" id="3OX-Na-YtW">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Finnish Extended" id="1Q8-5e-0hj">
+                                                                    <menuItem title="Finnish Extended" tag="-17" id="1Q8-5e-0hj">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="FinnishSami-PC" id="USI-Eq-THb">
+                                                                    <menuItem title="FinnishSami-PC" tag="-18" id="USI-Eq-THb">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="French" id="n7d-ot-1Qa">
+                                                                    <menuItem title="French" tag="1" id="n7d-ot-1Qa">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="French - numerical" id="KtY-d4-DBR">
+                                                                    <menuItem title="French - numerical" tag="1111" id="KtY-d4-DBR">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Georgian-QWERTY" id="ekJ-Kv-MuD">
+                                                                    <menuItem title="Georgian-QWERTY" tag="-27650" id="ekJ-Kv-MuD">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="German" id="wuN-g1-9n2">
+                                                                    <menuItem title="German" tag="3" id="wuN-g1-9n2">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Greek" id="zX2-UA-OBG">
+                                                                    <menuItem title="Greek" tag="-18944" id="zX2-UA-OBG">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Greek Polytonic" id="nic-4Z-Hii">
+                                                                    <menuItem title="Greek Polytonic" tag="-18945" id="nic-4Z-Hii">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Gujarati" id="OBW-5O-7d6">
+                                                                    <menuItem title="Gujarati" tag="-21504" id="OBW-5O-7d6">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Gujarati-QWERTY" id="rv5-HV-Llg">
+                                                                    <menuItem title="Gujarati-QWERTY" tag="-21505" id="rv5-HV-Llg">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Gurmukhi" id="dkb-MI-C1d">
+                                                                    <menuItem title="Gurmukhi" tag="-20992" id="dkb-MI-C1d">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Gurmukhi-QWERTY" id="9VU-N8-D0j">
+                                                                    <menuItem title="Gurmukhi-QWERTY" tag="-20993" id="9VU-N8-D0j">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Hawaiian" id="sNF-j1-ycD">
+                                                                    <menuItem title="Hawaiian" tag="-50" id="sNF-j1-ycD">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Hebrew" id="62V-cT-5dL">
+                                                                    <menuItem title="Hebrew" tag="-18432" id="62V-cT-5dL">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Hebrew-PC" id="7kI-kz-vKX">
+                                                                    <menuItem title="Hebrew-PC" tag="-18433" id="7kI-kz-vKX">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Hebrew-QWERTY" id="SHe-bH-bfP">
+                                                                    <menuItem title="Hebrew-QWERTY" tag="-18500" id="SHe-bH-bfP">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Faroese" id="CEk-IA-Ccg">
+                                                                    <menuItem title="Hungarian" tag="30763" id="Bux-q8-pGZ">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Hungarian" id="Bux-q8-pGZ">
+                                                                    <menuItem title="Icelandic" tag="-21" id="uAd-zt-OWh">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Icelandic" id="uAd-zt-OWh">
+                                                                    <menuItem title="Inuktitut-Nunavut" tag="-30604" id="fSw-4s-nBp">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Inuktitut-Nunavut" id="fSw-4s-nBp">
+                                                                    <menuItem title="Inuktitut-Nutaaq" tag="-30602" id="ZzR-k7-KED">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Inuktitut-Nutaaq" id="ZzR-k7-KED">
+                                                                    <menuItem title="Inuktitut-QWERTY" tag="-30600" id="k28-7V-Cle">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Inuktitut-QWERTY" id="k28-7V-Cle">
+                                                                    <menuItem title="Inuttitut Nunavik" tag="-30603" id="87y-A2-iKc">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Inuttitut Nunavik" id="87y-A2-iKc">
+                                                                    <menuItem title="Irish" tag="-50" id="O3I-oV-fRS">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Irish" id="O3I-oV-fRS">
+                                                                    <menuItem title="Irish Extended" tag="-500" id="ecK-7u-tnR">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Irish Extended" id="ecK-7u-tnR">
+                                                                    <menuItem title="Italian" tag="4" id="hA1-WF-6wp">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Italian" id="hA1-WF-6wp">
+                                                                    <menuItem title="Italian - Pro" tag="223" id="dy3-Cr-4Bt">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Italian - Pro" id="dy3-Cr-4Bt">
+                                                                    <menuItem title="Jawi-QWERTY" tag="-19000" id="Mer-uE-HXN">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Jawi-QWERTY" id="Mer-uE-HXN">
+                                                                    <menuItem title="Kannada" tag="-24064" id="CTi-Ed-zlv">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Kannada" id="CTi-Ed-zlv">
+                                                                    <menuItem title="Kannada-QWERTY" tag="-24065" id="zYe-w7-9OC">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Kannada-QWERTY" id="zYe-w7-9OC">
+                                                                    <menuItem title="Kazakh" tag="-19501" id="yzP-AR-IHI">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Kazakh" id="yzP-AR-IHI">
+                                                                    <menuItem title="Khmer" tag="-26114" id="ogp-Ij-26g">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Khmer" id="ogp-Ij-26g">
+                                                                    <menuItem title="Kurdish-Sorani" tag="-17926" id="JuR-wv-MUp">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Kurdish-Sorani" id="JuR-wv-MUp">
+                                                                    <menuItem title="Latvian" tag="30765" id="Ov5-7D-lSw">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Latvian" id="Ov5-7D-lSw">
+                                                                    <menuItem title="Lithuanian" tag="30761" id="52C-FV-BrB">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Lithuanian" id="52C-FV-BrB">
+                                                                    <menuItem title="Macedonian" tag="19523" id="jiC-DP-6rM">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Macedonian" id="jiC-DP-6rM">
+                                                                    <menuItem title="Malayalam" tag="-24576" id="FOA-Kf-FJw">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Malayalam" id="FOA-Kf-FJw">
+                                                                    <menuItem title="Malayalam-QWERTY" tag="-24577" id="l7e-e7-bsQ">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Malayalam-QWERTY" id="l7e-e7-bsQ">
+                                                                    <menuItem title="Maltese" tag="-501" id="9va-Bf-jEy">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Maltese" id="9va-Bf-jEy">
+                                                                    <menuItem title="Maori" tag="-51" id="m2K-uV-dGO">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Maori" id="m2K-uV-dGO">
+                                                                    <menuItem title="Myanmar-QWERTY" tag="-25601" id="pq7-E7-iH4">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Myanmar-QWERTY" id="pq7-E7-iH4">
+                                                                    <menuItem title="Nepali" tag="-20484" id="t3e-sh-Wdf">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Nepali" id="t3e-sh-Wdf">
+                                                                    <menuItem title="Northern Sami" tag="-1200" id="zej-oA-e3v">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Northern Sami" id="zej-oA-e3v">
+                                                                    <menuItem title="Norwegian" tag="12" id="t0Z-Jf-UPh">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Norwegian" id="t0Z-Jf-UPh">
+                                                                    <menuItem title="Norwegian Extended" tag="-12" id="dgW-da-eak">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Norwegian Extended" id="dgW-da-eak">
+                                                                    <menuItem title="NorwegianSami-PC" tag="-13" id="3Fo-p6-g0J">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="NorwegianSami-PC" id="3Fo-p6-g0J">
+                                                                    <menuItem title="Oriya" tag="-22016" id="dIt-hY-l5J">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Oriya" id="dIt-hY-l5J">
+                                                                    <menuItem title="Oriya-QWERTY" tag="-22017" id="7vR-7W-LiT">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Oriya-QWERTY" id="7vR-7W-LiT">
+                                                                    <menuItem title="Persian" tag="-17960" id="Cxf-z2-nHQ">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Persian" id="Cxf-z2-nHQ">
+                                                                    <menuItem title="Persian-ISIRI 2901" tag="-2901" id="q3n-e2-jvC">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Persian-ISIRI 2901" id="q3n-e2-jvC">
+                                                                    <menuItem title="Persian-QWERTY" tag="-1959" id="WAV-hh-Nto">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Persian-QWERTY" id="WAV-hh-Nto">
+                                                                    <menuItem title="Polish" tag="30762" id="C2c-Bw-FW5">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Polish Pro" id="C2c-Bw-FW5">
+                                                                    <menuItem title="Polish Pro" tag="30788" id="JgC-NU-cfM">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Portuguese" id="AX9-yp-gXq">
+                                                                    <menuItem title="Portuguese" tag="10" id="AX9-yp-gXq">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Romanian" id="I5k-OA-CaQ">
+                                                                    <menuItem title="Romanian" tag="-39" id="I5k-OA-CaQ">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Romanian-Standard" id="sRE-vA-ImI">
+                                                                    <menuItem title="Romanian-Standard" tag="-38" id="sRE-vA-ImI">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Russian" id="2Jg-fw-kEn">
+                                                                    <menuItem title="Russian" tag="19456" id="2Jg-fw-kEn">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="RussianWin" id="6V7-yG-zH2">
+                                                                    <menuItem title="RussianWin" tag="19458" id="6V7-yG-zH2">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Russian - Phonetic" id="XHD-Zs-7cT">
+                                                                    <menuItem title="Russian - Phonetic" tag="19457" id="XHD-Zs-7cT">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Sami-PC" id="NIz-kt-BYq">
+                                                                    <menuItem title="Sami-PC" tag="-1201" id="NIz-kt-BYq">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Serbian" id="mVP-Ao-0YI">
+                                                                    <menuItem title="Serbian" tag="19521" id="mVP-Ao-0YI">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Serbian-Latin" id="0MA-ZA-L1D">
+                                                                    <menuItem title="Serbian-Latin" tag="-19521" id="0MA-ZA-L1D">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Sinhala" id="zgY-Tb-mQh">
+                                                                    <menuItem title="Sinhala" tag="-25088" id="zgY-Tb-mQh">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Sinhala-QWERTY" id="FIL-8d-Zg7">
+                                                                    <menuItem title="Sinhala-QWERTY" tag="-25089" id="FIL-8d-Zg7">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Slovak" id="E2a-QB-ymV">
+                                                                    <menuItem title="Slovak" tag="30777" id="E2a-QB-ymV">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Slovak-QWERTY" id="d0K-tL-EhV">
+                                                                    <menuItem title="Slovak-QWERTY" tag="30779" id="d0K-tL-EhV">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Slovenian" id="0mm-d3-MQy">
+                                                                    <menuItem title="Slovenian" tag="-66" id="0mm-d3-MQy">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Spanish" id="AhZ-xO-Dc9">
+                                                                    <menuItem title="Spanish" tag="8" id="AhZ-xO-Dc9">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Spanish - ISO" id="X4o-db-fhW">
+                                                                    <menuItem title="Spanish - ISO" tag="87" id="X4o-db-fhW">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Swedish" id="b6o-kJ-cbs">
+                                                                    <menuItem title="Swedish" tag="224" id="b6o-kJ-cbs">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Swedish - Pro" id="qbC-xV-O6T">
+                                                                    <menuItem title="Swedish - Pro" tag="7" id="qbC-xV-O6T">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="SwedishSami-PC" id="wAc-Zc-B7Y">
+                                                                    <menuItem title="SwedishSami-PC" tag="-15" id="wAc-Zc-B7Y">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Swiss French" id="wVI-DR-bep">
+                                                                    <menuItem title="Swiss French" tag="18" id="wVI-DR-bep">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Swiss German" id="o4Y-cb-7qh">
+                                                                    <menuItem title="Swiss German" tag="19" id="o4Y-cb-7qh">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Telugu" id="URy-wg-7bM">
+                                                                    <menuItem title="Telugu" tag="-23552" id="URy-wg-7bM">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Telugu-QWERTY" id="coi-eJ-TpM">
+                                                                    <menuItem title="Telugu-QWERTY" tag="-23553" id="coi-eJ-TpM">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Thai" id="w1L-BE-Tmy">
+                                                                    <menuItem title="Thai" tag="-26624" id="w1L-BE-Tmy">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Thai-PattaChote" id="fQr-T1-ihx">
+                                                                    <menuItem title="Thai-PattaChote" tag="-226626" id="fQr-T1-ihx">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="TibetanOtaniUS" id="wJX-Yn-RYT">
+                                                                    <menuItem title="TibetanOtaniUS" tag="-26628" id="wJX-Yn-RYT">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Tibetan-QWERTY" id="R0H-la-3N2">
+                                                                    <menuItem title="Tibetan-QWERTY" tag="-26625" id="R0H-la-3N2">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Tibetan-Wylie" id="Dhu-M4-FcX">
+                                                                    <menuItem title="Tibetan-Wylie" tag="-2398" id="Dhu-M4-FcX">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Turkish" id="DaX-TB-cVx">
+                                                                    <menuItem title="Turkish" tag="-24" id="DaX-TB-cVx">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Turkish-QWERTY" id="QX9-iF-h9V">
+                                                                    <menuItem title="Turkish-QWERTY" tag="-35" id="QX9-iF-h9V">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Turkish-QWERTY-PC" id="oKc-nA-1Oq">
+                                                                    <menuItem title="Turkish-QWERTY-PC" tag="-36" id="oKc-nA-1Oq">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Ukrainian" id="PVY-1w-l7Z">
+                                                                    <menuItem title="Ukrainian" tag="19518" id="PVY-1w-l7Z">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="UnicodeHexInput" id="xH2-zv-7jm">
+                                                                    <menuItem title="UnicodeHexInput" tag="-1" id="xH2-zv-7jm">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Urdu" id="Sli-wJ-R5b">
+                                                                    <menuItem title="Urdu" tag="-17925" id="Sli-wJ-R5b">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                     <menuItem title="U.S." id="Ohp-v6-AWa">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="US Extended" id="jZ5-al-x8e">
+                                                                    <menuItem title="US Extended" state="on" tag="-2" id="jZ5-al-x8e">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="USInternational-PC" id="TFM-nR-TuR">
+                                                                    <menuItem title="USInternational-PC" tag="15000" id="TFM-nR-TuR">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Uyghur" id="hAv-aT-usN">
+                                                                    <menuItem title="Uyghur" tag="-27000" id="hAv-aT-usN">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Vietnamese" id="pkm-DS-heQ">
+                                                                    <menuItem title="Vietnamese" tag="-31232" id="pkm-DS-heQ">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="Welsh" id="4er-Hv-EIx">
+                                                                    <menuItem title="Welsh" tag="-790" id="4er-Hv-EIx">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                 </items>
@@ -3690,13 +3715,18 @@ CA
                             <binding destination="Voe-Tx-rLC" name="value" keyPath="buildProcessTextField" id="8h0-L9-zOI"/>
                         </connections>
                     </textField>
-                    <progressIndicator maxValue="485" style="bar" id="b0H-od-wL6">
+                    <progressIndicator maxValue="87" style="bar" id="b0H-od-wL6">
                         <rect key="frame" x="91" y="40" width="393" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <connections>
-                            <binding destination="Voe-Tx-rLC" name="value" keyPath="buildProccessProgressBar" id="jhp-Ue-wDr"/>
-                            <binding destination="Voe-Tx-rLC" name="animate" keyPath="buildProccessProgressBarAniminate" id="gLx-m8-uQ1"/>
-                            <binding destination="Voe-Tx-rLC" name="isIndeterminate" keyPath="buildProccessProgressBarIndeterminate" previousBinding="gLx-m8-uQ1" id="k3H-Wc-WuA"/>
+                            <binding destination="Voe-Tx-rLC" name="value" keyPath="buildProcessProgressBar" previousBinding="rTW-7k-5LE" id="nyR-Os-AxY">
+                                <dictionary key="options">
+                                    <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                </dictionary>
+                            </binding>
+                            <binding destination="Voe-Tx-rLC" name="animate" keyPath="buildProcessProgressBarAniminate" id="NPk-3K-00C"/>
+                            <binding destination="Voe-Tx-rLC" name="isIndeterminate" keyPath="buildProcessProgressBarIndeterminate" previousBinding="NPk-3K-00C" id="bfR-lt-gad"/>
+                            <binding destination="Voe-Tx-rLC" name="maxValue" keyPath="buildProcessProgressBarMax" id="rTW-7k-5LE"/>
                         </connections>
                     </progressIndicator>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="qBg-BL-LIc">
@@ -3730,7 +3760,7 @@ CA
                     </progressIndicator>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="-121.5" y="-110"/>
+            <point key="canvasLocation" x="-251.5" y="-92"/>
         </window>
         <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="1GG-CU-yDP" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
