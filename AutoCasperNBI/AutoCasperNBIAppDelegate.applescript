@@ -71,7 +71,6 @@ script AutoCasperNBIAppDelegate
     property ardUsernameEncoded : ""
     property netBootCreatedPath : ""
     property desktopImageExists : ""
-    property netBootImageExpandValue : ""
     property selectedCasperImagingAppVersionToDelim : ""
     property selectedCasperImagingAppVersionMajor : ""
     property selectedCasperImagingAppVersionMinor : ""
@@ -93,7 +92,6 @@ script AutoCasperNBIAppDelegate
     property netBootDmgFreeSpace : ""
     property netBootDmgUsedSpace : ""
     property netBootReducedDmgMountPath : ""
-    property netBootExpandedTotalSize : ""
     property userNotifyWindow : ""
     property userNotifyError : ""
     property userNotifySuccess : ""
@@ -120,11 +118,11 @@ script AutoCasperNBIAppDelegate
     
     --- Booleans
     property selectedOSDMGTextFieldEnabled : false
-    property checkGreenOSDMG : false
+    property selectedOSDMGCheckPass : false
     property exclamationRedOSDMG : false
     property cogOSDMG : false
     property cogOSDMGAnimate : true
-    property checkGreenSelectedApp : false
+    property selectedAppCheckPass : false
     property exclamationRedSelectedApp : false
     property warningSelectedApp : false
     property cogSelectedApp : false
@@ -141,7 +139,6 @@ script AutoCasperNBIAppDelegate
     property disableOptionsAndBuild : true
     property netBootImageIndexLoadBalanced : false
     property optionWindowEnabled : true
-    property netBootImageExpandEnabled : false
     property netBootImageReduceEnabled : false
     property ardEnabled : false
     property vncEnabled : false
@@ -253,8 +250,6 @@ script AutoCasperNBIAppDelegate
                                             netBootDescriptionEnabled:netBootDescriptionEnabled, ¬
                                             servedFromNetSUS:servedFromNetSUS,  ¬
                                             netBootImageIndexLoadBalanced:netBootImageIndexLoadBalanced, ¬
-                                            netBootImageExpandEnabled:netBootImageExpandEnabled, ¬
-                                            netBootImageExpandValue:netBootImageExpandValue, ¬
                                             netBootImageReduceEnabled:netBootImageReduceEnabled, ¬
                                             netBootServeOverNFS:netBootServeOverNFS, ¬
                                             vncEnabled:vncEnabled, ¬
@@ -281,8 +276,6 @@ script AutoCasperNBIAppDelegate
         tell defaults to set my netBootDescriptionEnabled to objectForKey_("netBootDescriptionEnabled") as boolean
         tell defaults to set my servedFromNetSUS to objectForKey_("servedFromNetSUS") as boolean
         tell defaults to set my netBootImageIndexLoadBalanced to objectForKey_("netBootImageIndexLoadBalanced") as boolean
-        tell defaults to set my netBootImageExpandEnabled to objectForKey_("netBootImageExpandEnabled") as boolean
-        tell defaults to set my netBootImageExpandValue to objectForKey_("netBootImageExpandValue") as string
         tell defaults to set my netBootImageReduceEnabled to objectForKey_("netBootImageReduceEnabled") as boolean
         tell defaults to set my netBootServeOverNFS to objectForKey_("netBootServeOverNFS") as boolean
         tell defaults to set my vncEnabled to objectForKey_("vncEnabled") as boolean
@@ -347,25 +340,20 @@ script AutoCasperNBIAppDelegate
     ----- TIDY ICONS ----
     -- Reset OSDMG Icons, cog & further options
     on doResetOSDMGIcons_(sender)
-        set my checkGreenOSDMG to false
-        --set my exclamationRedOSDMG to false
+        set my selectedOSDMGCheckPass to false
         set my cogOSDMG to false
         set my disableOptionsAndBuild to true
     end doResetOSDMGIcons_
 
     -- Reset SelectedApp Icons, cog & further options
     on doResetSelectedAppIcons_(sender)
-        set my checkGreenSelectedApp to false
-        --set my exclamationRedSelectedApp to false
-        --set my warningSelectedApp to false
+        set my selectedAppCheckPass to false
         set my cogSelectedApp to false
     end doResetSelectedAppIcons_
     
     -- Reset JSSURL Icons
     on doResetJSSURLIcons_(sender)
         set my checkGreenJSSURL to false
-        --set my exclamationRedJSSURL to false
-        --set my warningJSSURL to false
         set my cogJSSURL to false
     end doResetJSSURLIcons_
 
@@ -549,13 +537,11 @@ script AutoCasperNBIAppDelegate
                     set my yosemiteOS to false
                 end if
                 -- Display green check icon
-                set my checkGreenOSDMG to true
+                set my selectedOSDMGCheckPass to true
                 -- Set netBoot Name
                 set my netBootNameTextField to selectedOSdmgVersion & " AutoCasperNBI"
-                -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
-                servedFromNetSUS_(me)
-                -- Set Image Index
-                netBootImageIndex_(me)
+                -- See if pre-reqs have been met
+                checkIfReadyToProceed_(me)
             on error
                 --Log Action
                 set logMe to "Cannot read OS Version"
@@ -589,20 +575,6 @@ script AutoCasperNBIAppDelegate
         end try
     end selectedApp_
 
-    -- Make sure OS & Imaging.app is specified before proceeding, once checked enable JSS options, as well as Build & Option buttons
-    on checkIfReadyToProceed_(sender)
-        -- Check to see if we have ticks or minor warning before we proceed
-        if (checkGreenSelectedApp or minorJSSAndCasperImagingVersionDiff) and checkGreenOSDMG is equal to true
-            -- Enable Options & Build
-            set my disableOptionsAndBuild to false
-            --Log Action
-            set logMe to "Pre-Reqs met, Options & Build enabled."
-            logToFile_(me)
-            -- Get the NetBoot Serve option
-            netBootServeOption_(me)
-        end if
-    end checkIfReadyToProceed_
-
     -- Check selected app is Casper Imaging & return version
     on selectedAppCheck_(sender)
         -- Set label to Casper Imaging version
@@ -628,10 +600,8 @@ script AutoCasperNBIAppDelegate
                 set my selectedAppTextField to "Casper Imaging " & selectedCasperImagingAppVersion
                 -- Reset Selected App Icons
                 doResetSelectedAppIcons_(me)
-                -- Set Image Index (reset index to make sure we don't create images with the same)
-                netBootImageIndex_(me)
                 -- Display green tick
-                set my checkGreenSelectedApp to true
+                set my selectedAppCheckPass to true
                 -- Compare JSS & Casper Imaging Versions
                 checkJSSURL_(me)
             -- Error if cannot get the version number
@@ -658,6 +628,24 @@ script AutoCasperNBIAppDelegate
         -- See if pre-reqs have been met
         checkIfReadyToProceed_(me)
     end selectedAppCheck_
+    
+    -- Make sure OS & Imaging.app is specified before proceeding, once checked enable JSS options, as well as Build & Option buttons
+    on checkIfReadyToProceed_(sender)
+        -- Check to see if we have ticks or minor warning before we proceed
+        if selectedAppCheckPass and selectedOSDMGCheckPass is equal to true
+            -- Enable Options & Build
+            set my disableOptionsAndBuild to false
+            --Log Action
+            set logMe to "Pre-Reqs met, Options & Build enabled."
+            logToFile_(me)
+            -- Get the NetBoot Serve option
+            netBootServeOption_(me)
+            -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
+            servedFromNetSUS_(me)
+            -- Set Image Index
+            netBootImageIndex_(me)
+        end if
+    end checkIfReadyToProceed_
 
     -- Check the JSS URL details & try & get version of the JSS
     on checkJSSURL_(sender)
@@ -1040,42 +1028,6 @@ script AutoCasperNBIAppDelegate
         -- Update plist with selection
         tell defaults to setObject_forKey_(netBootImageReduceEnabled, "netBootImageReduceEnabled")
     end netBootImageReduce_
-
-    -- Bound to "Expand by"
-    on netBootImageExpand_(sender)
-        -- Set netBootImageExpandEnabled to boolean of value
-        set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
-        -- Set options depending on checkbox
-        if netBootImageExpandEnabled is true then
-            --Log Action
-            set logMe to "NetBoot expand enabled"
-            logToFile_(me)
-        else
-            --Log Action
-            set logMe to "NetBoot expand option unchecked"
-            logToFile_(me)
-        end if
-        -- Update plist with selection
-        tell defaults to setObject_forKey_(netBootImageExpandEnabled, "netBootImageExpandEnabled")
-    end netBootImageExpand_
-
-    -- Bound to NetBoot Image Resize value
-    on netBootImageExpandEnteredValue_(sender)
-        -- Set netBootImageExpandEnabled to boolean of value
-        set netBootImageExpandEnabled to netBootImageExpandEnabled as boolean
-        -- If we're expanding the NetBoot Image
-        if netBootImageExpandEnabled is true then
-            -- If we have a value
-            if netBootImageExpandValue is equal to ""
-                -- Display error to user
-                display dialog "Please select a value to resize the NetBoot Image or deselect \"Expand By\"" with icon 0 buttons {"OK"}
-                -- Set to false so we don't proceed
-                set closeButtonPreCheckPassed to false
-            end if
-            -- Update plist with selection
-            tell defaults to setObject_forKey_(netBootImageExpandValue, "netBootImageExpandValue")
-        end if
-    end netBootImageExpandEnteredValue_
 
     -- Bound to "Enable ARD"
     on ardOption_(sender)
@@ -1615,8 +1567,6 @@ script AutoCasperNBIAppDelegate
         set closeButtonPreCheckPassed to true
         -- Verify that the description field has a value & reset & prompt if not
         netBootDescriptionCheck_(me)
-        -- Bound to NetBoot Image Resize value
-        netBootImageExpandEnteredValue_(me)
         -- Check the value entered in the ARD Username textfield
         checkardUsername_(me)
         -- Check the value entered in the ARD Password textfield
@@ -1722,7 +1672,7 @@ script AutoCasperNBIAppDelegate
     -- Calculate progressbar max length, depending on selection
     on calcBuildProgressBarMax_(sender)
         -- Reset
-        set my buildProcessProgressBarMax to 67
+        set my buildProcessProgressBarMax to 72
         -- Update build Process ProgressBar
         set my buildProcessProgressBar to 0
         -- Check if reduce NetBoot Image is ticked
@@ -1762,7 +1712,7 @@ script AutoCasperNBIAppDelegate
             set my buildProcessProgressBarMax to buildProcessProgressBarMax + 1
         end if
         -- If we're creating on a 10.9.x netboot
-        if hostMacOSVersion starts with "10.9" then
+        if selectedOSdmgVersionMajor is 9 then
             set my buildProcessProgressBarMax to buildProcessProgressBarMax + 1
         end if
         -- If we're creating a Restorable DMG
@@ -1773,7 +1723,9 @@ script AutoCasperNBIAppDelegate
         if servedFromNetSUS is true
             set my buildProcessProgressBarMax to buildProcessProgressBarMax + 2
         end if
-        log "Progress Bar set to " & buildProcessProgressBarMax
+        --Log Action
+        set logMe to "Progress Bar set to " & buildProcessProgressBarMax
+        logToFile_(me)
     end calcBuildProgressBarMax_
 
     -- Prompt user for location to create the .nbi
@@ -3969,28 +3921,28 @@ script AutoCasperNBIAppDelegate
     on disableSpotlight_(sender)
         try
             -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Disabling Spotlight Indexing"
+            set my buildProcessTextField to "Disabling Spotlight"
             delay 0.1
             -- Update build Process ProgressBar
             set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
-            set logMe to "Trying to disable Spotlight Indexing on " & netBootDmgMountPath
+            set logMe to "Trying to disable Spotlight on " & netBootDmgMountPath
             logToFile_(me)
-            -- Disable Spotlight Indexing
-            do shell script "/usr/bin/mdutil -i off " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
+            -- Delete Spotlight LaunchDaemon
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/LaunchDaemons/com.apple.metadata.mds.plist"  user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
-            set logMe to "Disabled Spotlight Indexing on " & netBootDmgMountPath
+            set logMe to "Disabled Spotlight on " & netBootDmgMountPath
             logToFile_(me)
             -- Create dlyd shared cache files
             createDlydCaches_(me)
         on error
             --Log Action
-            set logMe to "Error: Disabling Spolight Indexing"
+            set logMe to "Error: Disabling Spolight"
             logToFile_(me)
             -- Set to false to display
             set my userNotifyErrorHidden to false
             -- Set Error message
-            set my userNotifyError to "Error: Disabling Spolight Indexing"
+            set my userNotifyError to "Error: Disabling Spolight"
             -- Notify of errors or success
             userNotify_(me)
         end try
@@ -4014,8 +3966,8 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Successfully created dyld caches"
             logToFile_(me)
-            -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
-            manualKernelCacheReductionCheck_(me)
+            -- Reduce Kernel cache
+            reduceKernelCache_(me)
         on error
             --Log Action
             set logMe to "Error: Creating dyld shared cache files"
@@ -4029,79 +3981,72 @@ script AutoCasperNBIAppDelegate
         end try
     end createDlydCaches
 
-    -- If we're running on 10.9.0 - .3 then manually reduce kernel cache
-    on manualKernelCacheReductionCheck_(sender)
-        considering numeric strings
-            -- If we're creating on a 10.9.x netboot
-            if hostMacOSVersion starts with "10.9" then
+    -- Reduce Kernel cache if we're on 10.9.x
+    on reduceKernelCache_(sender)
+        if selectedOSdmgVersionMajor is 9 then
+            try
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Deleting extensions to reduce kernel cache size"
+                delay 0.1
+                -- Update build Process ProgressBar
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
-                set logMe to "Manually reducing kernel cache as on 10.9"
+                set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/Accusys*"
                 logToFile_(me)
-                -- Reduce Kernel cache
-                reduceKernelCache_(me)
-            else
+                -- Delete extensions
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/Accusys*"  user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
-                set logMe to "Skipping extension deletion as not needed on this OS"
+                set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/Accusys*"
+                logToFile_(me)
+                --Log Action
+                set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
+                logToFile_(me)
+                -- Delete extensions
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/AMD*"  user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
+                logToFile_(me)
+                --Log Action
+                set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/ATI*"
+                logToFile_(me)
+                -- Delete extesntions
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATI*" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATI*"
+                logToFile_(me)
+                --Log Action
+                set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
+                logToFile_(me)
+                -- Delete extesntions
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATTO*" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
+                logToFile_(me)
+                --Log Action
+                set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/JMicronATA.kext"
+                logToFile_(me)
+                -- Delete extentions
+                do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/JMicronATA.kext" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/JMicronATA.kext"
                 logToFile_(me)
                 -- Generate the Kernel cache
                 generateKernelCache_(me)
-            end if
-        end considering
-    end manualKernelCacheReductionCheck_
-
-    -- Reduce Kernel cache if we're on 10.9.x
-    on reduceKernelCache_(sender)
-        try
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Deleting extensions to reduce kernel cache size"
-            delay 0.1
-            -- Update build Process ProgressBar
-            set my buildProcessProgressBar to buildProcessProgressBar + 1
-            --Log Action
-            set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
-            logToFile_(me)
-            -- Delete extensions
-            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/AMD*"  user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/AMD*"
-            logToFile_(me)
-            --Log Action
-            set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/ATI*"
-            logToFile_(me)
-            -- Delete extesntions
-            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATI*" user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATI*"
-            logToFile_(me)
-            --Log Action
-            set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
-            logToFile_(me)
-            -- Delete extesntions
-            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/ATTO*" user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/ATTO*"
-            logToFile_(me)
-            --Log Action
-            set logMe to "Trying to delete " & netBootDmgMountPath & "/System/Library/Extensions/JMicronATA.kext"
-            logToFile_(me)
-            -- Delete extentions
-            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/Extensions/JMicronATA.kext" user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/Extensions/JMicronATA.kext"
-            logToFile_(me)
+            on error
+                --Log Action
+                set logMe to "Error: Deleting extensions"
+                logToFile_(me)
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
+                -- Set Error message
+                set my userNotifyError to "Error: Deleting extensions"
+                -- Notify of errors or success
+                userNotify_(me)
+            end try
+        else
             -- Generate the Kernel cache
             generateKernelCache_(me)
-        on error
-            --Log Action
-            set logMe to "Error: Deleting extensions"
-            logToFile_(me)
-            -- Set to false to display
-            set my userNotifyErrorHidden to false
-            -- Set Error message
-            set my userNotifyError to "Error: Deleting extensions"
-            -- Notify of errors or success
-            userNotify_(me)
-        end try
+        end if
     end reduceKernelCache_
 
     -- Generate the Kernel cache
@@ -4805,6 +4750,30 @@ script AutoCasperNBIAppDelegate
             userNotify_(me)
         end if
     end weDidIt_
+
+    -- Open Log Location
+    on openLogLocation_(sender)
+        -- Close User Notify Window
+        userNotifyClose_(me)
+        --Open log file with console
+        tell application "Console"
+            open "~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log" as POSIX file
+        end tell
+        -- Make frontmost
+        tell application "System Events" to set frontmost of process "Console" to true
+    end openLogLocation_
+
+    -- Open NBI Location
+    on openNBILocation_(sender)
+        -- Close User Notify Window
+        userNotifyClose_(me)
+        -- Open NBI folder in Finder
+        tell application "Finder"
+            open netBootDirectory as POSIX file
+        end tell
+        -- Make frontmost
+        tell application "System Events" to set frontmost of process "Finder" to true
+    end openNBILocation_
 
     -- Notify of errors or success
     on userNotify_(sender)

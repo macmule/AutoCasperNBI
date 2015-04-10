@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "AutoCasperNBI/AutoCasperNBIAppDelegate.applescript"
-            timestampString = "448841942.282633"
+            timestampString = "450401822.262548"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "4352"
-            endingLineNumber = "4352"
+            startingLineNumber = "4297"
+            endingLineNumber = "4297"
             landmarkName = "on updateNBImageInfoPlist_(sender)"
             landmarkType = "5">
          </BreakpointContent>
