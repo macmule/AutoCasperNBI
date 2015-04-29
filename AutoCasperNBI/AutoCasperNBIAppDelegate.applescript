@@ -408,6 +408,8 @@ script AutoCasperNBIAppDelegate
         checkPasswords_(me)
         -- Open the Main Window
         openMainWindow_(me)
+        -- Set Image Index
+        netBootImageIndex_(me)
     end applicationWillFinishLaunching_
     
     -- Open the Main Window
@@ -840,7 +842,7 @@ script AutoCasperNBIAppDelegate
 
     -- Correct NetBoot Name, removing spaces if to be hosted on a NetSUS
     on servedFromNetSUS_(sender)
-        -- Set netBootImageIndexLoadBalanced to boolean of value
+        -- Set servedFromNetSUS to boolean of value
         set servedFromNetSUS to servedFromNetSUS as boolean
         -- If true, remove spaces from NetBoot Name
         if servedFromNetSUS is true then
@@ -4376,7 +4378,7 @@ script AutoCasperNBIAppDelegate
                 set logMe to "Trying to set .nbi to RootPath"
                 logToFile_(me)
                 -- Set NetBoot to Diskless
-                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.sparseimage" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
                 set logMe to "Set .nbi to RootPath"
                 logToFile_(me)
@@ -4621,8 +4623,8 @@ script AutoCasperNBIAppDelegate
                 --Log Action
                 set logMe to "ASR scanned " & netBootDirectory & "/NetBoot.restorable.dmg"
                 logToFile_(me)
-                -- Rename sparseimage if we're hosting on a NetSUS
-                renameSparseimageForNetSUS_(me)
+                -- Rename sparseimage to .DMG
+                renameSparseimageToDMG_(me)
             on error
                 --Log Action
                 set logMe to "Error: Creating Restorable DMG"
@@ -4637,82 +4639,41 @@ script AutoCasperNBIAppDelegate
         else
             -- Set netBootCreationSuccessful value, for notifying later
             set my netBootCreationSuccessful to true
-            -- Rename sparseimage if we're hosting on a NetSUS
-            renameSparseimageForNetSUS_(me)
+            -- Rename sparseimage to .DMG
+            renameSparseimageToDMG_(me)
         end if
     end createReadOnlyDMG_
 
-    -- Rename sparseimage if we're hosting on a NetSUS
-    on renameSparseimageForNetSUS_(sender)
-        -- If true, rename sparseimage
-        if servedFromNetSUS is true
+    -- Rename sparseimage to .DMG
+    on renameSparseimageToDMG_(sender)
             try
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Renaming NBI for serving from a NetSUS"
+                set my buildProcessTextField to "Renaming NetBoot.sparseimage to NetBoot.dmg"
                 delay 0.1
                 -- Update build Process ProgressBar
                 set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
-                set logMe to "Trying to rename " & netBootDirectory & "/NetBoot.sparseimage for serving from a  NetSUS"
+                set logMe to "Trying to rename " & netBootDirectory & "/NetBoot.sparseimage to NetBoot.dmg"
                 logToFile_(me)
                 -- Rename NetBoot.sparseimage
                 do shell script "/bin/mv " & quoted form of netBootDirectory & "/NetBoot.sparseimage " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
-                set logMe to "Renamed " & netBootDirectory & "/NetBoot.sparseimage for serving from a  NetSUS"
-                logToFile_(me)
-                -- Update NBImageInfo.plist RootPath ----
-                set my buildProcessTextField to "Setting NBImageInfo.plist RootPath"
-                delay 0.1
-                -- Update build Process ProgressBar
-                set my buildProcessProgressBar to buildProcessProgressBar + 1
-                --Log Action
-                set logMe to "Trying to set .nbi to RootPath"
-                logToFile_(me)
-                -- Set NetBoot to Diskless
-                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist RootPath -string NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
-                --Log Action
-                set logMe to "Set .nbi to RootPath"
-                logToFile_(me)
-                --Log Action
-                set logMe to "Trying to correct permissions on " & netBootDirectory & "/NBImageInfo.plist"
-                logToFile_(me)
-                -- Making NBImageInfo.plist writable
-                do shell script "/bin/chmod 644 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
-                --Log Action
-                set logMe to "Set permissons on " & netBootDirectory & "/NBImageInfo.plist to 644"
-                logToFile_(me)
-                ---- Convert NBImageInfo.plist to xml ----
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Converting NBImageInfo.plist to xml"
-                delay 0.1
-                -- Update build Process ProgressBar
-                set my buildProcessProgressBar to buildProcessProgressBar + 1
-                --Log Action
-                set logMe to "Trying to convert " & netBootDirectory & "/NBImageInfo.plist to xml"
-                logToFile_(me)
-                -- Making NBImageInfo.plist writable
-                do shell script "/usr/bin/plutil -convert xml1 " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
-                --Log Action
-                set logMe to "Converted " & netBootDirectory & "/NBImageInfo.plist to xml"
+                set logMe to "Renamed " & netBootDirectory & "/NetBoot.sparseimage to NetBoot.dmg"
                 logToFile_(me)
                 -- Reset build process variables
                 tidyUpTimeKids_(me)
             on error
                 --Log Action
-                set logMe to "Error: Renaming NBI for serving from a NetSUS"
+                set logMe to "Error: Renaming NetBoot.sparseimage to NetBoot.dmg"
                 logToFile_(me)
                 -- Set to false to display
                 set my userNotifyErrorHidden to false
                 -- Set Error message
-                set my userNotifyError to "Error: Renaming NBI for serving from a NetSUS"
+                set my userNotifyError to "Error: Renaming NetBoot.sparseimage to NetBoot.dmg"
                 -- Notify of errors or success
                 userNotify_(me)
             end try
-        else
-            -- Reset build process variables
-            tidyUpTimeKids_(me)
-        end if
-    end renameSparseimageForNetSUS_
+    end renameSparseimageToDMG_
 
     -- Reset build process variables
     on tidyUpTimeKids_(sender)

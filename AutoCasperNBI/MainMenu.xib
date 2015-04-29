@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1066" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1077" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
@@ -747,14 +747,14 @@ CA
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <box autoresizesSubviews="NO" title="Box" borderType="line" titlePosition="noTitle" id="dsm-cS-rQQ">
-                                                        <rect key="frame" x="15" y="389" width="377" height="97"/>
+                                                        <rect key="frame" x="15" y="387" width="377" height="99"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView">
-                                                            <rect key="frame" x="1" y="1" width="375" height="95"/>
+                                                            <rect key="frame" x="1" y="1" width="375" height="97"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="OES-T8-5YN">
-                                                                    <rect key="frame" x="16" y="49" width="343" height="34"/>
+                                                                    <rect key="frame" x="16" y="51" width="343" height="34"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="The below are automatically set via AutoCasperNBI for your NetBoot creation pleasure.        " id="ita-kW-hMa">
                                                                         <font key="font" metaFont="system"/>
@@ -763,7 +763,7 @@ CA
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="xou-bT-1OE">
-                                                                    <rect key="frame" x="16" y="-11" width="343" height="55"/>
+                                                                    <rect key="frame" x="16" y="-9" width="343" height="55"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Hold the mouse cursor over a setting to display it's Tool Tip, this will give more information." id="TQR-Ut-822">
                                                                         <font key="font" metaFont="system"/>
@@ -777,7 +777,7 @@ CA
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <button toolTip="Auto logs in as Root" allowsExpansionToolTips="YES" id="YGI-gl-o1f">
-                                                        <rect key="frame" x="40" y="285" width="203" height="20"/>
+                                                        <rect key="frame" x="35" y="291" width="203" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Auto login as Root" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="l5c-Qx-aOC">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -785,7 +785,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Enables root acount with the password: netboot" id="a0U-xS-eC4">
-                                                        <rect key="frame" x="40" y="300" width="203" height="20"/>
+                                                        <rect key="frame" x="35" y="306" width="203" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Create Root account" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="ABj-yU-V0S">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -793,7 +793,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Disables the Screen Saver for the root account." id="6df-kB-PSd">
-                                                        <rect key="frame" x="40" y="270" width="261" height="20"/>
+                                                        <rect key="frame" x="35" y="276" width="261" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Disables Screen Saver for Root account" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="aFe-Iq-IoB">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -801,7 +801,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Disables App Nap incase it interferes with use cases where the NBI is being used for diagnostic or stress testing." id="DsR-ZJ-XsR">
-                                                        <rect key="frame" x="40" y="150" width="259" height="20"/>
+                                                        <rect key="frame" x="35" y="141" width="259" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Disables App Nap" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="T14-nT-rss">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -809,15 +809,15 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Disables Software Update from running." id="hRi-6W-ZwG">
-                                                        <rect key="frame" x="40" y="135" width="259" height="20"/>
+                                                        <rect key="frame" x="35" y="126" width="259" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Disables Software Update" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="nBR-fM-XKp">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                     </button>
-                                                    <button toolTip="Disables Spotlight" id="Mcy-TJ-LAd">
-                                                        <rect key="frame" x="40" y="120" width="259" height="20"/>
+                                                    <button toolTip="Disables Spotlight, removing it's launchDaemons " id="Mcy-TJ-LAd">
+                                                        <rect key="frame" x="35" y="111" width="259" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Disables Spotlight" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="DjW-iL-Ppl">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -825,7 +825,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Deletes the com.apple.dockfixup.plist to stop extra items from being added to the root users Dock." id="HMg-iY-0MA">
-                                                        <rect key="frame" x="40" y="255" width="259" height="20"/>
+                                                        <rect key="frame" x="35" y="261" width="259" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Deletes com.apple.dockfixup.plist" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="ibB-Rb-7i0">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -833,7 +833,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Creates a Dock for the root user containing only the Finder, Casper Imaging &amp; Trash." id="S5e-GW-V6k">
-                                                        <rect key="frame" x="40" y="240" width="277" height="20"/>
+                                                        <rect key="frame" x="35" y="246" width="277" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Creates a minimal Dock for root account" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="L98-7A-iWs">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -841,31 +841,31 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Creates the debug folder within the Casper Imaging.app to enable debug mode." id="Rnz-7H-s7b">
-                                                        <rect key="frame" x="40" y="210" width="259" height="20"/>
+                                                        <rect key="frame" x="35" y="201" width="259" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Enables Casper Imaging's Debug Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="l3s-fy-J9Z">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                     </button>
-                                                    <button toolTip="Sets Casper Imaging to allow an invalid JSS cert, is a JSS URL is specified." id="0Oz-mG-uD8">
-                                                        <rect key="frame" x="40" y="165" width="297" height="20"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Enables invalid JSS Cert (if a JSS URL is given)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="HJw-tQ-6LT">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                    </button>
                                                     <button toolTip="Launches Casper Imaging at login" id="Twn-Pa-2K4">
-                                                        <rect key="frame" x="40" y="225" width="336" height="20"/>
+                                                        <rect key="frame" x="35" y="216" width="336" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Launches Casper Imaging at login" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="Kif-bY-Blb">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                     </button>
+                                                    <button toolTip="Copies the selected Casper Imaging to the NBI's /Application/ folder." id="uyM-Xe-Lku">
+                                                        <rect key="frame" x="35" y="231" width="336" height="20"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Copies Caper Imaging to NBI's Applications folder" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="pI8-jp-PM4">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                    </button>
                                                     <button toolTip="Remove Casper Imaging's quarantine flag (if present)." id="f2H-ec-FN5">
-                                                        <rect key="frame" x="40" y="195" width="287" height="20"/>
+                                                        <rect key="frame" x="35" y="186" width="287" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Removes Casper Imaging's Quarantine Flag" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="WW4-rQ-RUC">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -873,7 +873,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button id="QRz-XQ-y7h">
-                                                        <rect key="frame" x="40" y="180" width="291" height="20"/>
+                                                        <rect key="frame" x="35" y="171" width="291" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <string key="toolTip">Imports the cert for the JSS (if the JSS URL has been given &amp; was contactable), also imports the certificate as a trusted root certificate.</string>
                                                         <buttonCell key="cell" type="check" title="Imports JSS CA Certificated &amp; trust as a root" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="lKd-P2-xpO">
@@ -882,7 +882,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Sets the NetBoot Image to diskless." id="EIv-Ya-yAR">
-                                                        <rect key="frame" x="40" y="60" width="239" height="20"/>
+                                                        <rect key="frame" x="35" y="51" width="239" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Enables Diskless NetBoot" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="cpE-U7-eM3">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -890,7 +890,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Supresses the Diagnostic Usage prompt that appears when logging into a new account on 10.10.x." id="MYD-PU-HMw">
-                                                        <rect key="frame" x="40" y="315" width="297" height="20"/>
+                                                        <rect key="frame" x="35" y="321" width="297" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Suppresses Diagnostics Prompt (10.10.x)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="kSK-se-xCE">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -898,7 +898,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Disables GateKeeper" id="FWF-ak-T3V">
-                                                        <rect key="frame" x="40" y="90" width="201" height="20"/>
+                                                        <rect key="frame" x="35" y="81" width="201" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Disables GateKeeper" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="rMS-x4-c4o">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -906,7 +906,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Enables Disk Utilities Debug menu for assisting when troubleshooting disks." id="s86-zO-Wj4">
-                                                        <rect key="frame" x="40" y="75" width="230" height="20"/>
+                                                        <rect key="frame" x="35" y="66" width="230" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Enables Disk Utilities Debug Menu" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="dCt-te-XnD">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -914,15 +914,15 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Reduces Kernel Cache to less than 32MB for booting some older Macs." id="zSA-ei-o2g">
-                                                        <rect key="frame" x="40" y="360" width="303" height="20"/>
+                                                        <rect key="frame" x="35" y="366" width="303" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Reduces Kernel Cache if a 10.9.x NBI" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="clj-F4-42Z">
+                                                        <buttonCell key="cell" type="check" title="Reduces Kernel Cache if a 10.9.x NBI" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" state="on" inset="2" id="clj-F4-42Z">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Suppresses Apple's Setup Assistant" id="EVN-8i-mhu">
-                                                        <rect key="frame" x="40" y="345" width="208" height="20"/>
+                                                        <rect key="frame" x="35" y="351" width="208" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Supresses Apple Setup Assistant" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="ww3-BN-oT4">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -930,7 +930,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Supresses the iCloud Setup Assitant that appears when logging into a new account." id="1WF-ar-hSo">
-                                                        <rect key="frame" x="40" y="330" width="239" height="20"/>
+                                                        <rect key="frame" x="35" y="336" width="239" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Supresses iCloud Setup Assistant" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="g6x-xT-IBA">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -938,7 +938,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="Stops TimeMachine from asking for new disks to be used for backing up too." id="DIn-tD-gcy">
-                                                        <rect key="frame" x="40" y="105" width="212" height="20"/>
+                                                        <rect key="frame" x="35" y="96" width="212" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Disables TimeMachine prompts" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="ZZC-SV-Pga">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -946,7 +946,7 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="The NetBoot Image will be expanded to 64GB, this allows the NetBoot to use upto 64GB of RAM to cache it's startup disk." id="jt4-5q-AGt">
-                                                        <rect key="frame" x="40" y="45" width="239" height="20"/>
+                                                        <rect key="frame" x="35" y="36" width="239" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Expands NetBoot Image to 64GB" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="5ah-Wn-bhf">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -954,17 +954,25 @@ CA
                                                         </buttonCell>
                                                     </button>
                                                     <button toolTip="The NetBoot Image is compacted so as to take up as little disk space on the NetBoot Server." id="6uV-X8-Nwy">
-                                                        <rect key="frame" x="40" y="30" width="239" height="20"/>
+                                                        <rect key="frame" x="35" y="21" width="239" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Compacts NetBoot Image" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="zZH-bC-KPt">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                     </button>
-                                                    <button toolTip="The NetBoot Image is compacted so as to take up as little disk space on the NetBoot Server." id="qbJ-GG-PGP">
-                                                        <rect key="frame" x="40" y="15" width="304" height="20"/>
+                                                    <button toolTip="The NetBoot.sparseimage is renamed NetBoot.dmg for hosting on some NetBoot Servers" id="qbJ-GG-PGP">
+                                                        <rect key="frame" x="35" y="6" width="331" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Renames Sparseimage to DMG for hosting on NetSUS" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="1Sn-AO-31J">
+                                                        <buttonCell key="cell" type="check" title="Renames Sparseimage to DMG" bezelStyle="regularSquare" imagePosition="left" controlSize="small" enabled="NO" state="on" inset="2" id="1Sn-AO-31J">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                    </button>
+                                                    <button toolTip="Sets Casper Imaging to allow an invalid JSS cert, is a JSS URL is specified." id="0Oz-mG-uD8">
+                                                        <rect key="frame" x="34" y="155" width="292" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Enables invalid JSS Cert (if a JSS URL is given)" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" state="on" inset="2" id="HJw-tQ-6LT">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
