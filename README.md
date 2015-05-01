@@ -3,10 +3,10 @@
 <br>
 <url>https://macmule.com/AutoCasperNBI</url><br>
 <br>
-<b>KNOWN ISSUES</b><br>
- Yosemite DMGs are around 1GB larger than 10.7-10.9<br>
+<b>LATEST-RELEASE</b><br>
+<url>https://github.com/macmule/AutoCasperNBI/releases/latest</url><br>
 <br>
-<b>VERSIONS</b><br>
+<b>VERSION HISTORY</b><br>
 <br>
 1.2.0<br>
 <br>
