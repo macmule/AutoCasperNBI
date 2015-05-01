@@ -8,6 +8,47 @@
 <br>
 <b>VERSIONS</b>
 <br>
+Contains fixes from pre-releases 1.1.5 - 1.1.8, many thanks for those of you whom tested those for me.
+
+*   Completely disable Spotlight [#48](https://github.com/macmule/AutoCasperNBI/issues/48 "Completely disable Spotlight")
+*   Correct Progress Bar logging [#47](https://github.com/macmule/AutoCasperNBI/issues/47 "Correct Progress Bar logging")
+*   Unsigned Kernel Extensions error when creating 10.9 NBI on 10.10 [#46](https://github.com/macmule/AutoCasperNBI/issues/46 "Unsigned Kernel Extensions error when creating 10.9 NBI on 10.10")
+*   Add more buttons to success/error window [#45](https://github.com/macmule/AutoCasperNBI/issues/45 "Add more buttons to success/error window")
+*   Options greyed out when Imaging.app selected before OS.dmg [#43](https://github.com/macmule/AutoCasperNBI/issues/43 "Options greyed out when Imaging.app selected before OS.dmg")
+*   Hidden content in success popup [#42](https://github.com/macmule/AutoCasperNBI/issues/42 "Hidden content in success popup")
+*   Replace inputLayoutID with XIB's Tag ID (Again, thanks Frogor) [#31](https://github.com/macmule/AutoCasperNBI/issues/31 "Replace inputLayoutID with XIB's Tag ID")
+*   Sort out the bloody progress bar, proper like! [#32](https://github.com/macmule/AutoCasperNBI/issues/32 "Sort out the bloody progress bar, proper like!")
+*   JSS URL not written to plist in 1.1.6 [#38](https://github.com/macmule/AutoCasperNBI/issues/38 "JSS URL not written to plist in 1.1.6")
+*   1.1.6 Permissions incorrect on NBImage.plist post NetSUS DMG amendment [#39](https://github.com/macmule/AutoCasperNBI/issues/39 "1.1.6 Permissions incorrect on NBImage.plist post NetSUS DMG amendment")
+*   Correct typo in proccess variables [#40](https://github.com/macmule/AutoCasperNBI/issues/40 "Correct typo in proccess variables")
+*   Add refresh button for JSS URL [#41](https://github.com/macmule/AutoCasperNBI/issues/41 "Add refresh button for JSS URL")
+*   Removed Setup Assistant.app to stop Diagnostics Prompt. [#37](https://github.com/macmule/AutoCasperNBI/issues/37 "Diagnostics setup assistant showing on 10.10")
+*   Changed mount points to plist (thanks Frogor!!)
+*   Moved free space & total size calculations to bytes via plist of diskutil info, which should resolve a few issues.
+*   Amended size calculation as moved to sparse image requires 1/3 less space in some situations.
+*   Removed 1k of un-needed code [#30](https://github.com/macmule/AutoCasperNBI/issues/30 "So much un-unused Code.. me thinks it's time to delete!")
+*   Fixed behaviour when cancelling build. [#36](https://github.com/macmule/AutoCasperNBI/issues/36 "Re-enable build buttons when trying to build & out of space")
+*   Renamed "Read-Only DMG" to "Restorable DMG" in GUI & logs, kept old key in plist for compatibility.
+*   Corrected OS Version variable, so should behave correctly.
+*   Enhancement: Reduce DMG size further by using .sparseimage [#4](https://github.com/macmule/AutoCasperNBI/issues/4 "Enhancement: Reduce DMG size further by using .sparseimage")
+*   Enhancement: Check for updates before creds [#10](https://github.com/macmule/AutoCasperNBI/issues/10 "Enhancement: Check for updates before creds")
+*   Enable Disk Utilities debug mode [#13](https://github.com/macmule/AutoCasperNBI/issues/13 "Enable Disk Utilities debug mode")
+*   NetBoot Image Description does not get written to NBImageInfo.plist [#15](https://github.com/macmule/AutoCasperNBI/issues/15 "NetBoot Image Description does not get written to NBImageInfo.plist")
+*   10.9.x NBI created in 10.10.x won't boot [#16](https://github.com/macmule/AutoCasperNBI/issues/16 "10.9.x NBI created in 10.10.x won't boot")
+*   Put Casper Imaging into Debug mode [#17](https://github.com/macmule/AutoCasperNBI/issues/17 "Put Casper Imaging into Debug mode")
+*   AutoCasperNBI reading MB as GB when calculating space [#18](https://github.com/macmule/AutoCasperNBI/issues/18 "AutoCasperNBI reading MB as GB when calculating space")
+*   Correct typo in TimeMachine ToolTip [#19](https://github.com/macmule/AutoCasperNBI/issues/19 "Correct typo in TimeMachine ToolTip")
+*   Change Add Packages/Certs to remember last location & not always change. [#20](https://github.com/macmule/AutoCasperNBI/issues/20 "Change Add Packages/Certs to remember last location & not always change.")
+*   "Cannot Read OS Version" from Composer captured OS.dmg's [#22](https://github.com/macmule/AutoCasperNBI/issues/22 ""Cannot Read OS Version" from Composer captured OS.dmg's")
+*   Add timeout for JSS URL [#23](https://github.com/macmule/AutoCasperNBI/issues/23 "Add timeout for JSS URL")
+*   Automatically Compact NetBoot Image [#24](https://github.com/macmule/AutoCasperNBI/issues/24 "Automatically Compact NetBoot Image")*   Automatically Expand Image [#25](https://github.com/macmule/AutoCasperNBI/issues/25 "Automatically Expand Image")
+*   Update Icons for JSS 9.5 [#26](https://github.com/macmule/AutoCasperNBI/issues/26 "Update Icons for JSS 9.5")
+*   Remove status blobs [#27](https://github.com/macmule/AutoCasperNBI/issues/27 "Remove status blobs")
+*   Detail everything in "Always Set" section [#28](https://github.com/macmule/AutoCasperNBI/issues/28 "Detail everything in "Always Set" section")
+*   Move to GitHub releases page & big button on [https://macmule.com/AutoCasperNBI](https://macmule.com/AutoCasperNBI) [#29](https://github.com/macmule/AutoCasperNBI/issues/29 "Move to GitHub releases page & big button on https://macmule.com/AutoCasperNBI")
+*   With additional PKG's & Cert's don't revert window [#33](https://github.com/macmule/AutoCasperNBI/issues/33 "With additional PKG's & Cert's don't revert window")
+*   Some PKG's cannot be added [#34](https://github.com/macmule/AutoCasperNBI/issues/34 "Some PKG's cannot be added ")
+<br>
 <br>1.1.4<br>
 — Fixes an where changing the NetBoot Image Index field. Results in the error "Maximum Exceeded - Please provide a valid value "https://github.com/macmule/AutoCasperNBI/issues/12"<br>
 <br>1.1.3<br>
