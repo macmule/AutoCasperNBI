@@ -9,10 +9,10 @@
 <b>VERSION HISTORY</b><br>
 <br>1.2.1<br>
 <br>
--- RAM disk not hidden <a href="https://github.com/macmule/AutoCasperNBI/issues/50" class="issue-link" title="RAM disk not hidden">#50</a></li>
--- Support for Limited access JSS <a href="https://github.com/macmule/AutoCasperNBI/issues/53" class="issue-link" title="Support for Limited access JSS">#53</a></li>
--- NetBoot.restorable.dmg Non Journaled Volume <a href="https://github.com/macmule/AutoCasperNBI/issues/54" class="issue-link" title="NetBoot.restorable.dmg Non Journaled Volume">#54</a></li>
--- Reduce RAM Disk size from 2GB to 1GB <a href="https://github.com/macmule/AutoCasperNBI/issues/55" class="issue-link" title="Reduce RAM Disk size from 2GB to 1GB">#55</a></li>
+-- RAM disk not hidden <a href="https://github.com/macmule/AutoCasperNBI/issues/50" class="issue-link" title="RAM disk not hidden">#50</a></li><br>
+-- Support for Limited access JSS <a href="https://github.com/macmule/AutoCasperNBI/issues/53" class="issue-link" title="Support for Limited access JSS">#53</a></li><br>
+-- NetBoot.restorable.dmg Non Journaled Volume <a href="https://github.com/macmule/AutoCasperNBI/issues/54" class="issue-link" title="NetBoot.restorable.dmg Non Journaled Volume">#54</a></li><br>
+-- Reduce RAM Disk size from 2GB to 1GB <a href="https://github.com/macmule/AutoCasperNBI/issues/55" class="issue-link" title="Reduce RAM Disk size from 2GB to 1GB">#55</a></li><br>
 <br>
 <br>1.2.0<br>
 <br>
