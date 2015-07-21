@@ -672,7 +672,7 @@ script AutoCasperNBIAppDelegate
                 -- Try & get URL using insecure method, this way it will work with or without a valid SSL cert, timesout after 30 seconds
                 set jssURLHtml to do shell script "/usr/bin/curl -k " & jssURL & "/jss.html -m 30"
                 --Log Action
-                set logMe to "Received JSS version"
+                set logMe to "Checking returned data for JSS version"
                 logToFile_(me)
                 -- Run Handler
                 getJSSVersion_(me)
@@ -696,8 +696,6 @@ script AutoCasperNBIAppDelegate
                         -- Error if cannot get JSS Version
                         set logMe to "Cannot get JSS Version"
                         logToFile_(me)
-                        -- Set JSS exclaimation icon to show
-                        --set my exclamationRedJSSURL to true
                         -- Update text field with error
                         set my enteredJSSURLTextField to "Cannot get JSS version"
                     end if
@@ -2088,7 +2086,7 @@ script AutoCasperNBIAppDelegate
             -- Set to text value, to avoid an issue when name changed
             set netBootNameTextField to netBootNameTextField as text
             -- Create the NetBoot.sparseimage
-            do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot.sparseimage -type SPARSE -size 64g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"GPTSPUD\" -fs \"HFS+\" -stretch 500g -ov -puppetstrings" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/hdiutil create " & quoted form of netBootDirectory & "/NetBoot.sparseimage -type SPARSE -size 64g -volname " & quoted form of netBootNameTextField & " -uid 0 -gid 80 -mode 1775 -layout \"GPTSPUD\" -fs \"HFS+J\" -stretch 500g -ov -puppetstrings" user name adminUserName password adminUsersPassword with administrator privileges
             --Log action
             set logMe to "Successfully created NetBoot.sparseimage in " & quoted form of netBootDirectory
             logToFile_(me)
@@ -3531,7 +3529,7 @@ script AutoCasperNBIAppDelegate
     on writeCasperImagingPlist_(sender)
         try
             -- If a JSS URL is specified
-            if jssURL is not ""
+            if my jssURL is not ""
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Writing Casper Imaging plist"
                 delay 0.1
@@ -3614,46 +3612,39 @@ script AutoCasperNBIAppDelegate
             -- Notify of errors or success
             userNotify_(me)
         end try
-        
     end installCasperImagingLaunchAgent_
 
     -- Get JSS CA Cert if JSS URL given
     on importJSSCACert_(sender)
         -- If a JSS URL is specified
         if jssURL is not equal to "" then
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Downloading JSS CA Cert"
+            delay 0.1
+            -- Update build Process ProgressBar
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
+            -- Application Support location on TempOSdmg for installing at boot
+            set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Certificates/"
+            -- Log Action
+            set logMe to "Downloading JSS CA Cert for " & jssURL
+            logToFile_(me)
             try
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Downloading JSS CA Cert"
-                delay 0.1
-                -- Update build Process ProgressBar
-                set my buildProcessProgressBar to buildProcessProgressBar + 1
-                -- Application Support location on TempOSdmg for installing at boot
-                set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Certificates/"
-                -- Log Action
-                set logMe to "Downloading JSS CA Cert for " & jssURL
-                logToFile_(me)
                 -- Download CA Cert from JSS to /Library/Application Support/AutoCasperNBI/Certificates/UUID
                 do shell script "curl -k -o " & quoted form of variableVariable & tempUUID & ".cer " & jssURL & "/CA/SCEP?operation=getcacert" user name adminUserName password adminUsersPassword with administrator privileges
                 -- Log Action
-                set logMe to "Downloaded JSS CA Cert to " & quoted form of variableVariable
+                set logMe to "Successfully Downloaded JSS CA Cert to " & quoted form of variableVariable
                 logToFile_(me)
-                -- Add any additional certs if specified
-                importAdditionalCerts_(me)
             on error
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Error: Downloading JSS CA Cert"
+                delay 0.1
                 --Log Action
-                set logMe to "Error: Importing JSS CA Cert"
+                set logMe to "Error: Downloading JSS CA Cert"
                 logToFile_(me)
-                -- Set to false to display
-                set my userNotifyErrorHidden to false
-                -- Set Error message
-                set my userNotifyError to "Error: Importing JSS CA Cert"
-                -- Notify of errors or success
-                userNotify_(me)
             end try
-        else
-            -- Add any additional certs if specified
-            importAdditionalCerts_(me)
         end if
+        -- Add any additional certs if specified
+        importAdditionalCerts_(me)
     end importJSSCACert_
 
     -- Add any additional certs if specified

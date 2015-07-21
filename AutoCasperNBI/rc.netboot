@@ -137,7 +137,7 @@ local_mount()
 RAMDisk()
 {
   mntpt=$1
-  rdsize=4194304 #1GB ((1*1024^3)/512)=2097152, 2GB=((2*1024^3)/512)=4194304
+  rdsize=2097152 #1GB ((1*1024^3)/512)=2097152, 2GB=((2*1024^3)/512)=4194304
   echo "Creating RAM Disk for $mntpt"
   dev=`hdik -drivekey system-image=yes -nomount ram://$rdsize`
   if [ $? -eq 0 ] ; then
@@ -147,6 +147,7 @@ RAMDisk()
     mount -t hfs -o union -o nobrowse $dev $mntpt
     chown $st_uid:$st_gid $mntpt
     chmod $st_mode $mntpt
+    chflags hidden $mntpt
   fi
 }
 
