@@ -221,7 +221,7 @@ script AutoCasperNBIAppDelegate
         set logMe to  "Running on OS " & hostMacOSVersion & " (" & hostMacOSBuildVersion & ")"
         logToFile_(me)
         -- If we're running on 10.10, enable Yosemite icons
-        if my hostMacOSVersion begins with "10.10" then
+        if my hostMacOSVersion begins with "10.10" or my hostMacOSVersion begins with "10.11" then
             set my yosemiteOS to true
         else
             set my yosemiteOS to false
@@ -533,7 +533,7 @@ script AutoCasperNBIAppDelegate
                 -- Reset OSDMG Icons
                 doResetOSDMGIcons_(me)
                 -- If we're building a 10.10 NBI, enable Yosemite icons
-                if selectedOSdmgVersionMajor is 10 then
+                if selectedOSdmgVersionMajor is 10 or selectedOSdmgVersionMajor is 11 then
                     set my yosemiteOS to true
                 else
                     set my yosemiteOS to false
@@ -2214,8 +2214,8 @@ script AutoCasperNBIAppDelegate
                 -- Update build Process ProgressBar
                 set my buildProcessProgressBar to buildProcessProgressBar + 1
                 delay 0.1
-                -- Delete all in the location except those that are given below \"*DateAndTime.prefPane*\" -not -path
-                do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/PreferencePanes/* -maxdepth 0 -not -path  \"*Displays.prefPane*\" -not -path \"*Network.prefPane*\" -not -path \"*SharingPref.prefPane*\" -not -path \"*StartupDisk.prefPane*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
+                -- Delete all in the location except those that are given below
+                do shell script "find " & quoted form of netBootDmgMountPath & "/System/Library/PreferencePanes/* -maxdepth 0 -not -path \"*DateAndTime.prefPane*\" -not -path \"*Displays.prefPane*\" -not -path \"*Network.prefPane*\" -not -path \"*SharingPref.prefPane*\" -not -path \"*StartupDisk.prefPane*\" -exec rm -rf {} \\;" user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
                 set logMe to "Deleted Preference Panes from: " & netBootDmgMountPath & "/System/Library/PreferencePanes/"
                 logToFile_(me)
@@ -2857,7 +2857,7 @@ script AutoCasperNBIAppDelegate
         set my buildProcessProgressBar to buildProcessProgressBar + 1
         try
             -- If we're building a 10.10 .nbi
-            if selectedOSdmgVersionMajor is 10
+            if selectedOSdmgVersionMajor is greater than 9
                 --Log Action
                 set logMe to "Deleting " & netBootDmgMountPath & "/System/Library/CoreServices/Dock.app/Contents/Resources/com.apple.dockfixup.plist"
                 logToFile_(me)
@@ -3418,6 +3418,14 @@ script AutoCasperNBIAppDelegate
                 do shell script "cp -r " & quoted form of customDesktopImagePath & " " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
                 set logMe to "Copied " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                logToFile_(me)
+                --Log Action
+                set logMe to "Trying to set permissions to 755 on " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                logToFile_(me)
+                -- Making writable
+                do shell script "/bin/chmod -R 755 " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Set permissions to 755 on " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
                 logToFile_(me)
                 -- Copy Casper Imaging.app selected earlier
                 copyCasperImagingApp_(me)
@@ -4470,13 +4478,19 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Trying to set .nbi's EnabledSystemIdentifiers"
             logToFile_(me)
-            -- Get list of supported Macs for NBI
-            set variableVariable to do shell script "/usr/bin/defaults read " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist SupportedModelProperties"
-            -- Set EnabledSystemIdentifiers
-            do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist DisabledSystemIdentifiers " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Set .nbi's EnabledSystemIdentifiers"
-            logToFile_(me)
+            try
+                -- Get list of supported Macs for NBI
+                set variableVariable to do shell script "/usr/bin/defaults read " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist SupportedModelProperties"
+                -- Set EnabledSystemIdentifiers
+                do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist DisabledSystemIdentifiers " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Set .nbi's EnabledSystemIdentifiers"
+                logToFile_(me)
+            on error
+                --Log Action
+                set logMe to "Could not find EnabledSystemIdentifiers array"
+                logToFile_(me)
+            end try
             ---- Fix Plist ----
             -- Correct ownership
             do shell script "/usr/sbin/chown -R root:staff " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
