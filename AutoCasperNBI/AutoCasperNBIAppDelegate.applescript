@@ -1754,6 +1754,8 @@ script AutoCasperNBIAppDelegate
         if netBootSelectedLocation is not missing value then
             -- Check that we have enough space available to proceed
             getNetBootDmgRequiredSize_(me)
+            -- Skip
+            --testFunction_(me)
         end if
     end netBootLocation_
 
@@ -2016,6 +2018,21 @@ script AutoCasperNBIAppDelegate
     end checkFiles_
 
 ----- BUILD -----
+
+    on testFunction_(sender)
+        set netBootDmgMountPath to "/Volumes/10.11AutoCasperNBI"
+        set netBootDirectory to "/Users/administrator/Desktop/10.11AutoCasperNBI.nbi"
+        -- Disable main windows buttons
+        set my optionWindowEnabled to false
+        -- Update buildProcessLogTextField to show path to todays log
+        set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+        -- Set netBootCreationSuccessful value, for notifying later
+        set my netBootCreationSuccessful to false
+        -- Set build Process ProgressBar to indeterminate & animated to false
+        set my buildProcessProgressBarIndeterminate to false
+        set my buildProcessProgressBarAniminate to false
+        generateKernelCache_(me)
+    end testFunction_
 
     -- Create the .nbi folder
     on netBootLocationCreate_(sender)
@@ -3105,10 +3122,18 @@ script AutoCasperNBIAppDelegate
             -- Update build Process ProgressBar
             set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
+            set logMe to "Trying to create " & quoted form of variableVariable & "/Scripts/"
+            logToFile_(me)
+            -- Make certficates directory
+            do shell script "/bin/mkdir " & quoted form of variableVariable & "/Scripts/" user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "Created " & quoted form of variableVariable & "/Scripts/"
+            logToFile_(me)
+            --Log Action
             set logMe to "Trying to copy Boot.sh"
             logToFile_(me)
             -- Install Boot.sh
-            do shell script "ditto " & quoted form of pathToResources & "/Boot.sh " &  quoted form of variableVariable & "/Scripts/" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/cp " & quoted form of pathToResources & "/Boot.sh " &  quoted form of variableVariable & "/Scripts/" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Boot.sh copied"
             logToFile_(me)
@@ -3153,7 +3178,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Trying to copy com.AutoCasperNBI.boot.plist"
             logToFile_(me)
             -- Install Boot.sh
-            do shell script "ditto " & quoted form of pathToResources & "/com.AutoCasperNBI.boot.plist " & quoted form of netBootDmgMountPath & "/Library/LaunchDaemons/" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/cp " & quoted form of pathToResources & "/com.AutoCasperNBI.boot.plist " & quoted form of netBootDmgMountPath & "/Library/LaunchDaemons/" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "com.AutoCasperNBI.boot.plist copied"
             logToFile_(me)
@@ -3415,7 +3440,7 @@ script AutoCasperNBIAppDelegate
                 set logMe to "Trying to copy " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
                 logToFile_(me)
                 -- Copy selected image
-                do shell script "cp -r " & quoted form of customDesktopImagePath & " " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/bin/cp -r " & quoted form of customDesktopImagePath & " " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
                 set logMe to "Copied " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
                 logToFile_(me)
@@ -3467,7 +3492,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Casper Imaging.app to be copied to " & copiedAppPath
             logToFile_(me)
             -- Copy Casper Imaging.app & log
-            do shell script "cp -r " & quoted form of selectedAppPathToCopy & " " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/cp -r " & quoted form of selectedAppPathToCopy & " " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
             --Log action
             set logMe to "Copied " & selectedAppPath & " to " & variableVariable
             logToFile_(me)
@@ -3583,7 +3608,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Trying to install Casper Imaging LaunchAgent"
             logToFile_(me)
             -- Install com.AutoCasperNBI.CasperImaging.plist from rescources
-            do shell script "ditto " & quoted form of pathToResources & "/com.AutoCasperNBI.CasperImaging.plist " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/cp " & quoted form of pathToResources & "/com.AutoCasperNBI.CasperImaging.plist " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Casper Imaging LaunchAgent plist installed"
             logToFile_(me)
@@ -3672,7 +3697,7 @@ script AutoCasperNBIAppDelegate
                         -- Application Support location on TempOSdmg for installing at boot
                         set variableVariable to netBootDmgMountPath & "/Library/Application Support/AutoCasperNBI/Certificates/"
                         -- Copy Cert
-                        do shell script "cp -r " & quoted form of selectedCertsPath & " " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+                        do shell script "/bin/cp -r " & quoted form of selectedCertsPath & " " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
                         -- Log Action
                         set logMe to "Copied additional Cert " & quoted form of selectedCertsPath  & " to " & quoted form of variableVariable
                         logToFile_(me)
@@ -4151,7 +4176,7 @@ script AutoCasperNBIAppDelegate
                     --Log Action
                     set logMe to "Copied kernel cache on as NetBoot is older than 10.8"
                     logToFile_(me)
-            end if
+                end if
             end considering
             -- Copy the boot.efi to the booter shell
             copyBootEfi_(me)
@@ -4180,7 +4205,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
             logToFile_(me)
             -- Copy the plist
-            do shell script "/usr/bin/ditto " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/cp " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Copied " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/boot.efi to " & quoted form of netBootDirectory & "/i386/booter"
             logToFile_(me)
@@ -4193,7 +4218,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Unlocked " & quoted form of netBootDirectory & "/i386/booter"
             logToFile_(me)
             -- Correct ownership
-            do shell script "/usr/sbin/chown -R root:staff " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/sbin/chown root:staff " & quoted form of netBootDirectory & "/i386/booter" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Set ownership to root:staff on " & netBootDirectory & "/i386/booter"
             logToFile_(me)
@@ -4224,7 +4249,7 @@ script AutoCasperNBIAppDelegate
             set logMe to "Copying " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
             logToFile_(me)
             -- Copy the plist
-            do shell script "/usr/bin/ditto " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/bin/cp " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Copied " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/PlatformSupport.plist to " & quoted form of netBootDirectory & "/i386/PlatformSupport.plist"
             logToFile_(me)
@@ -4251,16 +4276,46 @@ script AutoCasperNBIAppDelegate
         -- Update build Process ProgressBar
         set my buildProcessProgressBar to buildProcessProgressBar + 1
         try
-            --Log Action
-            set logMe to "Copying NBImageInfo.plist"
-            logToFile_(me)
-            -- Copy the plist
-            do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/NBImageInfo.plist " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Copied NBImageInfo.plist"
-            logToFile_(me)
-            -- Updates NBImageInfo.plist
-            updateNBImageInfoPlist_(me)
+            -- If we're building an OS newer than 10.11
+            if selectedOSdmgVersionMajor is equal to 11
+                try
+                    --Log Action
+                    set logMe to "Copying NBImageInfo.plist for " & selectedOSBuilddmgVersion
+                    logToFile_(me)
+                    -- Log that we're looking to copy a NBImageInfo.plist
+                    set logMe to "/bin/cp " & quoted form of pathToResources & "/10.11NBImageInfo/" & selectedOSBuilddmgVersion & ".plist " & quoted form of netBootDirectory & "NBImageInfo.plist"
+                    logToFile_(me)
+                    -- Copy the plist
+                    do shell script "/bin/cp " & quoted form of pathToResources & "/10.11NBImageInfo/" & selectedOSBuilddmgVersion & ".plist " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "Copied NBImageInfo.plist"
+                    logToFile_(me)
+                    -- Updates NBImageInfo.plist
+                    updateNBImageInfoPlist_(me)
+                on error
+                    --Log Action
+                    set logMe to "Copying Latest 10.11 NBImageInfo.plist as cannot find for build"
+                    logToFile_(me)
+                    -- Copy the plist
+                    do shell script "/bin/cp " & quoted form of pathToResources & "/10.11NBImageInfo/Latest " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "Copied NBImageInfo.plist"
+                    logToFile_(me)
+                    -- Updates NBImageInfo.plist
+                    updateNBImageInfoPlist_(me)
+                end try
+            else
+                --Log Action
+                set logMe to "Copying NBImageInfo.plist"
+                logToFile_(me)
+                -- Copy the plist
+                do shell script "/bin/cp " & quoted form of pathToResources & "/NBImageInfo.plist " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Copied NBImageInfo.plist"
+                logToFile_(me)
+                -- Updates NBImageInfo.plist
+                updateNBImageInfoPlist_(me)
+            end if
         on error
             --Log Action
             set logMe to "Error: Copying NBImageInfo.plist"
@@ -4463,12 +4518,6 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Set .nbi to Enabled"
             logToFile_(me)
-            ---- RootPath ----
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Updating NBImageInfo.plist RootPath"
-            delay 0.1
-            -- Update build Process ProgressBar
-            set my buildProcessProgressBar to buildProcessProgressBar + 1
             ---- EnabledSystemIdentifiers ----
             -- Update Build Process Window's Text Field
             set my buildProcessTextField to "Setting NBImageInfo.plist's to EnabledSystemIdentifiers"
