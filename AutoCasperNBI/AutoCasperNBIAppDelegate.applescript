@@ -115,6 +115,7 @@ script AutoCasperNBIAppDelegate
     property selectedOSdmgFreeSpaceOnVolumeUnit : ""
     property mountPlist : ""
     property selectedOSdmgBytesTotal : ""
+    property latestNBImageInfo : ""
     
     --- Booleans
     property selectedOSDMGTextFieldEnabled : false
@@ -175,6 +176,8 @@ script AutoCasperNBIAppDelegate
     property showAlwaysSet : false
     property firstLaunch : true
     property netBootDescriptionSet : false
+    property elCapNBImageInfoPlistExists : false
+    property useLatestNBImageInfo : false
     
     -- Others
     property buildProcessProgressBarMax : 0
@@ -1613,7 +1616,9 @@ script AutoCasperNBIAppDelegate
             -- Checking variable
             set isAdminUser to true
             -- Make sure all variables are set if enabled
-            buildPreCheck_(me)
+            --buildPreCheck_(me)
+            -- Function for ElCap NBImageInfo.plist
+            elCapNBImageInfoPlist_(me)
             -- enable adminuser items
             set my disableAdminUserCheck to false
             -- stop cog
@@ -1637,6 +1642,95 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
         end try
     end adminCheck_
+
+    -- Function for ElCap NBImageInfo.plist
+    on elCapNBImageInfoPlist_(sender)
+        -- Reset variables
+        set elCapNBImageInfoPlistExists to false
+        set useLatestNBImageInfo to false
+        -- If we're building an 10.11 NBI
+        if selectedOSdmgVersionMajor is equal to 11 then
+            --Log Action
+            set logMe to "Checking that we have a NBImageInfo.plist for " & selectedOSBuilddmgVersion
+            logToFile_(me)
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Checking we have NBImageInfo.plist within app bundle"
+            delay 0.1
+            -- Check to see if the NBImageInfo.plist exists
+            tell application "Finder" to if exists pathToResources & "/10.11NBImageInfo/" & selectedOSBuilddmgVersion & ".plist" as POSIX file then set elCapNBImageInfoPlistExists to true
+            -- If we're missing the NBImageInfo.plist
+            if my elCapNBImageInfoPlistExists is true
+                --Log Action
+                set logMe to "Found a NBImageInfo.plist for " & selectedOSBuilddmgVersion
+                logToFile_(me)
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "NBImageInfo.plist found"
+                delay 0.1
+                -- Make sure all variables are set if enabled
+                buildPreCheck_(me)
+            else
+                --Log Action
+                set logMe to "NBImageInfo.plist not found for " & selectedOSBuilddmgVersion & " trying to download"
+                logToFile_(me)
+                try
+                    -- Update buildProcessLogTextField to show path to todays log
+                    set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
+                    -- Set build Process ProgressBar to indeterminate & animated to false
+                    set my buildProcessProgressBarIndeterminate to true
+                    set my buildProcessProgressBarAniminate to true
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Trying to download missing NBImageInfo.plist from macmule.com"
+                    delay 0.1
+                    -- close admin check window
+                    adminUserWindow's orderOut_(null)
+                    -- activate build process window
+                    activate
+                    showBuildProcessWindow's makeKeyAndOrderFront_(null)
+                    -- Try & download NBImageInfo.plist from https://macmule.com/NBImageInfo/<buildversion>.plist
+                    do shell script "/usr/bin/curl -k -f -o " & quoted form of pathToResources & "/10.11NBImageInfo/" & selectedOSBuilddmgVersion & ".plist https://macmule.com/NBImageInfo/" & selectedOSBuilddmgVersion & ".plist" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "Downloaded NBImageInfo.plist for " & selectedOSBuilddmgVersion & ". Re-running function."
+                    logToFile_(me)
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Downloaded missing NBImageInfo.plist from https://macmule.com"
+                    delay 0.1
+                    -- Close build window
+                    showBuildProcessWindow's orderOut:(null)
+                    -- Function for ElCap NBImageInfo.plist
+                    elCapNBImageInfoPlist_(me)
+                on error
+                    --Log Action
+                    set logMe to "Cannot download NBImageInfo.plist for " & selectedOSBuilddmgVersion & ". Getting latest NBImageInfo.plist details."
+                    logToFile_(me)
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Cannot download missing NBImageInfo.plist from macmule.com"
+                    delay 0.1
+                    -- Trying to read OSBuildDetails key from AutoCasperNBI.app/Content/Resources/
+                    set latestNBImageInfo to do shell script "/usr/bin/defaults read " & pathToResources & "/10.11NBImageInfo/Latest.plist OSBuildDetails"
+                    --Log Action
+                    set logMe to "Latest NBImageInfo.plist is for " & latestNBImageInfo
+                    logToFile_(me)
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Reading latest NBImageInfo.plist"
+                    delay 0.1
+                    -- Close build window
+                    showBuildProcessWindow's orderOut:(null)
+                    -- Prompt user
+                    display dialog "Cannot find NBImageInfo.plist for " & selectedOSDMGTextField & "." & return & return & "Latest NBImageInfo,plist is for " & latestNBImageInfo & "." & return & return & "OK to proceed creating NBI with this NBImageInfo.plist?" with icon caution buttons {"No", "Yes"} default button "Yes"
+                    -- If user selected yes
+                    if button returned of the result is "Yes" then
+                        -- Set to true for later use
+                        set useLatestNBImageInfo to true
+                        -- Make sure all variables are set if enabled
+                        buildPreCheck_(me)
+                    end if
+                end try
+            end if
+        else
+            -- Make sure all variables are set if enabled
+            buildPreCheck_(me)
+        end if
+    end elCapNBImageInfoPlist_
 
     -- Make sure all variables are set if enabled
     on buildPreCheck_(sender)
@@ -1791,8 +1885,8 @@ script AutoCasperNBIAppDelegate
             -- Create a plist with selectedOSdmg's information
             do shell script "diskutil info -plist " & quoted form of selectedOSdmgMountPath & " > " & quoted form of mountPlist
             -- Get total size & free space of selectedOSdmg in bytes
-            set selectedOSdmgBytesTotal to do shell script "defaults read " & mountPlist & " TotalSize"
-            set selectedOSdmgBytesFree to do shell script "defaults read " & mountPlist & " FreeSpace"
+            set selectedOSdmgBytesTotal to do shell script "/usr/bin/defaults read " & mountPlist & " TotalSize"
+            set selectedOSdmgBytesFree to do shell script "/usr/bin/defaults read " & mountPlist & " FreeSpace"
             -- Calculate total size & free space in GB
             set selectedOSdmgTotalSize to (round (selectedOSdmgBytesTotal / 1000 / 1000 / 1000) rounding up)
             set selectedOSdmgFreeSpace to (round (selectedOSdmgBytesFree / 1000 / 1000 / 1000) rounding down)
@@ -1856,7 +1950,7 @@ script AutoCasperNBIAppDelegate
             -- Create a plist with selectedVolume's information
             do shell script "diskutil info -plist " & quoted form of selectedVolume & " > " & quoted form of mountPlist
             -- Get total size & free space of selectedOSdmg in bytes
-            set selectedVolumeBytesFree to do shell script "defaults read " & mountPlist & " FreeSpace"
+            set selectedVolumeBytesFree to do shell script "/usr/bin/defaults read " & mountPlist & " FreeSpace"
             -- Calculate free space in GB rounded down
             set freeSpaceOnVolume to (round (selectedVolumeBytesFree / 1000 / 1000 / 1000) rounding down)
             --Log Action
@@ -1937,8 +2031,6 @@ script AutoCasperNBIAppDelegate
                     set desktopImageExists to true
                     -- Update label
                     set my customDesktopImageLabel to "Image Selected: " & customDesktopImagePath
-                    -- Create the .nbi folder
-                    --netBootLocationCreate_(me)
                 on error
                     -- Update label
                     set my customDesktopImageLabel to "Cannot Find: " & customDesktopImagePath
@@ -1950,16 +2042,12 @@ script AutoCasperNBIAppDelegate
                         logToFile_(me)
                         -- Set to false
                         set my buildPreCheckPassed to false
-                        -- Detach mounted volumes
-                        --tidyUpTimeKids_(me)
                     else
                         --Log Action
                         set logMe to "User chose to proceed with a missing Desktop Image"
                         logToFile_(me)
                         -- True if file exists
                         set desktopImageExists to false
-                        -- Create the .nbi folder
-                        --netBootLocationCreate_(me)
                     end if
                 end try
             end if
@@ -3663,7 +3751,7 @@ script AutoCasperNBIAppDelegate
             logToFile_(me)
             try
                 -- Download CA Cert from JSS to /Library/Application Support/AutoCasperNBI/Certificates/UUID
-                do shell script "curl -k -o " & quoted form of variableVariable & tempUUID & ".cer " & jssURL & "/CA/SCEP?operation=getcacert" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/curl -k -o " & quoted form of variableVariable & tempUUID & ".cer " & jssURL & "/CA/SCEP?operation=getcacert" user name adminUserName password adminUsersPassword with administrator privileges
                 -- Log Action
                 set logMe to "Successfully Downloaded JSS CA Cert to " & quoted form of variableVariable
                 logToFile_(me)
@@ -4278,7 +4366,8 @@ script AutoCasperNBIAppDelegate
         try
             -- If we're building an OS newer than 10.11
             if selectedOSdmgVersionMajor is equal to 11
-                try
+                -- If we're using the bespoke build version of NBImageInfo.plist
+                if useLatestNBImageInfo is false
                     --Log Action
                     set logMe to "Copying NBImageInfo.plist for " & selectedOSBuilddmgVersion
                     logToFile_(me)
@@ -4292,18 +4381,18 @@ script AutoCasperNBIAppDelegate
                     logToFile_(me)
                     -- Updates NBImageInfo.plist
                     updateNBImageInfoPlist_(me)
-                on error
+                else
                     --Log Action
-                    set logMe to "Copying Latest 10.11 NBImageInfo.plist as cannot find for build"
+                    set logMe to "Copying Latest 10.11 NBImageInfo.plist"
                     logToFile_(me)
                     -- Copy the plist
-                    do shell script "/bin/cp " & quoted form of pathToResources & "/10.11NBImageInfo/Latest " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                    do shell script "/bin/cp " & quoted form of pathToResources & "/10.11NBImageInfo/Latest.plist " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
                     --Log Action
                     set logMe to "Copied NBImageInfo.plist"
                     logToFile_(me)
                     -- Updates NBImageInfo.plist
                     updateNBImageInfoPlist_(me)
-                end try
+                end if
             else
                 --Log Action
                 set logMe to "Copying NBImageInfo.plist"
@@ -4363,8 +4452,8 @@ script AutoCasperNBIAppDelegate
                     -- Set NetBoot to Description
                     do shell script "/usr/bin/defaults write " & quoted form of netBootDirectory & "/NBImageInfo.plist Description -string " & quoted form of netBootDescription user name adminUserName password adminUsersPassword with administrator privileges
                     --Log Action
-                    --set logMe to "Set .nbi Description"
-                    --logToFile_(me)
+                    set logMe to "Set .nbi Description"
+                    logToFile_(me)
                 end if
                 ---- Index ----
                 -- Update Build Process Window's Text Field

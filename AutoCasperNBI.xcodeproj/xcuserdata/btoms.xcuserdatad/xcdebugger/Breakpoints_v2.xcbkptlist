@@ -10,12 +10,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "AutoCasperNBI/AutoCasperNBIAppDelegate.applescript"
-            timestampString = "466269768.476149"
+            timestampString = "467460521.409584"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "4052"
-            endingLineNumber = "4052"
+            startingLineNumber = "4141"
+            endingLineNumber = "4141"
             landmarkName = "on reduceKernelCache_(sender)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "AutoCasperNBI/AutoCasperNBIAppDelegate.applescript"
+            timestampString = "467460521.409584"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "4360"
+            endingLineNumber = "4360"
+            landmarkName = "on copyNBImageInfoPlist_(sender)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
