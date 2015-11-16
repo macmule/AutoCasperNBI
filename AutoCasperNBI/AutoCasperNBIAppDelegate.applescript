@@ -1570,7 +1570,7 @@ script AutoCasperNBIAppDelegate
         -- If we're creating a 10.11 NBI & enabling Simple Finder
         if selectedOSdmgVersionMajor is 11 and simpleFinderEnabled is true
             -- Error to user prompting for what to do next
-            display dialog "Simple Finder can be enabled on 10.11 NBI's, but currently cannot be disabled." & return & return & "A bug has been filed with Apple on this." & quoted form of netBootSelectedLocation & return & return & "Do you still wish to use Simple Finder?" with icon 2 buttons {"No", "Yes"}
+            display dialog "Simple Finder can be enabled on 10.11 NBI's, but currently cannot be disabled." & return & return & "A bug has been filed with Apple on this." & return & return & "Do you still wish to use Simple Finder?" with icon 2 buttons {"No", "Yes"}
             -- If user selected "No", disable Simple Finder
             if button returned of the result is "No" then
                 --Log action
