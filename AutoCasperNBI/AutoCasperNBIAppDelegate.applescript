@@ -154,7 +154,7 @@ script AutoCasperNBIAppDelegate
     property netBootCreationSuccessful : false
     property netBootServeOverNFS : true
     property customDesktopImageEnabled : false
-    property installRCNetBootSelected : false
+    property installRCNetBootSelected : true
     property timeServerOptionsEnabled : false
     property createReadOnlyDMG : false
     property userNotifyErrorHidden : true
@@ -535,8 +535,8 @@ script AutoCasperNBIAppDelegate
                 set AppleScript's text item delimiters to applescriptsDelims
                 -- Reset OSDMG Icons
                 doResetOSDMGIcons_(me)
-                -- If we're building a 10.10 NBI, enable Yosemite icons
-                if selectedOSdmgVersionMajor is 10 or selectedOSdmgVersionMajor is 11 then
+                -- If we're building a 10.10+ NBI, enable Yosemite icons
+                if selectedOSdmgVersionMajor greater than 9 then
                     set my yosemiteOS to true
                 else
                     set my yosemiteOS to false
@@ -1386,6 +1386,8 @@ script AutoCasperNBIAppDelegate
         --Log Action
         set logMe to "Enable Simple Finder set to : " & simpleFinderEnabled
         logToFile_(me)
+        -- Check for Simple Finder on 10.11 & alert
+        checkSimpleFinderElCap_(me)
     end simpleFinderCheckBox_
 
     -- Check additional Certs array, & amend accordingly
@@ -1561,6 +1563,26 @@ script AutoCasperNBIAppDelegate
         -- Get value from plist
         tell defaults to set my additionalPKGs to objectForKey_("additionalPKGs")
     end deletePKG_
+
+
+    -- Check for Simple Finder on 10.11 & alert
+    on checkSimpleFinderElCap_(sender)
+        -- If we're creating a 10.11 NBI & enabling Simple Finder
+        if selectedOSdmgVersionMajor is 11 and simpleFinderEnabled is true
+            -- Error to user prompting for what to do next
+            display dialog "Simple Finder can be enabled on 10.11 NBI's, but currently cannot be disabled." & return & return & "A bug has been filed with Apple on this." & quoted form of netBootSelectedLocation & return & return & "Do you still wish to use Simple Finder?" with icon 2 buttons {"No", "Yes"}
+            -- If user selected "No", disable Simple Finder
+            if button returned of the result is "No" then
+                --Log action
+                set logMe to "Disabling Simple Finder"
+                logToFile_(me)
+                -- Set to variable to boolean
+                set simpleFinderEnabled to false
+                -- Update plist with selection
+                tell defaults to setObject_forKey_(simpleFinderEnabled, "simpleFinderEnabled")
+            end if
+        end if
+    end checkSimpleFinderElCap_
 
 ----- CLOSE OPTIONS WINDOW CHECK -----
 
@@ -1756,6 +1778,8 @@ script AutoCasperNBIAppDelegate
             checkAdditionalPKGs_(me)
             -- Check additional Certs array, & amend accordingly
             checkAdditionalCerts_(me)
+            -- Check for Simple Finder on 10.11 & alert
+            checkSimpleFinderElCap_(me)
             -- Calculate progressbar max length, depending on selection
             calcBuildProgressBarMax_(me)
             -- Prompt user for location to create the .nbi
@@ -1766,7 +1790,7 @@ script AutoCasperNBIAppDelegate
     -- Calculate progressbar max length, depending on selection
     on calcBuildProgressBarMax_(sender)
         -- Reset
-        set my buildProcessProgressBarMax to 72
+        set my buildProcessProgressBarMax to 71
         -- Update build Process ProgressBar
         set my buildProcessProgressBar to 0
         -- Check if reduce NetBoot Image is ticked
@@ -1875,7 +1899,6 @@ script AutoCasperNBIAppDelegate
             showBuildProcessWindow's makeKeyAndOrderFront_(null)
             -- Show Cog on main window
             set my mainWindowCog to true
-            
             ----- NetBoot.sparseimage Size -----
             --Log Action
             set logMe to "Trying to get the Total size of " & quoted form of selectedOSdmgMountPath
@@ -2221,7 +2244,7 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Trying to mount: " & quoted form of netBootDirectory
             logToFile_(me)
-            -- Mount the NetBoot.dmg & get the mount pat
+            -- Mount the NetBoot.dmg & get the mount path
             set netBootDmgMountPath to do shell script "/usr/bin/hdiutil attach " & quoted form of netBootDirectory & "/NetBoot.sparseimage -nobrowse -owners on -plist | awk -F\"[<>]\" 'a{print $3; exit}$2==\"key\"&&$3==\"mount-point\"{a=1}'" as quoted form user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Mounted to: " & netBootDmgMountPath
@@ -2961,7 +2984,7 @@ script AutoCasperNBIAppDelegate
         -- Update build Process ProgressBar
         set my buildProcessProgressBar to buildProcessProgressBar + 1
         try
-            -- If we're building a 10.10 .nbi
+            -- If we're building a 10.10+.nbi
             if selectedOSdmgVersionMajor is greater than 9
                 --Log Action
                 set logMe to "Deleting " & netBootDmgMountPath & "/System/Library/CoreServices/Dock.app/Contents/Resources/com.apple.dockfixup.plist"
@@ -4203,7 +4226,7 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Updating kernel cache on: " & netBootDmgMountPath
             logToFile_(me)
-            -- Update
+            -- Update kernelcache
             do shell script quoted form of netBootDmgMountPath & "/usr/sbin/kextcache -update-volume " & quoted form of netBootDmgMountPath user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Updated kernel cache on: " & netBootDmgMountPath
@@ -4216,32 +4239,28 @@ script AutoCasperNBIAppDelegate
             set my buildProcessProgressBar to buildProcessProgressBar + 1
             --Log Action
             set logMe to "Generating kernel cache"
-            logToFile_(me)
+            --logToFile_(me)
             try
                 -- If we're building an OS newer than 10.9
                 if selectedOSdmgVersionMajor is greater than 9
-                    -- Different location used in 10.10.
-                    do shell script quoted form of netBootDmgMountPath & "/usr/sbin/kextcache -arch x86_64 -l -n -K " & quoted form of netBootDmgMountPath & "/System/Library/Kernels/kernel -c " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "Greater than 9 " & selectedOSdmgVersionMajor
+                    logToFile_(me)
+                    -- Different location used in 10.10.+
+                    do shell script "/usr/sbin/kextcache -arch x86_64 -l -n -K " & quoted form of netBootDmgMountPath & "/System/Library/Kernels/kernel -c " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "passed"
+                    logToFile_(me)
+                    
                 else
+                  try
                     -- Generate kernel cache, silently error as this will error when on 10.9.4 when skipping extensions.
                     do shell script quoted form of netBootDmgMountPath & "/usr/sbin/kextcache -arch x86_64 -l -n -K " & quoted form of netBootDmgMountPath & "/mach_kernel -c " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Extensions" user name adminUserName password adminUsersPassword with administrator privileges
+                    end try
                 end if
             end try
             --Log Action
-            set logMe to "Generated kernel cache on: " & netBootDmgMountPath
-            logToFile_(me)
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Copying updated kernel cache"
-            delay 0.1
-            -- Update build Process ProgressBar
-            set my buildProcessProgressBar to buildProcessProgressBar + 1
-            --Log Action
-            set logMe to "Copying updated kernel cache to: " & netBootDmgMountPath & "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache"
-            logToFile_(me)
-            -- Copy the plist
-            do shell script "/usr/bin/ditto " & quoted form of netBootDirectory & "/i386/x86_64/kernelcache " & quoted form of netBootDmgMountPath & "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache " user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Copied updated kernel cache to: " & netBootDmgMountPath & "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache"
+            set logMe to "Generated kernel cache at: " & netBootDirectory & "/i386/x86_64/kernelcache"
             logToFile_(me)
             -- Update Build Process Window's Text Field
             -- To stop hang on reboot
@@ -4252,10 +4271,10 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "Deleting bootcaches.plist from: " & netBootDmgMountPath & "/usr/standalone/bootcaches.plist"
             logToFile_(me)
-            -- Copy the plist
-            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/usr/standalone/bootcaches.plist"  user name adminUserName password adminUsersPassword with administrator privileges
+            -- Delete the bootcaches.plist
+            do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/usr/standalone/bootcaches.plist" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
-            set logMe to "Deleting bootcaches.plist from: " & netBootDmgMountPath & "/usr/standalone/bootcaches.plist"
+            set logMe to "Deleted bootcaches.plist from: " & netBootDmgMountPath & "/usr/standalone/bootcaches.plist"
             logToFile_(me)
             considering numeric strings
                 if selectedOSdmgVersionMajor is less than 8
@@ -4789,33 +4808,33 @@ script AutoCasperNBIAppDelegate
 
     -- Rename sparseimage to .DMG
     on renameSparseimageToDMG_(sender)
-            try
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Renaming NetBoot.sparseimage to NetBoot.dmg"
-                delay 0.1
-                -- Update build Process ProgressBar
-                set my buildProcessProgressBar to buildProcessProgressBar + 1
-                --Log Action
-                set logMe to "Trying to rename " & netBootDirectory & "/NetBoot.sparseimage to NetBoot.dmg"
-                logToFile_(me)
-                -- Rename NetBoot.sparseimage
-                do shell script "/bin/mv " & quoted form of netBootDirectory & "/NetBoot.sparseimage " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
-                --Log Action
-                set logMe to "Renamed " & netBootDirectory & "/NetBoot.sparseimage to NetBoot.dmg"
-                logToFile_(me)
-                -- Reset build process variables
-                tidyUpTimeKids_(me)
-            on error
-                --Log Action
-                set logMe to "Error: Renaming NetBoot.sparseimage to NetBoot.dmg"
-                logToFile_(me)
-                -- Set to false to display
-                set my userNotifyErrorHidden to false
-                -- Set Error message
-                set my userNotifyError to "Error: Renaming NetBoot.sparseimage to NetBoot.dmg"
-                -- Notify of errors or success
-                userNotify_(me)
-            end try
+        try
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Renaming NetBoot.sparseimage to NetBoot.dmg"
+            delay 0.1
+            -- Update build Process ProgressBar
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
+            --Log Action
+            set logMe to "Trying to rename " & netBootDirectory & "/NetBoot.sparseimage to NetBoot.dmg"
+            logToFile_(me)
+            -- Rename NetBoot.sparseimage
+            do shell script "/bin/mv " & quoted form of netBootDirectory & "/NetBoot.sparseimage " & quoted form of netBootDirectory & "/NetBoot.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "Renamed " & netBootDirectory & "/NetBoot.sparseimage to NetBoot.dmg"
+            logToFile_(me)
+            -- Reset build process variables
+            tidyUpTimeKids_(me)
+        on error
+            --Log Action
+            set logMe to "Error: Renaming NetBoot.sparseimage to NetBoot.dmg"
+            logToFile_(me)
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+            -- Set Error message
+            set my userNotifyError to "Error: Renaming NetBoot.sparseimage to NetBoot.dmg"
+            -- Notify of errors or success
+            userNotify_(me)
+        end try
     end renameSparseimageToDMG_
 
     -- Reset build process variables
@@ -4842,8 +4861,11 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "NetBoot successfully created at the following location " & netBootDirectory
             logToFile_(me)
-            -- Play complete.aif
-            do shell script "/usr/bin/afplay " & quoted form of pathToResources & "/complete.aif"
+            -- Try to stop errors when no soundcard
+            try
+                -- Play complete.aif
+                do shell script "/usr/bin/afplay " & quoted form of pathToResources & "/complete.aif"
+            end try
             -- Set to false to display
             set my userNotifySuccessHidden to false
             -- Set Error message
