@@ -2934,12 +2934,12 @@ CA
                                                         <rect key="frame" x="207" y="27" width="178" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <string key="toolTip">Keyboard Input Language for the NBI. This list is written as per com.apple.HIToolbox requires the keyboards names, even with dodgy capitalisation.</string>
-                                                        <popUpButtonCell key="cell" type="push" title="US Extended" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="-2" imageScaling="proportionallyDown" inset="2" selectedItem="jZ5-al-x8e" id="gqa-pz-aIV">
+                                                        <popUpButtonCell key="cell" type="push" title="Afghan Dari" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="-2092" imageScaling="proportionallyDown" inset="2" selectedItem="f6g-08-Faz" id="gqa-pz-aIV">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="OuF-Ay-0wN">
                                                                 <items>
-                                                                    <menuItem title="Afghan Dari" tag="-2092" id="f6g-08-Faz">
+                                                                    <menuItem title="Afghan Dari" state="on" tag="-2092" id="f6g-08-Faz">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                     <menuItem title="Afghan Pashto" tag="-2094" id="wab-DG-X6j">
@@ -3305,7 +3305,7 @@ CA
                                                                     <menuItem title="U.S." id="Ohp-v6-AWa">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
-                                                                    <menuItem title="US Extended" state="on" tag="-2" id="jZ5-al-x8e">
+                                                                    <menuItem title="US Extended" tag="-2" id="jZ5-al-x8e">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                     <menuItem title="USInternational-PC" tag="15000" id="TFM-nR-TuR">
