@@ -1564,7 +1564,6 @@ script AutoCasperNBIAppDelegate
         tell defaults to set my additionalPKGs to objectForKey_("additionalPKGs")
     end deletePKG_
 
-
     -- Check for Simple Finder on 10.11 & alert
     on checkSimpleFinderElCap_(sender)
         -- If we're creating a 10.11 NBI & enabling Simple Finder
@@ -1638,9 +1637,9 @@ script AutoCasperNBIAppDelegate
             -- Checking variable
             set isAdminUser to true
             -- Make sure all variables are set if enabled
-            --buildPreCheck_(me)
+            buildPreCheck_(me)
             -- Function for ElCap NBImageInfo.plist
-            elCapNBImageInfoPlist_(me)
+            --elCapNBImageInfoPlist_(me)
             -- enable adminuser items
             set my disableAdminUserCheck to false
             -- stop cog
@@ -1671,7 +1670,7 @@ script AutoCasperNBIAppDelegate
         set elCapNBImageInfoPlistExists to false
         set useLatestNBImageInfo to false
         -- If we're building an 10.11 NBI
-        if selectedOSdmgVersionMajor is equal to 11 then
+        if selectedOSdmgVersion is less than "10.11.2" then
             --Log Action
             set logMe to "Checking that we have a NBImageInfo.plist for " & selectedOSBuilddmgVersion
             logToFile_(me)
@@ -2116,7 +2115,6 @@ script AutoCasperNBIAppDelegate
             userNotify_(me)
             -- Set to false
             set my buildPreCheckPassed to false
-        else
         end if
     -- Build pre check is has been passed.
     if buildPreCheckPassed is true then
@@ -2129,21 +2127,6 @@ script AutoCasperNBIAppDelegate
     end checkFiles_
 
 ----- BUILD -----
-
-    on testFunction_(sender)
-        set netBootDmgMountPath to "/Volumes/10.11AutoCasperNBI"
-        set netBootDirectory to "/Users/administrator/Desktop/10.11AutoCasperNBI.nbi"
-        -- Disable main windows buttons
-        set my optionWindowEnabled to false
-        -- Update buildProcessLogTextField to show path to todays log
-        set my buildProcessLogTextField to "Today's Log: ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
-        -- Set netBootCreationSuccessful value, for notifying later
-        set my netBootCreationSuccessful to false
-        -- Set build Process ProgressBar to indeterminate & animated to false
-        set my buildProcessProgressBarIndeterminate to false
-        set my buildProcessProgressBarAniminate to false
-        generateKernelCache_(me)
-    end testFunction_
 
     -- Create the .nbi folder
     on netBootLocationCreate_(sender)
@@ -4383,35 +4366,17 @@ script AutoCasperNBIAppDelegate
         -- Update build Process ProgressBar
         set my buildProcessProgressBar to buildProcessProgressBar + 1
         try
-            -- If we're building an OS newer than 10.11
-            if selectedOSdmgVersionMajor is equal to 11
-                -- If we're using the bespoke build version of NBImageInfo.plist
-                if useLatestNBImageInfo is false
-                    --Log Action
-                    set logMe to "Copying NBImageInfo.plist for " & selectedOSBuilddmgVersion
-                    logToFile_(me)
-                    -- Log that we're looking to copy a NBImageInfo.plist
-                    set logMe to "/bin/cp " & quoted form of pathToResources & "/10.11NBImageInfo/" & selectedOSBuilddmgVersion & ".plist " & quoted form of netBootDirectory & "NBImageInfo.plist"
-                    logToFile_(me)
-                    -- Copy the plist
-                    do shell script "/bin/cp " & quoted form of pathToResources & "/10.11NBImageInfo/" & selectedOSBuilddmgVersion & ".plist " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
-                    --Log Action
-                    set logMe to "Copied NBImageInfo.plist"
-                    logToFile_(me)
-                    -- Updates NBImageInfo.plist
-                    updateNBImageInfoPlist_(me)
-                else
-                    --Log Action
-                    set logMe to "Copying Latest 10.11 NBImageInfo.plist"
-                    logToFile_(me)
-                    -- Copy the plist
-                    do shell script "/bin/cp " & quoted form of pathToResources & "/10.11NBImageInfo/Latest.plist " & quoted form of netBootDirectory & "/NBImageInfo.plist" user name adminUserName password adminUsersPassword with administrator privileges
-                    --Log Action
-                    set logMe to "Copied NBImageInfo.plist"
-                    logToFile_(me)
-                    -- Updates NBImageInfo.plist
-                    updateNBImageInfoPlist_(me)
-                end if
+            -- If we're building a 10.11 - 10.11.1 NBI, then copy from 10.11NBImageInfo folder
+            if selectedOSdmgVersion is less than "10.11.2" then
+                --Log Action
+                set logMe to "Copying NBImageInfo.plist for 10.11 - 10.11.1"
+                logToFile_(me)
+                do shell script "/bin/cp " & quoted form of pathToResources & "/10.11NBImageInfo/NBImageInfo.plist " & quoted form of netBootDirectory & "/" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Copied NBImageInfo.plist"
+                logToFile_(me)
+                -- Updates NBImageInfo.plist
+                updateNBImageInfoPlist_(me)
             else
                 --Log Action
                 set logMe to "Copying NBImageInfo.plist"
