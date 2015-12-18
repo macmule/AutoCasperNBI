@@ -2548,8 +2548,8 @@ script AutoCasperNBIAppDelegate
                 --Log Action
                 set logMe to "Successfully emptied targeted directories in " & netBootDmgMountPath & "/System/Library/"
                 logToFile_(me)
-                -- Delete swap files from the NetBoot.dmg
-                removeSwapFiles_(me)
+                -- Creates the folder path /Library/Application Support/Apple/Remote Desktop/ as this is needed on 10.11.2
+                createRemoteDesktopFolder_(me)
             else
                 --Log Action
                 set logMe to "NetBoot reduction not enabled. Skipping..."
@@ -2569,6 +2569,52 @@ script AutoCasperNBIAppDelegate
             userNotify_(me)
         end try
     end reduceNetBootImage_
+
+    -- Creates the folder path /Library/Application Support/Apple/Remote Desktop/ as this is needed on 10.11.2
+    on createRemoteDesktopFolder_(sender)
+        -- Update Build Process Window's Text Field
+        set my buildProcessTextField to "Creating Remote Desktop Folder"
+        delay 0.1
+        -- Update build Process ProgressBar
+        set my buildProcessProgressBar to buildProcessProgressBar + 1
+        -- Set variableVariable
+        set variableVariable to netBootDmgMountPath & "/Library/Application Support/Apple/Remote Desktop/"
+        --Log Action
+        set logMe to "Creating " & variableVariable
+        -- Log To file
+        logToFile_(me)
+        try
+            -- Make certficates directory
+            do shell script "/bin/mkdir -p " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "Trying to set ownership to root:wheel on " & quoted form of variableVariable
+            logToFile_(me)
+            -- Correct ownership
+            do shell script "/usr/sbin/chown -R root:wheel " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "Set ownership to root:wheel on " & quoted form of variableVariable
+            logToFile_(me)
+            -- Update build Process ProgressBar
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
+            --Log Action
+            set logMe to "Trying to set permissions to 755 on " & quoted form of variableVariable
+            logToFile_(me)
+            -- Making writable
+            do shell script "/bin/chmod -R 755 " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
+        on error
+            --Log Action
+            set logMe to "Error: Creating Remote Desktop Folder"
+            logToFile_(me)
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+            -- Set Error message
+            set my userNotifyError to "Error: Creating Remote Desktop Folder"
+            -- Notify of errors or success
+            userNotify_(me)
+        end try
+        -- Delete swap files from the NetBoot.dmg
+        removeSwapFiles_(me)
+    end createRemoteDesktopFolder
 
     -- Delete swap files from the NetBoot.dmg
     on removeSwapFiles_(sender)

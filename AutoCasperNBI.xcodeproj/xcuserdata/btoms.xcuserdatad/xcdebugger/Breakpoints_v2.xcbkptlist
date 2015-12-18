@@ -14,7 +14,9 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "4362"
-            endingLineNumber = "4362">
+            endingLineNumber = "4362"
+            landmarkName = "on copyBootEfi_(sender)"
+            landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
