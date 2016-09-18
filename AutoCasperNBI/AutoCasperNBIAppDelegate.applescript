@@ -12,6 +12,7 @@ script AutoCasperNBIAppDelegate
 
 --- Classes
 	property parent : class "NSObject"
+    property NSApp  : current application's class "NSApp"
     
 --- Objects
     property defaults : ""
@@ -85,6 +86,7 @@ script AutoCasperNBIAppDelegate
     property buildProcessLogTextField : ""
     property versionOfAutoCasperNBI : ""
     property netBootDirectory : ""
+    property rootDirectory : ""
     property adminUserName : ""
     property adminUsersPassword : ""
     property adminUserWindow : ""
@@ -597,7 +599,7 @@ script AutoCasperNBIAppDelegate
         if selectedAppBundleName is equal to "Casper Imaging" then
             try
                 -- If Casper Imaging, return version
-                set selectedCasperImagingAppVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleGetInfoString"
+                set selectedCasperImagingAppVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleShortVersionString"
                 --Log Action
                 set logMe to "Casper Imaging Version: " & selectedCasperImagingAppVersion
                 logToFile_(me)
@@ -673,7 +675,7 @@ script AutoCasperNBIAppDelegate
                 set logMe to "Trying to get JSS version"
                 logToFile_(me)
                 -- Try & get URL using insecure method, this way it will work with or without a valid SSL cert, timesout after 30 seconds
-                set jssURLHtml to do shell script "/usr/bin/curl -k " & jssURL & "/jss.html -m 30"
+                set jssURLHtml to do shell script "/usr/bin/curl -k " & jssURL & "/index.cxml -m 30"
                 --Log Action
                 set logMe to "Checking returned data for JSS version"
                 logToFile_(me)
@@ -722,12 +724,12 @@ script AutoCasperNBIAppDelegate
             -- Store delimiters for resetting later
             set applescriptsDelims to AppleScript's text item delimiters
             -- We only need the content between the title tags
-            set startTag to "<meta name=\"version\" content=\""
-            set endTag to "\">"
-            -- Split at the <title> tag
+            set startTag to "<jamfServlet version="
+            set endTag to "><epoch>"
+            -- Split at the <jamfServlet version= tag
             set AppleScript's text item delimiters to startTag
             set jssVersionCut to text item 2 of jssURLHtml
-            -- Split again at </title>
+            -- Split again at ><epoch>
             set AppleScript's text item delimiters to endTag
             set jssVersion to text item 1 of jssVersionCut
             -- Reset delimiters
@@ -1062,6 +1064,14 @@ script AutoCasperNBIAppDelegate
                 display dialog "Please enter a Username for the ARD user or deselect the ARD option" with icon 0 buttons {"OK"}
                 --Log Action
                 set logMe to "Error: Please enter a Username for the ARD user or deselect the ARD option"
+                logToFile_(me)
+                -- Set to false so we don't proceed
+                set closeButtonPreCheckPassed to false
+            else if ardusername is equal to "root" then
+                -- Display error to user
+                display dialog "Please enter a Username other than root" with icon 0 buttons {"OK"}
+                --Log Action
+                set logMe to "Error: Please enter a Username other than root"
                 logToFile_(me)
                 -- Set to false so we don't proceed
                 set closeButtonPreCheckPassed to false
@@ -1789,7 +1799,7 @@ script AutoCasperNBIAppDelegate
     -- Calculate progressbar max length, depending on selection
     on calcBuildProgressBarMax_(sender)
         -- Reset
-        set my buildProcessProgressBarMax to 71
+        set my buildProcessProgressBarMax to 72
         -- Update build Process ProgressBar
         set my buildProcessProgressBar to 0
         -- Check if reduce NetBoot Image is ticked
@@ -1847,27 +1857,17 @@ script AutoCasperNBIAppDelegate
 
     -- Prompt user for location to create the .nbi
     on netBootLocation_(sender)
-        try
-            -- close admin check window
-            adminUserWindow's orderOut_(null)
-            --If /Library/NetBoot/NetBootSPO/ exists
-            choose folder with prompt "Choose a location to create the .nbi in:" default location "/Library/NetBoot/NetBootSP0/"
-            -- Set netBootSelectedLocation to path of location given
-            set netBootSelectedLocation to POSIX path of the result
-            --Log Action
-            set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
-            logToFile_(me)
-            -- close build process window
-            mainWindow's orderOut_(null)
-        on error
-            --Else open pointing to the desktop folder
-            choose folder with prompt "Choose a location to create the .nbi in:" default location (path to desktop folder)
-            -- Set netBootSelectedLocation to path of location given
-            set netBootSelectedLocation to POSIX path of the result
-            --Log Action
-            set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
-            logToFile_(me)
-        end try
+        -- close admin check window
+        --adminUserWindow's orderOut_(null)
+        --Else open pointing to the desktop folder
+        choose folder with prompt "Choose a location to create the .nbi in:" default location (path to desktop folder)
+        -- Set netBootSelectedLocation to path of location given
+        set netBootSelectedLocation to POSIX path of the result
+        --Log Action
+        set logMe to "Selected path to create .nbi is: " & netBootSelectedLocation
+        logToFile_(me)
+        -- close build process window
+        --mainWindow's orderOut_(null)
         if netBootSelectedLocation is not missing value then
             -- Check that we have enough space available to proceed
             getNetBootDmgRequiredSize_(me)
@@ -1928,7 +1928,6 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "The NetBoot.sparseimage will need to be around " & netBootDmgRequiredSize & "GB"
             logToFile_(me)
-            
             ----- SIZE OF VOLUME ON WHICH WE'RE CREATING THE NBI ----
             -- Set netBootSelectedLocation to path of location given
             set variableVariable to netBootSelectedLocation
@@ -2141,14 +2140,24 @@ script AutoCasperNBIAppDelegate
                 set my buildProcessProgressBarIndeterminate to false
                 set my buildProcessProgressBarAniminate to false
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Creating .nbi folder"
+                set my buildProcessTextField to "Creating folder structure"
                 delay 0.1
                 -- Update build Process ProgressBar
                 set my buildProcessProgressBar to buildProcessProgressBar + 1
+                -- Set root directory
+                set rootDirectory to netBootSelectedLocation & netBootNameTextField
                 -- Set to path of NetBoot directory
-                set netBootDirectory to netBootSelectedLocation & netBootNameTextField & ".nbi"
+                set netBootDirectory to rootDirectory & "/" & netBootNameTextField & ".nbi"
                 --Log action
-                set logMe to "Trying to create .nbi folder " & netBootDirectory
+                set logMe to "Trying to create root folder " & rootDirectory
+                logToFile_(me)
+                -- Create .nbi folder
+                do shell script "/bin/mkdir " & quoted form of rootDirectory user name adminUserName password adminUsersPassword with administrator privileges
+                --Log action
+                set logMe to "Successfully created " & quoted form of rootDirectory
+                logToFile_(me)
+                --Log action
+                set logMe to "Trying to create nbi folder " & netBootDirectory
                 logToFile_(me)
                 -- Create .nbi folder
                 do shell script "/bin/mkdir " & quoted form of netBootDirectory user name adminUserName password adminUsersPassword with administrator privileges
@@ -3064,8 +3073,8 @@ script AutoCasperNBIAppDelegate
             --Log Action
             set logMe to "App Nap disabled"
             logToFile_(me)
-            -- Disable Screen Saver
-            disableScreenSaver_(me)
+            -- Disable Persistance
+            disablePersistance_(me)
         on error
             --Log Action
             set logMe to "Error: Disabling App Nap"
@@ -3078,6 +3087,37 @@ script AutoCasperNBIAppDelegate
             userNotify_(me)
         end try
     end disableAppNap_
+
+    -- Disable Persistance
+    on disablePersistance_(sender)
+        try
+            -- Update Build Process Window's Text Field
+            set my buildProcessTextField to "Disabling Persistance"
+            delay 0.1
+            -- Update build Process ProgressBar
+            set my buildProcessProgressBar to buildProcessProgressBar + 1
+            --Log Action
+            set logMe to "Trying to disable Persistance"
+            logToFile_(me)
+            -- Set Language
+            do shell script "/usr/bin/defaults write " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/.GlobalPreferences.plist ApplePersistence -bool NO" user name adminUserName password adminUsersPassword with administrator privileges
+            --Log Action
+            set logMe to "Persistance disabled"
+            logToFile_(me)
+            -- Disable Screen Saver
+            disableScreenSaver_(me)
+        on error
+            --Log Action
+            set logMe to "Error: Disabling Persistance"
+            logToFile_(me)
+            -- Set to false to display
+            set my userNotifyErrorHidden to false
+            -- Set Error message
+            set my userNotifyError to "Error: Disabling Persistance"
+            -- Notify of errors or success
+            userNotify_(me)
+        end try
+    end disablePersistance_
 
     -- Disable Screen Saver
     on disableScreenSaver_(sender)
@@ -4779,9 +4819,9 @@ script AutoCasperNBIAppDelegate
                 set logMe to "Trying create Restorable DMG of " & netBootDirectory & "/NetBoot.sparseimage"
                 logToFile_(me)
                 -- Make a Read-Only copy of NetBoot.sparseimage
-                do shell script "/usr/bin/hdiutil convert -format UDZO -o " & quoted form of netBootDirectory & "/NetBoot.restorable.dmg " & quoted form of netBootDirectory & "/NetBoot.sparseimage" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/bin/hdiutil convert -format UDZO -o " & quoted form of rootDirectory & "/" & quoted form of netBootNameTextField & ".restorable.dmg " & quoted form of netBootDirectory & "/NetBoot.sparseimage" user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
-                set logMe to "Created " & netBootDirectory & "/NetBoot.restorable.dmg"
+                set logMe to "Created " & netBootDirectory & "/" & quoted form of netBootNameTextField & ".restorable.dmg"
                 logToFile_(me)
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Scanning Restorable DMG"
@@ -4789,12 +4829,12 @@ script AutoCasperNBIAppDelegate
                 -- Update build Process ProgressBar
                 set my buildProcessProgressBar to buildProcessProgressBar + 1
                 --Log Action
-                set logMe to "ASR scanning " & netBootDirectory & "/NetBoot.restorable.dmg"
+                set logMe to "ASR scanning " & quoted form of rootDirectory & "/" & quoted form of netBootNameTextField & ".restorable.dmg"
                 logToFile_(me)
                 -- ASR scan NetBoot.readonly.dmg
-                do shell script "/usr/sbin/asr -imagescan -allowfragmentedcatalog " & quoted form of netBootDirectory & "/NetBoot.restorable.dmg" user name adminUserName password adminUsersPassword with administrator privileges
+                do shell script "/usr/sbin/asr -imagescan -allowfragmentedcatalog " & quoted form of rootDirectory & "/" & quoted form of netBootNameTextField & ".restorable.dmg" user name adminUserName password adminUsersPassword with administrator privileges
                 --Log Action
-                set logMe to "ASR scanned " & netBootDirectory & "/NetBoot.restorable.dmg"
+                set logMe to "ASR scanned " & quoted form of rootDirectory & "/" & quoted form of netBootNameTextField & ".restorable.dmg"
                 logToFile_(me)
                 -- Rename sparseimage to .DMG
                 renameSparseimageToDMG_(me)
@@ -4906,7 +4946,7 @@ script AutoCasperNBIAppDelegate
         userNotifyClose_(me)
         -- Open NBI folder in Finder
         tell application "Finder"
-            open netBootDirectory as POSIX file
+            open rootDirectory as POSIX file
         end tell
         -- Make frontmost
         tell application "System Events" to set frontmost of process "Finder" to true
@@ -4914,6 +4954,8 @@ script AutoCasperNBIAppDelegate
 
     -- Notify of errors or success
     on userNotify_(sender)
+        -- Bounce app icon
+        current application's NSApp's requestUserAttention:0
         -- activate user notify window
         activate
         userNotifyWindow's makeKeyAndOrderFront_(null)

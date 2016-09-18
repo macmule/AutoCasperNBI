@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7C06F40719DA19680057D6ED /* 10.8+root.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C06F40619DA19680057D6ED /* 10.8+root.plist */; };
-		7C07F19319F10B5E00314193 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C07F19219F10B5E00314193 /* Sparkle.framework */; };
-		7C07F19519F10BA600314193 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7C07F19219F10B5E00314193 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7C07F19719F10C8B00314193 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7C07F19619F10C8B00314193 /* dsa_pub.pem */; };
 		7C0E1A291A700D8E0008ED3C /* JSS.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C0E1A271A700D8E0008ED3C /* JSS.icns */; };
 		7C13057F193FC0B60060F343 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C13057E193FC0B60060F343 /* Cocoa.framework */; };
@@ -42,6 +40,8 @@
 		7C9BC9E519EC7D0500C4FDDD /* YoYo-Localization.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C9BC9E419EC7D0500C4FDDD /* YoYo-Localization.icns */; };
 		7C9BC9E719EC7EE800C4FDDD /* YoYo-package.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C9BC9E619EC7EE800C4FDDD /* YoYo-package.icns */; };
 		7CB60994199189E20068574D /* root.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CB60993199189E20068574D /* root.plist */; };
+		7CBF12721D0A092C005798FA /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CBF126F1D0A08B2005798FA /* Sparkle.framework */; };
+		7CBF12741D0A0AC1005798FA /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7CBF126F1D0A08B2005798FA /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7CC26BD819DA1C0D002A093B /* kcpassword in Resources */ = {isa = PBXBuildFile; fileRef = 7CC26BD719DA1C0D002A093B /* kcpassword */; };
 		7CC26BDA19DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CC26BD919DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist */; };
 		7CC26BDC19DA1DF8002A093B /* rc.netboot in Resources */ = {isa = PBXBuildFile; fileRef = 7CC26BDB19DA1DF8002A093B /* rc.netboot */; };
@@ -65,7 +65,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7C07F19519F10BA600314193 /* Sparkle.framework in CopyFiles */,
+				7CBF12741D0A0AC1005798FA /* Sparkle.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,7 +73,6 @@
 
 /* Begin PBXFileReference section */
 		7C06F40619DA19680057D6ED /* 10.8+root.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = "10.8+root.plist"; sourceTree = "<group>"; };
-		7C07F19219F10B5E00314193 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		7C07F19619F10C8B00314193 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		7C0E1A271A700D8E0008ED3C /* JSS.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = JSS.icns; sourceTree = "<group>"; };
 		7C13057B193FC0B60060F343 /* AutoCasperNBI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoCasperNBI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -112,6 +111,7 @@
 		7C9BC9E419EC7D0500C4FDDD /* YoYo-Localization.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-Localization.icns"; sourceTree = "<group>"; };
 		7C9BC9E619EC7EE800C4FDDD /* YoYo-package.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-package.icns"; sourceTree = "<group>"; };
 		7CB60993199189E20068574D /* root.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = root.plist; sourceTree = "<group>"; };
+		7CBF126F1D0A08B2005798FA /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = /Users/btoms/Git/macmule/AutoCasperNBI/Sparkle.framework; sourceTree = "<absolute>"; };
 		7CC26BD719DA1C0D002A093B /* kcpassword */ = {isa = PBXFileReference; lastKnownFileType = file; path = kcpassword; sourceTree = "<group>"; };
 		7CC26BD919DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.AutoCasperNBI.CasperImaging.plist; sourceTree = "<group>"; };
 		7CC26BDB19DA1DF8002A093B /* rc.netboot */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = rc.netboot; sourceTree = "<group>"; };
@@ -134,8 +134,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C130581193FC0B60060F343 /* AppleScriptObjC.framework in Frameworks */,
-				7C07F19319F10B5E00314193 /* Sparkle.framework in Frameworks */,
 				7C13057F193FC0B60060F343 /* Cocoa.framework in Frameworks */,
+				7CBF12721D0A092C005798FA /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,7 +162,7 @@
 		7C13057D193FC0B60060F343 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7C07F19219F10B5E00314193 /* Sparkle.framework */,
+				7CBF126F1D0A08B2005798FA /* Sparkle.framework */,
 				7C13057E193FC0B60060F343 /* Cocoa.framework */,
 				7C130580193FC0B60060F343 /* AppleScriptObjC.framework */,
 				7C130582193FC0B60060F343 /* Other Frameworks */,
@@ -278,8 +278,13 @@
 		7C130573193FC0B60060F343 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = macmule;
+				TargetAttributes = {
+					7C13057A193FC0B60060F343 = {
+						DevelopmentTeam = 7WHVYYF52U;
+					};
+				};
 			};
 			buildConfigurationList = 7C130576193FC0B60060F343 /* Build configuration list for PBXProject "AutoCasperNBI" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -413,13 +418,19 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -432,7 +443,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -451,21 +462,26 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -474,7 +490,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7WHVYYF52U;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -482,8 +501,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AutoCasperNBI/AutoCasperNBI-Prefix.pch";
 				INFOPLIST_FILE = "AutoCasperNBI/AutoCasperNBI-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.macmule.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -492,7 +514,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7WHVYYF52U;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -500,8 +525,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AutoCasperNBI/AutoCasperNBI-Prefix.pch";
 				INFOPLIST_FILE = "AutoCasperNBI/AutoCasperNBI-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.macmule.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
