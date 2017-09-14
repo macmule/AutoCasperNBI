@@ -119,6 +119,7 @@ script AutoCasperNBIAppDelegate
     property mountPlist : ""
     property selectedOSdmgBytesTotal : ""
     property latestNBImageInfo : ""
+    property imagingApp : ""
     
     --- Booleans
     property selectedOSDMGTextFieldEnabled : false
@@ -221,6 +222,18 @@ script AutoCasperNBIAppDelegate
         logToFile_(me)
         -- Get OS of host mac to verify that we can create an .nbi from supplied OS.dmg
         set my hostMacOSVersion to (do shell script "/usr/bin/sw_vers -productVersion")
+        -- Variables to mess with, keeping the orignal with their decimals
+        set my hostMacOSVersionToDelim to hostMacOSVersion
+        -- Store delimiters for resetting later
+        set applescriptsDelims to AppleScript's text item delimiters
+        -- Set delimiters to decimal
+        set AppleScript's text item delimiters to "."
+        -- Set variables to the split versions
+        set hostMacOSVersionToDelim to hostMacOSVersionToDelim's text items
+        -- Set to major version of OS
+        set hostMacOSVersionMajor to text item 2 of hostMacOSVersionToDelim as integer
+        -- Reset delimiters
+        set AppleScript's text item delimiters to applescriptsDelims
         -- Get host macs Build version for logging/debugging
         set my hostMacOSBuildVersion to (do shell script "/usr/bin/sw_vers -buildVersion")
         -- Log OS version & build of host mac
@@ -521,7 +534,7 @@ script AutoCasperNBIAppDelegate
         --  Set to text of variable
         set selectedOSdmgMountPath to selectedOSdmgMountPath as text
         -- If APFS source byt not 10.13
-        if ((NSString's stringWithString:selectedOSdmgKind) as string) is equal to "apfs" then
+        if (hostMacOSVersionMajor is less than 13) and ((NSString's stringWithString:selectedOSdmgKind) as string) is equal to "apfs" then
             --Log Action
             set logMe to "APFS source, not a 10.13 host"
             logToFile_(me)
@@ -628,6 +641,7 @@ script AutoCasperNBIAppDelegate
                 doResetSelectedAppIcons_(me)
                 -- Display green tick
                 set my selectedAppCheckPass to true
+                set imagingApp to "Casper"
                 -- Compare JSS & Casper Imaging Versions
                 checkJSSURL_(me)
             -- Error if cannot get the version number
@@ -639,15 +653,40 @@ script AutoCasperNBIAppDelegate
                 -- Disable options and build
                 set my disableOptionsAndBuild to true
             end try
+        else if selectedAppBundleName is equal to "Jamf Imaging" then
+            try
+                -- If Jamf Imaging, return version
+                set selectedCasperImagingAppVersion to do shell script "/usr/bin/defaults read " & quoted form of selectedAppPath & "/Contents/Info.plist CFBundleShortVersionString"
+                --Log Action
+                set logMe to "Jamf Imaging Version: " & selectedCasperImagingAppVersion
+                logToFile_(me)
+                -- Set label to Casper Imaging version
+                set my selectedAppTextField to "Jamf Imaging " & selectedCasperImagingAppVersion
+                -- Reset Selected App Icons
+                doResetSelectedAppIcons_(me)
+                -- Display green tick
+                set my selectedAppCheckPass to true
+                set imagingApp to "Jamf"
+                -- Compare JSS & Casper Imaging Versions
+                checkJSSURL_(me)
+                -- Error if cannot get the version number
+            on error
+                -- Reset Selected App Icons
+                doResetSelectedAppIcons_(me)
+                -- Display Error if cannot get version number
+                set my selectedAppTextField to "Cannot Get Version"
+                -- Disable options and build
+                set my disableOptionsAndBuild to true
+            end try
         -- If selected app is not Casper Imaging.
         else
             --Log Action
-            set logMe to "Select Casper Imaging.app"
+            set logMe to "Select an Imaging.app"
             logToFile_(me)
             -- Reset Selected App Icons
             doResetSelectedAppIcons_(me)
             -- Display message that we have selected Casper Imaging
-            set my selectedAppTextField to "Select Casper Imaging.app"
+            set my selectedAppTextField to "Select an Imaging.app"
             -- Disable options and build
             set my disableOptionsAndBuild to true
         end if
@@ -810,7 +849,7 @@ script AutoCasperNBIAppDelegate
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
             -- Update lable with JSS & Casper Imaging version comparison result
-            set my jssAndCasperImagingVersionCheckTextfield to "Major version difference between JSS & Casper Imaging"
+            set my jssAndCasperImagingVersionCheckTextfield to "Major version difference between JSS & " & imagingApp & " Imaging"
             -- If major versions match
         else if selectedCasperImagingAppVersionMajor is equal to jssVersionMajor then
             -- Check if minor versions match, alert if not
@@ -824,7 +863,7 @@ script AutoCasperNBIAppDelegate
                 doResetJSSURLIcons_(me)
                 set my disableOptionsAndBuild to false
                 -- Update lable with JSS & Casper Imaging version comparison result
-                set my jssAndCasperImagingVersionCheckTextfield to "Minor version difference between JSS & Casper Imaging"
+                set my jssAndCasperImagingVersionCheckTextfield to "Minor version difference between JSS & " & imagingApp & " Imaging"
                 -- See if pre-reqs have been met
                 checkIfReadyToProceed_(me)
             -- If Casper Imaging & JSS are the same version
@@ -832,7 +871,7 @@ script AutoCasperNBIAppDelegate
                 -- Show check if version received
                 set my checkGreenJSSURL to true
                 -- Update lable with JSS & Casper Imaging version comparison result
-                set my jssAndCasperImagingVersionCheckTextfield to "JSS & Casper Imaging versions match"
+                set my jssAndCasperImagingVersionCheckTextfield to "JSS & " & imagingApp & " Imaging versions match"
                 -- See if pre-reqs have been met
                 checkIfReadyToProceed_(me)
             end if
@@ -986,13 +1025,13 @@ script AutoCasperNBIAppDelegate
                 -- If we don't have a JSS URL set, then omit
                 if jssURL is equal to "" then
                     -- Set NetBoot Description
-                    set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & ". Created by, " & longUserName & " on: " & buildDate & "."
+                    set my netBootDescription to selectedOSDMGTextField & " with " & imagingApp & " Imaging " & selectedCasperImagingAppVersion & ". Created by, " & longUserName & " on: " & buildDate & "."
                     --Log Action
                     set logMe to "NetBoot description set to " & quoted form of netBootDescription
                     logToFile_(me)
                 else
                     -- Set NetBoot Description
-                    set my netBootDescription to selectedOSDMGTextField & " with Casper Imaging " & selectedCasperImagingAppVersion & " pointing to JSS " & jssURL & ". Created by, " & longUserName & " on: " & buildDate & "."
+                    set my netBootDescription to selectedOSDMGTextField & " with " & imagingApp & " Imaging " & selectedCasperImagingAppVersion & " pointing to JSS " & jssURL & ". Created by, " & longUserName & " on: " & buildDate & "."
                     --Log Action
                     set logMe to "NetBoot description set to " & quoted form of netBootDescription
                     logToFile_(me)
@@ -3719,21 +3758,21 @@ script AutoCasperNBIAppDelegate
     on copyCasperImagingApp_(sender)
         try
             -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Copying Casper Imaging.app"
+            set my buildProcessTextField to "Copying " & imagingApp & " Imaging.app"
             delay 0.1
             -- Update build Process ProgressBar
             set my buildProcessProgressBar to buildProcessProgressBar + 1
             -- Cut the trailing /
             set selectedAppPathToCopy to do shell script "/bin/echo " & quoted form of selectedAppPath & " | rev | cut -c 2- | rev"
             --Log Action
-            set logMe to "Casper Imaging.app to copy resides " & selectedAppPathToCopy
+            set logMe to imagingApp & " Imaging.app to copy resides " & selectedAppPathToCopy
             logToFile_(me)
             -- Copy location for Casper Imaging.app
             set variableVariable to netBootDmgMountPath & "/Applications/"
             -- Copy path of Casper Imaging.app
-            set copiedAppPath to netBootDmgMountPath & "/Applications/Casper Imaging.app"
+            set copiedAppPath to netBootDmgMountPath & "/Applications/" & imagingApp & " Imaging.app"
             --Log Action
-            set logMe to "Casper Imaging.app to be copied to " & copiedAppPath
+            set logMe to imagingApp & " Imaging.app to be copied to " & copiedAppPath
             logToFile_(me)
             -- Copy Casper Imaging.app & log
             do shell script "/bin/cp -r " & quoted form of selectedAppPathToCopy & " " & quoted form of variableVariable user name adminUserName password adminUsersPassword with administrator privileges
@@ -3771,7 +3810,7 @@ script AutoCasperNBIAppDelegate
     on enableCasperImagingDebug_(sender)
         try
             -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Setting Casper Imaging to Debug mode"
+            set my buildProcessTextField to "Setting " & imagingApp & " Imaging to Debug mode"
             delay 0.1
             -- Update build Process ProgressBar
             set my buildProcessProgressBar to buildProcessProgressBar + 1
@@ -3791,12 +3830,12 @@ script AutoCasperNBIAppDelegate
             writeCasperImagingPlist_(me)
         on error
             --Log Action
-            set logMe to "Error: Setting Casper Imaging to Debug mode"
+            set logMe to "Error: Setting " & imagingApp & " Imaging to Debug mode"
             logToFile_(me)
             -- Set to false to display
             set my userNotifyErrorHidden to false
             -- Set Error message
-            set my userNotifyError to "Error: Setting Casper Imaging to Debug mode"
+            set my userNotifyError to "Error: Setting " & imagingApp & " Imaging to Debug mode"
             -- Notify of errors or success
             userNotify_(me)
         end try
@@ -3808,7 +3847,7 @@ script AutoCasperNBIAppDelegate
             -- If a JSS URL is specified
             if my jssURL is not ""
                 -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Writing Casper Imaging plist"
+                set my buildProcessTextField to "Writing jamf plist"
                 delay 0.1
                 -- Update build Process ProgressBar
                 set my buildProcessProgressBar to buildProcessProgressBar + 1
@@ -3829,12 +3868,12 @@ script AutoCasperNBIAppDelegate
             installCasperImagingLaunchAgent_(me)
         on error
             --Log Action
-            set logMe to "Error: Writing the Casper Imaging plist"
+            set logMe to "Error: Writing the jamf plist"
             logToFile_(me)
             -- Set to false to display
             set my userNotifyErrorHidden to false
             -- Set Error message
-            set my userNotifyError to "Error: Writing the Casper Imaging plist"
+            set my userNotifyError to "Error: Writing the jamf plist"
             -- Notify of errors or success
             userNotify_(me)
         end try
@@ -3842,53 +3881,103 @@ script AutoCasperNBIAppDelegate
 
     -- Install CasperImagingLaunchAgent
     on installCasperImagingLaunchAgent_(sender)
-        try
-            -- Update Build Process Window's Text Field
-            set my buildProcessTextField to "Installing Casper Imaging LaunchAgent"
-            delay 0.1
-            -- Update build Process ProgressBar
-            set my buildProcessProgressBar to buildProcessProgressBar + 1
-            --Log Action
-            set logMe to "Trying to install Casper Imaging LaunchAgent"
-            logToFile_(me)
-            -- Install com.AutoCasperNBI.CasperImaging.plist from rescources
-            do shell script "/bin/cp " & quoted form of pathToResources & "/com.AutoCasperNBI.CasperImaging.plist " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/" user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Casper Imaging LaunchAgent plist installed"
-            logToFile_(me)
-            -- Update build Process ProgressBar
-            set my buildProcessProgressBar to buildProcessProgressBar + 1
-            --Log Action
-            set logMe to "Correcting ownership on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist"
-            logToFile_(me)
-            -- Correct ownership
-            do shell script "/usr/sbin/chown root:wheel " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist" user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Set ownership to root:wheel on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist"
-            logToFile_(me)
-            -- Update build Process ProgressBar
-            set my buildProcessProgressBar to buildProcessProgressBar + 1
-            --Log Action
-            set logMe to "Trying to correct permissions on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist"
-            logToFile_(me)
-            -- Making  writable
-            do shell script "/bin/chmod 644 " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist" user name adminUserName password adminUsersPassword with administrator privileges
-            --Log Action
-            set logMe to "Set permissons on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist to 644"
-            logToFile_(me)
-            -- Get JSS CA Cert if JSS URL given
-            importJSSCACert_(me)
-        on error
-            --Log Action
-            set logMe to "Error: Installing Casper Imaging LaunchAgent"
-            logToFile_(me)
-            -- Set to false to display
-            set my userNotifyErrorHidden to false
-            -- Set Error message
-            set my userNotifyError to "Error: Installing Casper Imaging LaunchAgent"
-            -- Notify of errors or success
-            userNotify_(me)
-        end try
+        if imagingApp is "Casper"
+            try
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Installing Casper Imaging LaunchAgent"
+                delay 0.1
+                -- Update build Process ProgressBar
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
+                --Log Action
+                set logMe to "Trying to install Casper Imaging LaunchAgent"
+                logToFile_(me)
+                -- Install com.AutoCasperNBI.CasperImaging.plist from rescources
+                do shell script "/bin/cp " & quoted form of pathToResources & "/com.AutoCasperNBI.CasperImaging.plist " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Casper Imaging LaunchAgent plist installed"
+                logToFile_(me)
+                -- Update build Process ProgressBar
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
+                --Log Action
+                set logMe to "Correcting ownership on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist"
+                logToFile_(me)
+                -- Correct ownership
+                do shell script "/usr/sbin/chown root:wheel " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Set ownership to root:wheel on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist"
+                logToFile_(me)
+                -- Update build Process ProgressBar
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
+                --Log Action
+                set logMe to "Trying to correct permissions on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist"
+                logToFile_(me)
+                -- Making  writable
+                do shell script "/bin/chmod 644 " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Set permissons on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.CasperImaging.plist to 644"
+                logToFile_(me)
+                -- Get JSS CA Cert if JSS URL given
+                importJSSCACert_(me)
+            on error
+                --Log Action
+                set logMe to "Error: Installing Casper Imaging LaunchAgent"
+                logToFile_(me)
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
+                -- Set Error message
+                set my userNotifyError to "Error: Installing Casper Imaging LaunchAgent"
+                -- Notify of errors or success
+                userNotify_(me)
+            end try
+        else
+            try
+                -- Update Build Process Window's Text Field
+                set my buildProcessTextField to "Installing Jamf Imaging LaunchAgent"
+                delay 0.1
+                -- Update build Process ProgressBar
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
+                --Log Action
+                set logMe to "Trying to install Jamf Imaging LaunchAgent"
+                logToFile_(me)
+                -- Install com.AutoCasperNBI.JamfImaging.plist from rescources
+                do shell script "/bin/cp " & quoted form of pathToResources & "/com.AutoCasperNBI.JamfImaging.plist " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Jamf Imaging LaunchAgent plist installed"
+                logToFile_(me)
+                -- Update build Process ProgressBar
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
+                --Log Action
+                set logMe to "Correcting ownership on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.JamfImaging.plist"
+                logToFile_(me)
+                -- Correct ownership
+                do shell script "/usr/sbin/chown root:wheel " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.JamfImaging.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Set ownership to root:wheel on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.JamfImaging.plist"
+                logToFile_(me)
+                -- Update build Process ProgressBar
+                set my buildProcessProgressBar to buildProcessProgressBar + 1
+                --Log Action
+                set logMe to "Trying to correct permissions on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.JamfImaging.plist"
+                logToFile_(me)
+                -- Making  writable
+                do shell script "/bin/chmod 644 " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.JamfImaging.plist" user name adminUserName password adminUsersPassword with administrator privileges
+                --Log Action
+                set logMe to "Set permissons on " & quoted form of netBootDmgMountPath & "/Library/LaunchAgents/com.AutoCasperNBI.JamfImaging.plist to 644"
+                logToFile_(me)
+                -- Get JSS CA Cert if JSS URL given
+                importJSSCACert_(me)
+                on error
+                --Log Action
+                set logMe to "Error: Installing Jamf Imaging LaunchAgent"
+                logToFile_(me)
+                -- Set to false to display
+                set my userNotifyErrorHidden to false
+                -- Set Error message
+                set my userNotifyError to "Error: Installing Jamf Imaging LaunchAgent"
+                -- Notify of errors or success
+                userNotify_(me)
+            end try
+        end if
     end installCasperImagingLaunchAgent_
 
     -- Get JSS CA Cert if JSS URL given

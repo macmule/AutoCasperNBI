@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "AutoCasperNBI/AutoCasperNBIAppDelegate.applescript"
-            timestampString = "495154533.493349"
+            timestampString = "527070768.81765"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "4826"
-            endingLineNumber = "4826"
-            landmarkName = "on createReadOnlyDMG_(sender)"
+            startingLineNumber = "4865"
+            endingLineNumber = "4865"
+            landmarkName = "on updateNBImageInfoPlist_(sender)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
