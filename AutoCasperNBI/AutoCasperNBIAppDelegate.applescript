@@ -3512,7 +3512,7 @@ script AutoCasperNBIAppDelegate
                      --Log Action
                      set logMe to "Successfully copied Lion Root user plist"
                      logToFile_(me)
-                else if selectedOSdmgVersionMajor is less than 13
+                else
                     --Log Action
                     set logMe to "Trying to copy Root user plist (10.8+)"
                     logToFile_(me)
@@ -3523,20 +3523,6 @@ script AutoCasperNBIAppDelegate
                     set my buildProcessProgressBar to buildProcessProgressBar + 1
                     -- Copy the root.plist
                     do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/10.8+root.plist " & quoted form of netBootDmgMountPath & "/private/var/db/dslocal/nodes/Default/users/root.plist" user name adminUserName password adminUsersPassword with administrator privileges
-                    --Log Action
-                    set logMe to "Successfully copied Root user plist"
-                    logToFile_(me)
-                else
-                    --Log Action
-                    set logMe to "Trying to copy Root user plist (10.13+)"
-                    logToFile_(me)
-                    -- Update Build Process Window's Text Field
-                    set my buildProcessTextField to "Copying Root User plist"
-                    delay 0.1
-                    -- Update build Process ProgressBar
-                    set my buildProcessProgressBar to buildProcessProgressBar + 1
-                    -- Copy the root.plist
-                    do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/10.13+root.plist " & quoted form of netBootDmgMountPath & "/private/var/db/dslocal/nodes/Default/users/root.plist" user name adminUserName password adminUsersPassword with administrator privileges
                     --Log Action
                     set logMe to "Successfully copied Root user plist"
                     logToFile_(me)
@@ -3634,7 +3620,7 @@ script AutoCasperNBIAppDelegate
             -- Update build Process ProgressBar
             set my buildProcessProgressBar to buildProcessProgressBar + 1
             -- Copy the correct dock.plist
-            do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/com.apple.dock.plist." & imagingApp & " " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.dock.plist" user name adminUserName password adminUsersPassword with administrator privileges
+            do shell script "/usr/bin/ditto " & quoted form of pathToResources & "/" & imagingApp & ".com.apple.dock.plist " & quoted form of netBootDmgMountPath & "/private/var/root/Library/Preferences/com.apple.dock.plist" user name adminUserName password adminUsersPassword with administrator privileges
             --Log Action
             set logMe to "Successfully copied Root user dock.plist"
             logToFile_(me)
@@ -4446,7 +4432,7 @@ script AutoCasperNBIAppDelegate
                 logToFile_(me)
                 -- Create xpc extensions cache files
                 createXpcExtensionsCaches_(me)
-                else
+            else
                 -- Create xpc extensions cache files
                 createXpcExtensionsCaches_(me)
             end if

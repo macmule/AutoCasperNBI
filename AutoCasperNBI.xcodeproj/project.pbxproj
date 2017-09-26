@@ -32,7 +32,7 @@
 		7C39447E1960C57D00BF371B /* Package.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447D1960C57D00BF371B /* Package.icns */; };
 		7C3944801960C7DA00BF371B /* CertStackLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */; };
 		7C3ABCEB1F69EFB2004776B0 /* com.AutoCasperNBI.JamfImaging.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C3ABCEA1F69EFB2004776B0 /* com.AutoCasperNBI.JamfImaging.plist */; };
-		7C55D7EF19DA299000AC599D /* com.apple.dock.plist.Casper in Resources */ = {isa = PBXBuildFile; fileRef = 7C55D7EE19DA299000AC599D /* com.apple.dock.plist.Casper */; };
+		7C55D7EF19DA299000AC599D /* Casper.com.apple.dock.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C55D7EE19DA299000AC599D /* Casper.com.apple.dock.plist */; };
 		7C801962196EA9AE0079952B /* AutoCasperNBI.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C801961196EA9AE0079952B /* AutoCasperNBI.png */; };
 		7C83B56E19A3931600E9572E /* Finder.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C83B56D19A3931600E9572E /* Finder.icns */; };
 		7C83B57219A3AF3E00E9572E /* Localization.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C83B57119A3AF3E00E9572E /* Localization.icns */; };
@@ -57,8 +57,7 @@
 		7CDD2BC019EC7BAA008D370F /* YoYo-Clock.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CDD2BBB19EC7BAA008D370F /* YoYo-Clock.icns */; };
 		7CDD2BC119EC7BAA008D370F /* YoYo-AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CDD2BBC19EC7BAA008D370F /* YoYo-AppIcon.icns */; };
 		7CEDD051195B8243009DA982 /* Installer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7CEDD050195B8243009DA982 /* Installer.icns */; };
-		7CF3937B1F769EAF00A12972 /* com.apple.dock.plist.Jamf in Resources */ = {isa = PBXBuildFile; fileRef = 7CF3937A1F769EAF00A12972 /* com.apple.dock.plist.Jamf */; };
-		7CF3937D1F769F1200A12972 /* 10.13+root.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CF3937C1F769F1200A12972 /* 10.13+root.plist */; };
+		7CF3937B1F769EAF00A12972 /* Jamf.com.apple.dock.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7CF3937A1F769EAF00A12972 /* Jamf.com.apple.dock.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -106,7 +105,7 @@
 		7C39447D1960C57D00BF371B /* Package.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Package.icns; sourceTree = "<group>"; };
 		7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CertStackLarge@2x.png"; sourceTree = "<group>"; };
 		7C3ABCEA1F69EFB2004776B0 /* com.AutoCasperNBI.JamfImaging.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = com.AutoCasperNBI.JamfImaging.plist; path = ../../../../Downloads/com.AutoCasperNBI.JamfImaging.plist; sourceTree = "<group>"; };
-		7C55D7EE19DA299000AC599D /* com.apple.dock.plist.Casper */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = com.apple.dock.plist.Casper; sourceTree = "<group>"; };
+		7C55D7EE19DA299000AC599D /* Casper.com.apple.dock.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = Casper.com.apple.dock.plist; sourceTree = "<group>"; };
 		7C801961196EA9AE0079952B /* AutoCasperNBI.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AutoCasperNBI.png; sourceTree = "<group>"; };
 		7C83B56D19A3931600E9572E /* Finder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Finder.icns; sourceTree = "<group>"; };
 		7C83B57119A3AF3E00E9572E /* Localization.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Localization.icns; sourceTree = "<group>"; };
@@ -130,8 +129,7 @@
 		7CDD2BBB19EC7BAA008D370F /* YoYo-Clock.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-Clock.icns"; sourceTree = "<group>"; };
 		7CDD2BBC19EC7BAA008D370F /* YoYo-AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "YoYo-AppIcon.icns"; sourceTree = "<group>"; };
 		7CEDD050195B8243009DA982 /* Installer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Installer.icns; sourceTree = "<group>"; };
-		7CF3937A1F769EAF00A12972 /* com.apple.dock.plist.Jamf */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = com.apple.dock.plist.Jamf; sourceTree = "<group>"; };
-		7CF3937C1F769F1200A12972 /* 10.13+root.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = "10.13+root.plist"; sourceTree = "<group>"; };
+		7CF3937A1F769EAF00A12972 /* Jamf.com.apple.dock.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = Jamf.com.apple.dock.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,11 +195,10 @@
 				7CCA40B619D9F22600C7114F /* com.AutoCasperNBI.boot.plist */,
 				7C06F40619DA19680057D6ED /* 10.8+root.plist */,
 				7CC26BD919DA1D2C002A093B /* com.AutoCasperNBI.CasperImaging.plist */,
-				7CF3937C1F769F1200A12972 /* 10.13+root.plist */,
 				7CC636E5197D444E008473CE /* NBImageInfo.plist */,
 				7CC26BDB19DA1DF8002A093B /* rc.netboot */,
-				7C55D7EE19DA299000AC599D /* com.apple.dock.plist.Casper */,
-				7CF3937A1F769EAF00A12972 /* com.apple.dock.plist.Jamf */,
+				7C55D7EE19DA299000AC599D /* Casper.com.apple.dock.plist */,
+				7CF3937A1F769EAF00A12972 /* Jamf.com.apple.dock.plist */,
 				7CCA40B419D9EE9800C7114F /* Boot.sh */,
 				7C13059E193FC0CE0060F343 /* MainMenu.xib */,
 				7C130592193FC0B60060F343 /* AutoCasperNBIAppDelegate.applescript */,
@@ -319,10 +316,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7CF3937B1F769EAF00A12972 /* com.apple.dock.plist.Jamf in Resources */,
+				7CF3937B1F769EAF00A12972 /* Jamf.com.apple.dock.plist in Resources */,
 				7C1305AB193FC10A0060F343 /* NetBootVolume.icns in Resources */,
-				7CF3937D1F769F1200A12972 /* 10.13+root.plist in Resources */,
-				7C55D7EF19DA299000AC599D /* com.apple.dock.plist.Casper in Resources */,
+				7C55D7EF19DA299000AC599D /* Casper.com.apple.dock.plist in Resources */,
 				7C83B57419A3B39A00E9572E /* diskcopy.icns in Resources */,
 				7C06F40719DA19680057D6ED /* 10.8+root.plist in Resources */,
 				7CDD2BBD19EC7BAA008D370F /* YoYo-icn_desktop.tiff in Resources */,
