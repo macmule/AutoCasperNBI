@@ -848,8 +848,11 @@ script AutoCasperNBIAppDelegate
             doResetSelectedAppIcons_(me)
             -- Reset JSS URL icons
             doResetJSSURLIcons_(me)
+            set my disableOptionsAndBuild to false
             -- Update lable with JSS & Casper Imaging version comparison result
             set my jssAndCasperImagingVersionCheckTextfield to "Major version difference between JSS & " & imagingApp & " Imaging"
+            -- See if pre-reqs have been met
+            checkIfReadyToProceed_(me)
             -- If major versions match
         else if selectedCasperImagingAppVersionMajor is equal to jssVersionMajor then
             -- Check if minor versions match, alert if not
