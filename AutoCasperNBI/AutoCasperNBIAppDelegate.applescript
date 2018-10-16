@@ -5233,11 +5233,7 @@ script AutoCasperNBIAppDelegate
         -- Close User Notify Window
         userNotifyClose_(me)
         --Open log file with console
-        tell application "Console"
-            open "~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log" as POSIX file
-        end tell
-        -- Make frontmost
-        --tell application "System Events" to set frontmost of process "Console" to true
+        do shell script "/usr/bin/open -a /Applications/Utilities/Console.app ~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log"
     end openLogLocation_
 
     -- Open NBI Location
