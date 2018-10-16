@@ -25,13 +25,13 @@
 		7C1305AD193FC10A0060F343 /* RemoteDesktop.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C1305A6193FC10A0060F343 /* RemoteDesktop.icns */; };
 		7C1305AE193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C1305A7193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns */; };
 		7C19700A198058F00092062D /* Scripts.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C197009198058F00092062D /* Scripts.icns */; };
+		7C19733F21766DA200282107 /* com.AutoCasperNBI.JamfImaging.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C19733E21766DA100282107 /* com.AutoCasperNBI.JamfImaging.plist */; };
 		7C23C474195A3AEB00FAC70A /* Screensharing.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C23C473195A3AEB00FAC70A /* Screensharing.icns */; };
 		7C27FA26198C357900BD5A07 /* AlertStopIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C27FA25198C357900BD5A07 /* AlertStopIcon.icns */; };
 		7C27FA28198C3D9500BD5A07 /* complete.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7C27FA27198C3D9500BD5A07 /* complete.aif */; };
 		7C3759491BC7027900CBB857 /* 10.11NBImageInfo in Resources */ = {isa = PBXBuildFile; fileRef = 7C3759481BC7027900CBB857 /* 10.11NBImageInfo */; };
 		7C39447E1960C57D00BF371B /* Package.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447D1960C57D00BF371B /* Package.icns */; };
 		7C3944801960C7DA00BF371B /* CertStackLarge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */; };
-		7C3ABCEB1F69EFB2004776B0 /* com.AutoCasperNBI.JamfImaging.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C3ABCEA1F69EFB2004776B0 /* com.AutoCasperNBI.JamfImaging.plist */; };
 		7C55D7EF19DA299000AC599D /* Casper.com.apple.dock.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C55D7EE19DA299000AC599D /* Casper.com.apple.dock.plist */; };
 		7C801962196EA9AE0079952B /* AutoCasperNBI.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C801961196EA9AE0079952B /* AutoCasperNBI.png */; };
 		7C83B56E19A3931600E9572E /* Finder.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C83B56D19A3931600E9572E /* Finder.icns */; };
@@ -98,13 +98,13 @@
 		7C1305A6193FC10A0060F343 /* RemoteDesktop.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = RemoteDesktop.icns; sourceTree = "<group>"; };
 		7C1305A7193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ToolbarDesktopFolderIcon.icns; sourceTree = "<group>"; };
 		7C197009198058F00092062D /* Scripts.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Scripts.icns; sourceTree = "<group>"; };
+		7C19733E21766DA100282107 /* com.AutoCasperNBI.JamfImaging.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.AutoCasperNBI.JamfImaging.plist; sourceTree = "<group>"; };
 		7C23C473195A3AEB00FAC70A /* Screensharing.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Screensharing.icns; sourceTree = "<group>"; };
 		7C27FA25198C357900BD5A07 /* AlertStopIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AlertStopIcon.icns; sourceTree = "<group>"; };
 		7C27FA27198C3D9500BD5A07 /* complete.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = complete.aif; sourceTree = "<group>"; };
 		7C3759481BC7027900CBB857 /* 10.11NBImageInfo */ = {isa = PBXFileReference; lastKnownFileType = folder; path = 10.11NBImageInfo; sourceTree = "<group>"; };
 		7C39447D1960C57D00BF371B /* Package.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Package.icns; sourceTree = "<group>"; };
 		7C39447F1960C7DA00BF371B /* CertStackLarge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CertStackLarge@2x.png"; sourceTree = "<group>"; };
-		7C3ABCEA1F69EFB2004776B0 /* com.AutoCasperNBI.JamfImaging.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = com.AutoCasperNBI.JamfImaging.plist; path = ../../../../Downloads/com.AutoCasperNBI.JamfImaging.plist; sourceTree = "<group>"; };
 		7C55D7EE19DA299000AC599D /* Casper.com.apple.dock.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = Casper.com.apple.dock.plist; sourceTree = "<group>"; };
 		7C801961196EA9AE0079952B /* AutoCasperNBI.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AutoCasperNBI.png; sourceTree = "<group>"; };
 		7C83B56D19A3931600E9572E /* Finder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Finder.icns; sourceTree = "<group>"; };
@@ -187,7 +187,7 @@
 		7C130586193FC0B60060F343 /* AutoCasperNBI */ = {
 			isa = PBXGroup;
 			children = (
-				7C3ABCEA1F69EFB2004776B0 /* com.AutoCasperNBI.JamfImaging.plist */,
+				7C19733E21766DA100282107 /* com.AutoCasperNBI.JamfImaging.plist */,
 				7C3759481BC7027900CBB857 /* 10.11NBImageInfo */,
 				7CB60993199189E20068574D /* root.plist */,
 				7C07F19619F10C8B00314193 /* dsa_pub.pem */,
@@ -284,12 +284,12 @@
 		7C130573193FC0B60060F343 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = macmule;
 				TargetAttributes = {
 					7C13057A193FC0B60060F343 = {
 						DevelopmentTeam = 7WHVYYF52U;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -326,6 +326,7 @@
 				7C07F19719F10C8B00314193 /* dsa_pub.pem in Resources */,
 				7C27FA26198C357900BD5A07 /* AlertStopIcon.icns in Resources */,
 				7C23C474195A3AEB00FAC70A /* Screensharing.icns in Resources */,
+				7C19733F21766DA200282107 /* com.AutoCasperNBI.JamfImaging.plist in Resources */,
 				7CEDD051195B8243009DA982 /* Installer.icns in Resources */,
 				7C3944801960C7DA00BF371B /* CertStackLarge@2x.png in Resources */,
 				7C83B57619A3B41700E9572E /* CDiskImage.icns in Resources */,
@@ -335,7 +336,6 @@
 				7C9BC9E519EC7D0500C4FDDD /* YoYo-Localization.icns in Resources */,
 				7C13058B193FC0B60060F343 /* InfoPlist.strings in Resources */,
 				7CDD2BC119EC7BAA008D370F /* YoYo-AppIcon.icns in Resources */,
-				7C3ABCEB1F69EFB2004776B0 /* com.AutoCasperNBI.JamfImaging.plist in Resources */,
 				7C0E1A291A700D8E0008ED3C /* JSS.icns in Resources */,
 				7CC26BDC19DA1DF8002A093B /* rc.netboot in Resources */,
 				7C19700A198058F00092062D /* Scripts.icns in Resources */,
@@ -378,7 +378,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\n#\n# Sets the version string to a monotonically increased string, based on\n# the number of git commits.\n\nset -o errexit\nset -o nounset\n\nVERSION=$(git --git-dir=\"$PROJECT_DIR/.git\" --work-tree=\"$PROJECT_DIR\" log | grep '^commit' | wc -l)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $VERSION\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"";
+			shellScript = "#!/bin/bash\n#\n# Sets the version string to a monotonically increased string, based on\n# the number of git commits.\n\nset -o errexit\nset -o nounset\n\nVERSION=$(git --git-dir=\"$PROJECT_DIR/.git\" --work-tree=\"$PROJECT_DIR\" log | grep '^commit' | wc -l)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $VERSION\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -426,12 +426,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -477,12 +479,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -513,9 +517,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 7WHVYYF52U;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -539,9 +543,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 7WHVYYF52U;
 				FRAMEWORK_SEARCH_PATHS = (

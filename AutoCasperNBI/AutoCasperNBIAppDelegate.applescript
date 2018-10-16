@@ -498,7 +498,7 @@ script AutoCasperNBIAppDelegate
         -- Delay needed to update label
         delay 0.1
         -- Set to front window
-        tell application "System Events" to set frontmost of process "AutoCasperNBI" to true
+        --tell application "System Events" to set frontmost of process "AutoCasperNBI" to true
         --  Try & mount OS.dmg
         -- Stolen from frogor on IRC with permission :)
         -- Mount OS.dmh & get mount point
@@ -5237,7 +5237,7 @@ script AutoCasperNBIAppDelegate
             open "~/Library/Logs/AutoCasperNBI/AutoCasperNBI-" & logDate & ".log" as POSIX file
         end tell
         -- Make frontmost
-        tell application "System Events" to set frontmost of process "Console" to true
+        --tell application "System Events" to set frontmost of process "Console" to true
     end openLogLocation_
 
     -- Open NBI Location
@@ -5249,7 +5249,7 @@ script AutoCasperNBIAppDelegate
             open rootDirectory as POSIX file
         end tell
         -- Make frontmost
-        tell application "System Events" to set frontmost of process "Finder" to true
+        --tell application "System Events" to set frontmost of process "Finder" to true
     end openNBILocation_
 
     -- Notify of errors or success
