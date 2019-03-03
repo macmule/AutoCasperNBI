@@ -2472,18 +2472,45 @@ script AutoCasperNBIAppDelegate
                 --Log Action
                 set logMe to "Emptied " & netBootDmgMountPath & "/System/Library/Compositions/"
                 logToFile_(me)
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "/System/Library/CoreServices/DefaultDesktop.jpg"
-                delay 0.1
-                try
-                    -- Remove DefaultDesktop.jpg's symbolic link, silently error is doesn't exist
-                    do shell script "unlink " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
-                    -- Delete DefaultDesktop.jpg
-                    do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
-                end try
-                --Log Action
-                set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                logToFile_(me)
+                if selectedOSdmgVersionMajor is less than 14 then
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "/System/Library/CoreServices/DefaultDesktop.jpg"
+                    delay 0.1
+                    try
+                        -- Remove DefaultDesktop.jpg's symbolic link, silently error is doesn't exist
+                        do shell script "/bin/unlink " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                        -- Delete DefaultDesktop.jpg
+                        do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                    end try
+                    --Log Action
+                    set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                    logToFile_(me)
+                else
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "/System/Library/CoreServices/DefaultBackground.jpg"
+                    delay 0.1
+                    try
+                        -- Remove DefaultDesktop.jpg's symbolic link, silently error is doesn't exist
+                        do shell script "/bin/unlink " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultBackground.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                        -- Delete DefaultDesktop.jpg
+                        do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultBackground.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                    end try
+                    --Log Action
+                    set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultBackground.jpg"
+                    logToFile_(me)
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "/System/Library/CoreServices/DefaultDesktop.heic"
+                    delay 0.1
+                    try
+                        -- Remove DefaultDesktop.jpg's symbolic link, silently error is doesn't exist
+                        do shell script "/bin/unlink " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.heic" user name adminUserName password adminUsersPassword with administrator privileges
+                        -- Delete DefaultDesktop.jpg
+                        do shell script "/bin/rm -rf " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.heic" user name adminUserName password adminUsersPassword with administrator privileges
+                    end try
+                    --Log Action
+                    set logMe to "Deleted " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.heic"
+                    logToFile_(me)
+                end if
                 -- Update Build Process Window's Text Field
                 set my buildProcessTextField to "Emptying /System/Library/LinguisticData/"
                 delay 0.1
@@ -3607,52 +3634,88 @@ script AutoCasperNBIAppDelegate
     on copyDesktopImage_(sender)
         -- If we have a desktop selected & we can find it
         if desktopImageExists is true
-            try
-                -- Update Build Process Window's Text Field
-                set my buildProcessTextField to "Copying Desktop Image"
-                delay 0.1
-                -- Update build Process ProgressBar
-                set my buildProcessProgressBar to buildProcessProgressBar + 1
-                -- Set variableVariable to path of DefaultDesktop.jpg
-                set variableVariable to netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                --Log Action
-                set logMe to "Removing symbolic link on " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                logToFile_(me)
-                try
-                    -- Remove DefaultDesktop.jpg's symbolic link, silently error is doesn't exist
-                    do shell script "unlink " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
-                end try
+            if selectedOSdmgVersionMajor is less than 14 then
                 -- Set to text
                 set customDesktopImagePath to customDesktopImagePath as text
-                --Log Action
-                set logMe to "Trying to copy " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                logToFile_(me)
-                -- Copy selected image
-                do shell script "/bin/cp -r " & quoted form of customDesktopImagePath & " " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
-                --Log Action
-                set logMe to "Copied " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                logToFile_(me)
-                --Log Action
-                set logMe to "Trying to set permissions to 755 on " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                logToFile_(me)
-                -- Making writable
-                do shell script "/bin/chmod -R 755 " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
-                --Log Action
-                set logMe to "Set permissions to 755 on " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
-                logToFile_(me)
-                -- Copy Casper Imaging.app selected earlier
-                copyCasperImagingApp_(me)
-            on error
-                --Log Action
-                set logMe to "Error: Copying Desktop Image"
-                logToFile_(me)
-                -- Set to false to display
-                set my userNotifyErrorHidden to false
-                -- Set Error message
-                set my userNotifyError to "Error: Copying Desktop Image"
-                -- Notify of errors or success
-                userNotify_(me)
-            end try
+                try
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Copying Desktop Image"
+                    delay 0.1
+                    -- Update build Process ProgressBar
+                    set my buildProcessProgressBar to buildProcessProgressBar + 1
+                    --Log Action
+                    set logMe to "Removing symbolic link on " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                    logToFile_(me)
+                    try
+                        -- Remove DefaultDesktop.jpg's symbolic link, silently error is doesn't exist
+                        do shell script "/bin/unlink " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                    end try
+                    --Log Action
+                    set logMe to "Trying to copy " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                    logToFile_(me)
+                    -- Copy selected image
+                    do shell script "/bin/cp -r " & quoted form of customDesktopImagePath & " " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "Copied " & customDesktopImagePath & " to " & netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                    logToFile_(me)
+                    --Log Action
+                    set logMe to "Trying to set permissions to 755 on " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                    logToFile_(me)
+                    -- Making writable
+                    do shell script "/bin/chmod -R 755 " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "Set permissions to 755 on " & quoted form of netBootDmgMountPath & "/System/Library/CoreServices/DefaultDesktop.jpg"
+                    logToFile_(me)
+                    -- Copy Casper Imaging.app selected earlier
+                    copyCasperImagingApp_(me)
+                on error
+                    --Log Action
+                    set logMe to "Error: Copying Desktop Image"
+                    logToFile_(me)
+                    -- Set to false to display
+                    set my userNotifyErrorHidden to false
+                    -- Set Error message
+                    set my userNotifyError to "Error: Copying Desktop Image"
+                    -- Notify of errors or success
+                    userNotify_(me)
+                end try
+            else
+                try
+                    -- Update Build Process Window's Text Field
+                    set my buildProcessTextField to "Copying Desktop Image"
+                    delay 0.1
+                    -- Update build Process ProgressBar
+                    set my buildProcessProgressBar to buildProcessProgressBar + 1
+                    --Log Action
+                    set logMe to "Trying to copy " & customDesktopImagePath & " to " & netBootDmgMountPath & "/Library/Desktop Pictures/Mojave.heic"
+                    logToFile_(me)
+                    -- Copy selected image
+                    do shell script "/bin/cp -r " & quoted form of customDesktopImagePath & " " & quoted form of netBootDmgMountPath & "/Library/Desktop\\ Pictures/Mojave.heic" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "Copied " & customDesktopImagePath & " to " & netBootDmgMountPath & "/Library/Desktop Pictures/Mojave.heic"
+                    logToFile_(me)
+                    --Log Action
+                    set logMe to "Trying to set permissions to 755 on " & quoted form of netBootDmgMountPath & "/Library/Desktop Pictures/Mojave.heic"
+                    logToFile_(me)
+                    -- Making writable
+                    do shell script "/bin/chmod -R 755 " & quoted form of netBootDmgMountPath & "/Library/Desktop\\ Pictures/Mojave.heic" user name adminUserName password adminUsersPassword with administrator privileges
+                    --Log Action
+                    set logMe to "Set permissions to 755 on " & quoted form of netBootDmgMountPath & "/Library/Desktop Pictures/Mojave.heic"
+                    logToFile_(me)
+                    -- Copy Casper Imaging.app selected earlier
+                    copyCasperImagingApp_(me)
+                on error
+                    --Log Action
+                    set logMe to "Error: Copying Desktop Image"
+                    logToFile_(me)
+                    -- Set to false to display
+                    set my userNotifyErrorHidden to false
+                    -- Set Error message
+                    set my userNotifyError to "Error: Copying Desktop Image"
+                    -- Notify of errors or success
+                    userNotify_(me)
+                end try
+            end if
         else
             -- Copy Casper Imaging.app selected earlier
             copyCasperImagingApp_(me)

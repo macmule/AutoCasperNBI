@@ -97,6 +97,7 @@
 		7C1305A5193FC10A0060F343 /* osx-jss-login.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "osx-jss-login.png"; sourceTree = "<group>"; };
 		7C1305A6193FC10A0060F343 /* RemoteDesktop.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = RemoteDesktop.icns; sourceTree = "<group>"; };
 		7C1305A7193FC10A0060F343 /* ToolbarDesktopFolderIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ToolbarDesktopFolderIcon.icns; sourceTree = "<group>"; };
+		7C1726BA21AC798400D07797 /* AutoCasperNBI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AutoCasperNBI.entitlements; sourceTree = "<group>"; };
 		7C197009198058F00092062D /* Scripts.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Scripts.icns; sourceTree = "<group>"; };
 		7C19733E21766DA100282107 /* com.AutoCasperNBI.JamfImaging.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = com.AutoCasperNBI.JamfImaging.plist; sourceTree = "<group>"; };
 		7C23C473195A3AEB00FAC70A /* Screensharing.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Screensharing.icns; sourceTree = "<group>"; };
@@ -187,6 +188,7 @@
 		7C130586193FC0B60060F343 /* AutoCasperNBI */ = {
 			isa = PBXGroup;
 			children = (
+				7C1726BA21AC798400D07797 /* AutoCasperNBI.entitlements */,
 				7C19733E21766DA100282107 /* com.AutoCasperNBI.JamfImaging.plist */,
 				7C3759481BC7027900CBB857 /* 10.11NBImageInfo */,
 				7CB60993199189E20068574D /* root.plist */,
@@ -290,6 +292,11 @@
 					7C13057A193FC0B60060F343 = {
 						DevelopmentTeam = 7WHVYYF52U;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 0;
+							};
+						};
 					};
 				};
 			};
